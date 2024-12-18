@@ -15,6 +15,17 @@ export class Player extends TransformNode {
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
 
+
+    // player movement vars
+    private _h: number;
+    private _v: number;
+
+    private _moveDirection: Vector3 = new Vector3();
+    private _inputAmt: number;
+
+
+    private static PLAYER_SPEED: number = 0.5;
+
     constructor(assets, scene: Scene, shadowGenerator: ShadowGenerator, input?) {
         super("player", scene);
         this.scene = scene;
@@ -57,5 +68,36 @@ export class Player extends TransformNode {
         let centerPlayer = this.mesh.position.y + 2;
         this._camRoot.position = Vector3.Lerp(this._camRoot.position,
             new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
+    }
+
+    private _updateFromControls(): void {
+        this._moveDirection = Vector3.Zero(); // vector that holds movement information
+        this._h = this._input.horizontal; // x-axis
+        this._v = this._input.vertical; // z-axis
+
+        //--MOVEMENTS BASED ON CAMERA (as it rotates)--
+        let fwd = this._camRoot.forward;
+        let right = this._camRoot.right;
+        let correctedVertical = fwd.scaleInPlace(this._v);
+        let correctedHorizontal = right.scaleInPlace(this._h);
+
+        // movement based off of camera's view
+        let move = correctedHorizontal.addInPlace(correctedVertical);
+
+        // clear y so that the character doesn't fly up, normalize for next step
+        this._moveDirection = new Vector3((move).normalize().x, 0, (move).normalize().z);
+
+        // clamp the input value so that diagonal movement isn't twice as fast
+        let inputMag = Math.abs(this._h) + Math.abs(this._v); // input magnitude
+        if (inputMag < 0) {
+            this._inputAmt = 0;
+        } else if (inputMag > 1) {
+            this._inputAmt = 1;
+        } else {
+            this._inputAmt = inputMag;
+        }
+
+        // final movement that takes into consideration the inputs
+        this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED);
     }
 }
