@@ -1,4 +1,13 @@
-import { TransformNode, ShadowGenerator, Scene, Mesh, UniversalCamera, ArcRotateCamera, Vector3 } from "@babylonjs/core";
+import {
+    TransformNode,
+    ShadowGenerator,
+    Scene,
+    Mesh,
+    UniversalCamera,
+    ArcRotateCamera,
+    Vector3,
+    Quaternion, Ray
+} from "@babylonjs/core";
 
 export class Player extends TransformNode {
     public camera;
@@ -14,17 +23,26 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-
+    private static PLAYER_SPEED: number = 0.5;
+    private static GRAVITY: number = -2.8;
+    private static JUMP_FORCE: number = 0.8;
 
     // player movement vars
+    private _deltaTime: number = 0;
     private _h: number;
     private _v: number;
 
     private _moveDirection: Vector3 = new Vector3();
     private _inputAmt: number;
 
+    //gravity, ground detection, jumping
+    private _gravity: Vector3 = new Vector3();
+    private _grounded: boolean;
+    private _lastGroundPos: Vector3 = Vector3.Zero();
 
-    private static PLAYER_SPEED: number = 0.5;
+
+
+
 
     constructor(assets, scene: Scene, shadowGenerator: ShadowGenerator, input?) {
         super("player", scene);
@@ -71,6 +89,8 @@ export class Player extends TransformNode {
     }
 
     private _updateFromControls(): void {
+        this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
+
         this._moveDirection = Vector3.Zero(); // vector that holds movement information
         this._h = this._input.horizontal; // x-axis
         this._v = this._input.vertical; // z-axis
@@ -99,5 +119,77 @@ export class Player extends TransformNode {
 
         // final movement that takes into consideration the inputs
         this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED);
+
+        // check if there is movement to determine if rotation is needed
+        let input = new Vector3(this._input.horizontalAxis, 0, this._input.verticalAxis); // along which axis is the direction
+
+        if (input.length() == 0) { // if there is no input detected, prevent rotation and keep player in same rotation
+            return;
+        }
+
+        // rotation based on input and the camera angle
+        let angle = Math.atan2(this._input.horizontalAxis, this._input.verticalAxis);
+        angle += this._camRoot.rotation.y;
+        let targ = Quaternion.FromEulerAngles(0, angle, 0);
+        this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
+    }
+
+    public activatePlayerCamera(): UniversalCamera {
+        this.scene.registerBeforeRender(() => {
+
+            this._beforeRenderUpdate();
+            this._updateCamera();
+
+        })
+        return this.camera;
+    }
+
+    private _beforeRenderUpdate(): void {
+        this._updateFromControls();
+        this._updateGroundDetection();
+    }
+
+    private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {
+        let raycastFloorPos = new Vector3(this.mesh.position.x + offsetx, this.mesh.position.y + 0.5,
+            this.mesh.position.z + offsetz);
+        let ray = new Ray(raycastFloorPos, Vector3.Up().scale(-1), raycastlen);
+
+        let predicate = function (mesh) {
+            return mesh.isPickable && mesh.isEnabled();
+        }
+        let pick = this.scene.pickWithRay(ray, predicate);
+
+        if (pick.hit) {
+            return pick.pickedPoint;
+        } else {
+            return Vector3.Zero();
+        }
+    }
+
+    private _isGrounded(): boolean {
+        if (this._floorRaycast(0, 0, 0.6).equals(Vector3.Zero())) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private _updateGroundDetection(): void {
+        if (!this._isGrounded()) {
+            this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
+            this._grounded = false;
+        }
+
+        // limit the speed of gravity to the negative of the jump power
+        if (this._gravity.y < -Player.JUMP_FORCE) {
+            this._gravity.y = -Player.JUMP_FORCE;
+        }
+        this.mesh.moveWithCollisions(this._moveDirection.addInPlace(this._gravity));
+        
+        if (this._isGrounded()) {
+            this._gravity.y = 0;
+            this._grounded = true;
+            this._lastGroundPos.copyFrom(this.mesh.position);
+        }
     }
 }

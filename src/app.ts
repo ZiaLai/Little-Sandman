@@ -252,6 +252,8 @@ class App {
 
         //Create the player
         this._player = new Player(this.assets, scene, shadowGenerator, this._input);
+
+        const camera = this._player.activatePlayerCamera();
     }
 
     private async _goToGame(){
