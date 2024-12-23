@@ -39,6 +39,7 @@ export class Player extends TransformNode {
     private _gravity: Vector3 = new Vector3();
     private _grounded: boolean;
     private _lastGroundPos: Vector3 = Vector3.Zero();
+    private _jumpCount: 1;
 
 
 
@@ -190,6 +191,14 @@ export class Player extends TransformNode {
             this._gravity.y = 0;
             this._grounded = true;
             this._lastGroundPos.copyFrom(this.mesh.position);
+
+            this._jumpCount = 1;
+        }
+        
+        // Jump detection
+        if (this._input.jumpKeyDown && this._jumpCount > 0) {
+            this._gravity.y = Player.JUMP_FORCE;
+            this._jumpCount--;
         }
     }
 }
