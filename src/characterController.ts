@@ -41,6 +41,7 @@ export class Player extends TransformNode {
     private _grounded: boolean;
     private _lastGroundPos: Vector3 = Vector3.Zero();
     private _jumpCount: 1;
+    private _canHover: boolean = false;
     private _hoverTimer: number = 0;
     private _hovering: boolean = false;
 
@@ -198,6 +199,7 @@ export class Player extends TransformNode {
             this._gravity.y = 0;
             this._grounded = true;
             this._lastGroundPos.copyFrom(this.mesh.position);
+            this._canHover = true;
 
             this._jumpCount = 1;
         }
@@ -218,7 +220,8 @@ export class Player extends TransformNode {
         }
 
         // Start hovering
-        if (this._input.hoverKeyDown && !this._grounded) {
+        if (this._input.hoverKeyDown && this._canHover && !this._grounded) {
+           this._canHover = false;
            this._hovering = true;
            this._hoverTimer = Player.HOVER_TIME;
         }
