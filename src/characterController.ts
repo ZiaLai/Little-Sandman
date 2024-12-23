@@ -6,7 +6,7 @@ import {
     UniversalCamera,
     ArcRotateCamera,
     Vector3,
-    Quaternion, Ray
+    Quaternion, Ray, Scalar
 } from "@babylonjs/core";
 
 export class Player extends TransformNode {
@@ -185,7 +185,7 @@ export class Player extends TransformNode {
                 this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
                 this._grounded = false;
             } else {
-                this._gravity.y = 0;
+                this._gravity.y = Scalar.Lerp(this._gravity.y, 0, 0.2);
             }
         }
 
