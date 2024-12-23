@@ -1,13 +1,14 @@
 import {ActionManager, ExecuteCodeAction, Scalar, Scene} from "@babylonjs/core";
 
 export class PlayerInput {
-    private vertical: number;
-    private verticalAxis: number;
-    private horizontal: number;
-    private horizontalAxis: number;
-    private inputMap: {};
-    private dashing: boolean;
-    private jumpKeyDown: boolean;
+    public vertical: number;
+    public verticalAxis: number;
+    public horizontal: number;
+    public horizontalAxis: number;
+    public inputMap: {};
+    public dashing: boolean;
+    public jumpKeyDown: boolean;
+    public hoverKeyDown: boolean;
 
 
     constructor(scene: Scene) {
@@ -54,18 +55,17 @@ export class PlayerInput {
             this.horizontalAxis = 0;
         }
 
-        //dash
-        if (this.inputMap["Shift"]) {
-            this.dashing = true;
-        } else {
-            this.dashing = false;
-        }
-
         // Jump Checks (SPACE)
         if (this.inputMap[" "]) {
             this.jumpKeyDown = true;
         } else {
             this.jumpKeyDown = false;
+        }
+
+        if (this.inputMap["Shift"]) {
+            this.hoverKeyDown = true;
+        } else {
+            this.hoverKeyDown = false;
         }
 
     }

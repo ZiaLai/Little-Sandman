@@ -26,6 +26,7 @@ export class Player extends TransformNode {
     private static PLAYER_SPEED: number = 0.5;
     private static GRAVITY: number = -2.8;
     private static JUMP_FORCE: number = 0.8;
+    private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
 
     // player movement vars
     private _deltaTime: number = 0;
@@ -40,6 +41,9 @@ export class Player extends TransformNode {
     private _grounded: boolean;
     private _lastGroundPos: Vector3 = Vector3.Zero();
     private _jumpCount: 1;
+    private _canHover: boolean = false;
+    private _hoverTimer: number = 0;
+    private _hovering: boolean = false;
 
 
 
@@ -177,8 +181,12 @@ export class Player extends TransformNode {
 
     private _updateGroundDetection(): void {
         if (!this._isGrounded()) {
-            this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
-            this._grounded = false;
+            if (!this._hovering) {
+                this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
+                this._grounded = false;
+            } else {
+                this._gravity.y = 0;
+            }
         }
 
         // limit the speed of gravity to the negative of the jump power
@@ -199,6 +207,22 @@ export class Player extends TransformNode {
         if (this._input.jumpKeyDown && this._jumpCount > 0) {
             this._gravity.y = Player.JUMP_FORCE;
             this._jumpCount--;
+            this._canHover = true;
+        }
+
+
+        // Detect if hovering is ending
+        if (this._hovering) {
+            this._hoverTimer -= 1;
+            if (this._hoverTimer <= 0 || !this._input.hoverKeyDown) {
+                this._hovering = false;
+            }
+        }
+
+        if (this._input.hoverKeyDown && this._canHover && !this._grounded) {
+           this._canHover = false;
+           this._hovering = true;
+           this._hoverTimer = Player.HOVER_TIME;
         }
     }
 }
