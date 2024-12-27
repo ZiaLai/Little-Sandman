@@ -1,7 +1,24 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color4, StandardMaterial, Color3, PointLight, ShadowGenerator, Quaternion, Matrix } from "@babylonjs/core";
+import {
+    Engine,
+    Scene,
+    ArcRotateCamera,
+    Vector3,
+    HemisphericLight,
+    Mesh,
+    MeshBuilder,
+    FreeCamera,
+    Color4,
+    StandardMaterial,
+    Color3,
+    PointLight,
+    ShadowGenerator,
+    Quaternion,
+    Matrix,
+    SceneLoader
+} from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import { Environment } from "./environment";
 import { Player } from "./characterController";
@@ -167,7 +184,7 @@ class App {
         cutScene.addControl(next);
 
         next.onPointerUpObservable.add(() => {
-            this._goToGame();
+            //this._goToGame();
         })
 
         //--WHEN SCENE IS FINISHED LOADING--
@@ -181,6 +198,7 @@ class App {
         var finishedLoading = false;
         await this._setUpGame().then(res =>{
             finishedLoading = true;
+            this._goToGame();
         });
     }
 
@@ -213,24 +231,35 @@ class App {
 
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
-            var box = MeshBuilder.CreateBox("Small1", { width: 0.5, depth: 0.5, height: 0.25, faceColors: [new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1),new Color4(0,0,0,1), new Color4(0,0,0,1)] }, scene);
-            box.position.y = 1.5;
-            box.position.z = 1;
+            // var box = MeshBuilder.CreateBox("Small1", { width: 0.5, depth: 0.5, height: 0.25, faceColors: [new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1),new Color4(0,0,0,1), new Color4(0,0,0,1)] }, scene);
+            // box.position.y = 1.5;
+            // box.position.z = 1;
+            //
+            // var body = Mesh.CreateCylinder("body", 3, 2,2,0,0,scene);
+            // var bodymtl = new StandardMaterial("red",scene);
+            // bodymtl.diffuseColor = new Color3(.8,.5,.5);
+            // body.material = bodymtl;
+            // body.isPickable = false;
+            // body.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0)); // simulates the imported mesh's origin
+            //
+            // //parent the meshes
+            // box.parent = body;
+            // body.parent = outer;
+            return SceneLoader.ImportMeshAsync(null, "./models/", "player.glb", scene).then((result) => {
+                const root = result.meshes[0];
+                // body is our actual player mesh
+                const body = root;
+                body.parent = outer;
+                body.isPickable = false; // so our raycasts don't hit ourselves
+                body.getChildMeshes().forEach(m => {
+                    m.isPickable = false;
+                })
+                return {
+                    mesh: outer as Mesh
+                }
+            })
 
-            var body = Mesh.CreateCylinder("body", 3, 2,2,0,0,scene);
-            var bodymtl = new StandardMaterial("red",scene);
-            bodymtl.diffuseColor = new Color3(.8,.5,.5);
-            body.material = bodymtl;
-            body.isPickable = false;
-            body.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0)); // simulates the imported mesh's origin
 
-            //parent the meshes
-            box.parent = body;
-            body.parent = outer;
-
-            return {
-                mesh: outer as Mesh
-            }
         }
         return loadCharacter().then(assets=> {
             this.assets = assets;
@@ -291,7 +320,7 @@ class App {
 
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
-        scene.getMeshByName("outer").position = new Vector3(0,3,0);
+        scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition() // move the player to the start position;
         //get rid of start scene, switch to gamescene and change states
         this._scene.dispose();
         this._state = State.GAME;

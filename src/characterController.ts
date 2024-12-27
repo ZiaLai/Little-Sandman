@@ -23,7 +23,7 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 0.5;
+    private static PLAYER_SPEED: number = 0.4;
     private static GRAVITY: number = -2.8;
     private static JUMP_FORCE: number = 0.8;
     private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
@@ -56,6 +56,8 @@ export class Player extends TransformNode {
 
         this.mesh = assets.mesh;
         this.mesh.parent = this;
+
+        this.scene.getLightByName("sparklight").parent = this.scene.getTransformNodeByName("Empty");
 
         shadowGenerator.addShadowCaster(assets.mesh); //the player mesh will cast shadows
 
