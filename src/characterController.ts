@@ -6,13 +6,14 @@ import {
     UniversalCamera,
     ArcRotateCamera,
     Vector3,
-    Quaternion, Ray, Scalar
+    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera
 } from "@babylonjs/core";
 
 export class Player extends TransformNode {
     public camera;
     public scene: Scene;
     private _input;
+    private _canvas: HTMLCanvasElement;
 
     //Player
     public mesh: Mesh; //outer collisionbox of player
@@ -49,13 +50,17 @@ export class Player extends TransformNode {
 
 
 
-    constructor(assets, scene: Scene, shadowGenerator: ShadowGenerator, input?) {
+    constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, input?) {
         super("player", scene);
         this.scene = scene;
-        this._setupPlayerCamera();
-
         this.mesh = assets.mesh;
         this.mesh.parent = this;
+
+        this._setupPlayerCamera();
+        this._canvas = canvas;
+
+
+
 
         this.scene.getLightByName("sparklight").parent = this.scene.getTransformNodeByName("Empty");
 
@@ -69,30 +74,35 @@ export class Player extends TransformNode {
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0);
         // To face the player from behind (180 degrees)
-        this._camRoot.rotation = new Vector3(0, Math.PI, 0);
+       // this._camRoot.rotation = new Vector3(0, Math.PI, 0);
 
         // rotations along the x-axis (up/down tilting)
-        let yTilt = new TransformNode("ytilt");
+        //let yTilt = new TransformNode("ytilt");
         // adjustments to camera view to point down at our player
-        yTilt.rotation = Player.ORIGINAL_TILT;
-        this._yTilt = yTilt;
-        yTilt.parent = this._camRoot;
+        //yTilt.rotation = Player.ORIGINAL_TILT;
+        //this._yTilt = yTilt;
+        //yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -30), this.scene);
-        this.camera.lockedTarget = this._camRoot.position;
-        this.camera.fov = 0.47350045992678597;
-        this.camera.parent = yTilt;
+        this.camera = new ArcRotateCamera("cam", 0, 0, 25, new Vector3(0, 0, 0), this.scene);
 
         this.scene.activeCamera = this.camera;
+
+        this.camera.lockedTarget = this.mesh;
+        //this.camera.lockedTarget = this._camRoot.position;
+        this.camera.fov = 0.47350045992678597;
+        //this.camera.parent = yTilt;
+
+
+        this.camera.attachControl(this._canvas, true);
         return this.camera;
 
     }
 
     private _updateCamera(): void {
         let centerPlayer = this.mesh.position.y + 2;
-        this._camRoot.position = Vector3.Lerp(this._camRoot.position,
-            new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
+        //this._camRoot.position = Vector3.Lerp(this._camRoot.position,
+         //   new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
     }
 
     private _updateFromControls(): void {

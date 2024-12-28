@@ -280,7 +280,7 @@ class App {
         shadowGenerator.darkness = 0.4;
 
         //Create the player
-        this._player = new Player(this.assets, scene, shadowGenerator, this._input);
+        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, this._input);
 
         const camera = this._player.activatePlayerCamera();
     }
