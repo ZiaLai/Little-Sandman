@@ -88,7 +88,7 @@ export class Player extends TransformNode {
 
         this.scene.activeCamera = this.camera;
 
-        this.camera.lockedTarget = this.mesh;
+        this.camera.lockedTarget = this._camRoot;
         //this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
         //this.camera.parent = yTilt;
@@ -100,9 +100,13 @@ export class Player extends TransformNode {
     }
 
     private _updateCamera(): void {
-        let centerPlayer = this.mesh.position.y + 2;
-        //this._camRoot.position = Vector3.Lerp(this._camRoot.position,
-         //   new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
+        let x = this.mesh.position.x;
+        let y = this.mesh.position.y;
+        let z = this.mesh.position.z;
+        this._camRoot.position = new Vector3(x, y + 5, z)
+        // this._camRoot.position = Vector3.Lerp(this._camRoot.position,
+        //    new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
+
     }
 
     private _updateFromControls(): void {
