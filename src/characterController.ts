@@ -24,7 +24,7 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 0.4;
+    private static PLAYER_SPEED: number = 1;
     private static GRAVITY: number = -2.8;
     private static JUMP_FORCE: number = 0.8;
     private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
@@ -45,6 +45,9 @@ export class Player extends TransformNode {
     private _canHover: boolean = false;
     private _hoverTimer: number = 0;
     private _hovering: boolean = false;
+    private _verticalVelocity: number;
+    private _horizontalVelocity: number;
+    private _direction: number;
 
 
 
@@ -109,50 +112,86 @@ export class Player extends TransformNode {
 
     }
 
+    // private _updateFromControls(): void {
+    //     this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
+    //
+    //     this._moveDirection = Vector3.Zero(); // vector that holds movement information
+    //     this._h = this._input.horizontal; // x-axis
+    //     this._v = this._input.vertical; // z-axis
+    //
+    //     //--MOVEMENTS BASED ON CAMERA (as it rotates)--
+    //     let fwd = this._camRoot.forward;
+    //     let right = this._camRoot.right;
+    //     let correctedVertical = fwd.scaleInPlace(this._v);
+    //     let correctedHorizontal = right.scaleInPlace(this._h);
+    //
+    //     // movement based off of camera's view
+    //     let move = correctedHorizontal.addInPlace(correctedVertical);
+    //
+    //     // clear y so that the character doesn't fly up, normalize for next step
+    //     this._moveDirection = new Vector3((move).normalize().x, 0, (move).normalize().z);
+    //
+    //     // clamp the input value so that diagonal movement isn't twice as fast
+    //     let inputMag = Math.abs(this._h) + Math.abs(this._v); // input magnitude
+    //     if (inputMag < 0) {
+    //         this._inputAmt = 0;
+    //     } else if (inputMag > 1) {
+    //         this._inputAmt = 1;
+    //     } else {
+    //         this._inputAmt = inputMag;
+    //     }
+    //
+    //     // final movement that takes into consideration the inputs
+    //     this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED);
+    //
+    //     // check if there is movement to determine if rotation is needed
+    //     let input = new Vector3(this._input.horizontalAxis, 0, this._input.verticalAxis); // along which axis is the direction
+    //
+    //     if (input.length() == 0) { // if there is no input detected, prevent rotation and keep player in same rotation
+    //         return;
+    //     }
+    //
+    //     // rotation based on input and the camera angle
+    //     let angle = Math.atan2(this._input.horizontalAxis, this._input.verticalAxis);
+    //     angle += this._camRoot.rotation.y;
+    //     let targ = Quaternion.FromEulerAngles(0, angle, 0);
+    //     this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
+    // }
+
     private _updateFromControls(): void {
         this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
 
-        this._moveDirection = Vector3.Zero(); // vector that holds movement information
-        this._h = this._input.horizontal; // x-axis
-        this._v = this._input.vertical; // z-axis
+        // Obtenir les directions de mouvement basées sur la caméra
+        let forward = this._camRoot.forward.scale(this._input.vertical);
+        let right = this._camRoot.right.scale(this._input.horizontal);
+        let movement = forward.add(right);
 
-        //--MOVEMENTS BASED ON CAMERA (as it rotates)--
-        let fwd = this._camRoot.forward;
-        let right = this._camRoot.right;
-        let correctedVertical = fwd.scaleInPlace(this._v);
-        let correctedHorizontal = right.scaleInPlace(this._h);
+        let horizontal: number;
+        let vertical: number;
 
-        // movement based off of camera's view
-        let move = correctedHorizontal.addInPlace(correctedVertical);
 
-        // clear y so that the character doesn't fly up, normalize for next step
-        this._moveDirection = new Vector3((move).normalize().x, 0, (move).normalize().z);
+        let angle = this.camera.alpha % (2 * Math.PI);
+        
+        this._direction = -this._input.vertical * Player.PLAYER_SPEED;
+        //this._direction = angle;
 
-        // clamp the input value so that diagonal movement isn't twice as fast
-        let inputMag = Math.abs(this._h) + Math.abs(this._v); // input magnitude
-        if (inputMag < 0) {
-            this._inputAmt = 0;
-        } else if (inputMag > 1) {
-            this._inputAmt = 1;
-        } else {
-            this._inputAmt = inputMag;
-        }
+        horizontal = Math.cos(angle) * this._direction;
+        vertical = Math.sin(angle) * this._direction;
 
-        // final movement that takes into consideration the inputs
-        this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED);
+        this._moveDirection = new Vector3(horizontal, 0, vertical);
 
-        // check if there is movement to determine if rotation is needed
-        let input = new Vector3(this._input.horizontalAxis, 0, this._input.verticalAxis); // along which axis is the direction
+        this._horizontalVelocity = this._input.horizontal * Player.PLAYER_SPEED;
+        this._verticalVelocity = this._input.vertical * Player.PLAYER_SPEED;
+        //console.log("horizontal : " + this._horizontalVelocity);
 
-        if (input.length() == 0) { // if there is no input detected, prevent rotation and keep player in same rotation
-            return;
-        }
 
-        // rotation based on input and the camera angle
-        let angle = Math.atan2(this._input.horizontalAxis, this._input.verticalAxis);
-        angle += this._camRoot.rotation.y;
-        let targ = Quaternion.FromEulerAngles(0, angle, 0);
-        this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
+
+        // // Rotation du joueur en fonction de l'entrée et de l'angle de la caméra
+        // if (movement.lengthSquared() > 0) {
+        //     let angle = Math.atan2(this._input.horizontal, this._input.vertical) + this._camRoot.rotation.y;
+        //     let targetRotation = Quaternion.FromEulerAngles(0, angle, 0);
+        //     this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targetRotation, 10 * this._deltaTime);
+        // }
     }
 
     public activatePlayerCamera(): UniversalCamera {
@@ -209,7 +248,14 @@ export class Player extends TransformNode {
         if (this._gravity.y < -Player.JUMP_FORCE) {
             this._gravity.y = -Player.JUMP_FORCE;
         }
-        this.mesh.moveWithCollisions(this._moveDirection.addInPlace(this._gravity));
+
+        let moveVector = this._moveDirection;
+        // moveVector.x *= this._horizontalVelocity;
+        // moveVector.z *= this._verticalVelocity;
+        moveVector = moveVector.addInPlace(this._gravity);
+        this.mesh.moveWithCollisions(moveVector);
+
+        console.log("moveVector : " + moveVector);
         
         if (this._isGrounded()) {
             this._gravity.y = 0;
