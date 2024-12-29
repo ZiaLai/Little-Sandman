@@ -171,17 +171,38 @@ export class Player extends TransformNode {
 
 
         let angle = this.camera.alpha % (2 * Math.PI);
-        
-        this._direction = -this._input.vertical * Player.PLAYER_SPEED;
-        //this._direction = angle;
 
-        horizontal = Math.cos(angle) * this._direction;
-        vertical = Math.sin(angle) * this._direction;
+        this._horizontalVelocity = - this._input.horizontal * Player.PLAYER_SPEED;
+        this._verticalVelocity = - this._input.vertical * Player.PLAYER_SPEED;
+
+        //this._direction = -this._input.vertical * Player.PLAYER_SPEED;
+        this._direction = angle;
+
+        if (this._input.verticalAxis === 1 || this._input.verticalAxis === -1) {
+            horizontal = Math.cos(angle) * this._verticalVelocity;
+            vertical = Math.sin(angle) * this._verticalVelocity;
+        }
+        else if (this._input.horizontalAxis === 1 || this._input.horizontalAxis === -1) {
+            horizontal = (Math.cos(angle - Math.PI / 2)) * this._horizontalVelocity;
+            vertical = (Math.sin(angle - Math.PI / 2)) * this._horizontalVelocity;
+        }
+
 
         this._moveDirection = new Vector3(horizontal, 0, vertical);
 
-        this._horizontalVelocity = this._input.horizontal * Player.PLAYER_SPEED;
-        this._verticalVelocity = this._input.vertical * Player.PLAYER_SPEED;
+
+        // let input = new Vector3(this._input.horizontalAxis, 0, this._input.verticalAxis);
+        //
+        // if (input.length() == 0) { // if there is no input detected, prevent rotation and keep player in same rotation
+        //      return;
+        // }
+        //
+        // let rotationAngle = - Math.atan2(this._input.horizontalAxis, this._input.verticalAxis);
+        // rotationAngle += this._camRoot.rotation.y;
+        // let targ = Quaternion.FromEulerAngles(0, rotationAngle, 0);
+        // this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
+
+
         //console.log("horizontal : " + this._horizontalVelocity);
 
 
