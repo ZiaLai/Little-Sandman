@@ -62,9 +62,6 @@ export class Player extends TransformNode {
         this._setupPlayerCamera();
         this._canvas = canvas;
 
-
-
-
         this.scene.getLightByName("sparklight").parent = this.scene.getTransformNodeByName("Empty");
 
         shadowGenerator.addShadowCaster(assets.mesh); //the player mesh will cast shadows
@@ -72,23 +69,24 @@ export class Player extends TransformNode {
         this._input = input; //inputs we will get from inputController.ts
     }
 
-    private _setupPlayerCamera(): UniversalCamera {
+
+    private _setupPlayerCamera(): UniversalCamera { //Ancienne version
         //root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0);
         // To face the player from behind (180 degrees)
-       // this._camRoot.rotation = new Vector3(0, Math.PI, 0);
+        this._camRoot.rotation = new Vector3(0, Math.PI, 0);
 
         // rotations along the x-axis (up/down tilting)
-        //let yTilt = new TransformNode("ytilt");
+        let yTilt = new TransformNode("ytilt");
         // adjustments to camera view to point down at our player
-        //yTilt.rotation = Player.ORIGINAL_TILT;
-        //this._yTilt = yTilt;
-        //yTilt.parent = this._camRoot;
+        yTilt.rotation = Player.ORIGINAL_TILT;
+        this._yTilt = yTilt;
+        yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
         this.camera = new ArcRotateCamera("cam", 0, 0, 25, new Vector3(0, 0, 0), this.scene);
-
+        
         this.scene.activeCamera = this.camera;
 
         this.camera.lockedTarget = this._camRoot;
@@ -106,13 +104,16 @@ export class Player extends TransformNode {
         let x = this.mesh.position.x;
         let y = this.mesh.position.y;
         let z = this.mesh.position.z;
-        this._camRoot.position = new Vector3(x, y + 5, z)
+        this._camRoot.position = new Vector3(x, y + 5, z);
+        this._yTilt = this.camera.beta;
+        this._camRoot.rotation = this.camera.rotation;
+        console.log("yTilt : " + this._yTilt);
         // this._camRoot.position = Vector3.Lerp(this._camRoot.position,
         //    new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
 
     }
 
-    // private _updateFromControls(): void {
+    // private _updateFromControls(): void { // Ancienne version du tuto
     //     this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
     //
     //     this._moveDirection = Vector3.Zero(); // vector that holds movement information
@@ -120,7 +121,7 @@ export class Player extends TransformNode {
     //     this._v = this._input.vertical; // z-axis
     //
     //     //--MOVEMENTS BASED ON CAMERA (as it rotates)--
-    //     let fwd = this._camRoot.forward;
+    //     let fwd = this.camera.getDirection();
     //     let right = this._camRoot.right;
     //     let correctedVertical = fwd.scaleInPlace(this._v);
     //     let correctedHorizontal = right.scaleInPlace(this._h);
@@ -158,37 +159,44 @@ export class Player extends TransformNode {
     //     this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
     // }
 
-    private _updateFromControls(): void {
-        this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
 
-        // Obtenir les directions de mouvement basées sur la caméra
-        let forward = this._camRoot.forward.scale(this._input.vertical);
-        let right = this._camRoot.right.scale(this._input.horizontal);
-        let movement = forward.add(right);
-
-        let horizontal: number;
-        let vertical: number;
-
-
-        let angle = this.camera.alpha % (2 * Math.PI);
-
-        this._horizontalVelocity = - this._input.horizontal * Player.PLAYER_SPEED;
-        this._verticalVelocity = - this._input.vertical * Player.PLAYER_SPEED;
-
-        //this._direction = -this._input.vertical * Player.PLAYER_SPEED;
-        this._direction = angle;
-
-        if (this._input.verticalAxis === 1 || this._input.verticalAxis === -1) {
-            horizontal = Math.cos(angle) * this._verticalVelocity;
-            vertical = Math.sin(angle) * this._verticalVelocity;
-        }
-        else if (this._input.horizontalAxis === 1 || this._input.horizontalAxis === -1) {
-            horizontal = (Math.cos(angle - Math.PI / 2)) * this._horizontalVelocity;
-            vertical = (Math.sin(angle - Math.PI / 2)) * this._horizontalVelocity;
-        }
-
-
-        this._moveDirection = new Vector3(horizontal, 0, vertical);
+    // private _updateFromControls(): void { // Version avec de la trigonométrie
+    //                                         // Pas de déplacement diagonal, pas de rotations...
+    //     this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
+    //
+    //     // Obtenir les directions de mouvement basées sur la caméra
+    //     let forward = this._camRoot.forward.scale(this._input.vertical);
+    //     let right = this._camRoot.right.scale(this._input.horizontal);
+    //     let movement = forward.add(right);
+    //
+    //     let horizontal: number;
+    //     let vertical: number;
+    //
+    //
+    //     let angle = this.camera.alpha % (2 * Math.PI);
+    //
+    //     this._horizontalVelocity = - this._input.horizontal * Player.PLAYER_SPEED;
+    //     this._verticalVelocity = - this._input.vertical * Player.PLAYER_SPEED;
+    //
+    //     //this._direction = -this._input.vertical * Player.PLAYER_SPEED;
+    //     this._direction = angle;
+    //
+    //
+    //     if (this._input.verticalAxis === 1 && this._input.horizontalAxis === -1) {
+    //         horizontal = Math.cos(angle) * this._verticalVelocity;
+    //         vertical = Math.sin(angle) * this._verticalVelocity;
+    //     }
+    //     else if (this._input.verticalAxis === 1 || this._input.verticalAxis === -1) {
+    //         horizontal = Math.cos(angle) * this._verticalVelocity;
+    //         vertical = Math.sin(angle) * this._verticalVelocity;
+    //     }
+    //     else if (this._input.horizontalAxis === 1 || this._input.horizontalAxis === -1) {
+    //         horizontal = (Math.cos(angle - Math.PI / 2)) * this._horizontalVelocity;
+    //         vertical = (Math.sin(angle - Math.PI / 2)) * this._horizontalVelocity;
+    //     }
+    //
+    //
+    //     this._moveDirection = new Vector3(horizontal, 0, vertical);
 
 
         // let input = new Vector3(this._input.horizontalAxis, 0, this._input.verticalAxis);
@@ -213,6 +221,28 @@ export class Player extends TransformNode {
         //     let targetRotation = Quaternion.FromEulerAngles(0, angle, 0);
         //     this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targetRotation, 10 * this._deltaTime);
         // }
+   // }
+
+    public _updateFromControls(): void { // Nouvelle version en suivant le tuto
+        this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
+
+        this._moveDirection = Vector3.Zero(); // vecteur du mouvement, qu'on recalcule à chaque frame
+        this._h = this._input.horizontal; // input sur l'axe des x
+        this._v = this._input.vertical; // input sur l'axe des z
+
+       // let fwd = this.camera.getTarget().subtract(this.camera.position).normalize();
+        let fwd = new Vector3(Math.cos(this.camera.alpha), 0, Math.sin(this.camera.alpha));
+        let right = new Vector3(Math.cos(this.camera.alpha - Math.PI / 2), 0, Math.sin(this.camera.alpha - Math.PI / 2));
+        console.log("camera direction : " + fwd);
+
+        let correctedVertical = fwd.scaleInPlace(this._v);
+        let correctedHorizontal = right.scaleInPlace(this._h);
+
+        this._moveDirection = correctedHorizontal.addInPlace(correctedVertical);
+        this._moveDirection = this._moveDirection.scaleInPlace(Player.PLAYER_SPEED);
+
+
+
     }
 
     public activatePlayerCamera(): UniversalCamera {
@@ -276,7 +306,7 @@ export class Player extends TransformNode {
         moveVector = moveVector.addInPlace(this._gravity);
         this.mesh.moveWithCollisions(moveVector);
 
-        console.log("moveVector : " + moveVector);
+        //console.log("moveVector : " + moveVector);
         
         if (this._isGrounded()) {
             this._gravity.y = 0;
