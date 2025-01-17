@@ -107,7 +107,7 @@ export class Player extends TransformNode {
         this._camRoot.position = new Vector3(x, y + 5, z);
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
-        console.log("yTilt : " + this._yTilt);
+        //console.log("yTilt : " + this._yTilt);
         // this._camRoot.position = Vector3.Lerp(this._camRoot.position,
         //    new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
 
@@ -143,7 +143,8 @@ export class Player extends TransformNode {
         //console.log("inputAmt : " + this._inputAmt);
 
         this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED);
-        console.log("moveDirectino : " + this._moveDirection);
+        //console.log("vertical : " + this._input.vertical
+        //            + ", input : " + this._input.inputMap["z"]);
 
         // Rotations
         // On vérifie s'il y a un mouvement pour déterminer si on a besoin de faire une rotation

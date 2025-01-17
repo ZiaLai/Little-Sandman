@@ -15,6 +15,7 @@ export class PlayerInput {
     public camHorizontal: number;
     public camVerticalAxis: number;
     public camHorizontalAxis: number;
+    private specialKeys: string[] = ["Shift"];
 
 
     constructor(scene: Scene) {
@@ -22,11 +23,19 @@ export class PlayerInput {
 
         this.inputMap = {};
         scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
-            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+            let key = evt.sourceEvent.key;
+            if (!(this.specialKeys.includes(key))) {
+                key = key.toLowerCase()
+            }
+            this.inputMap[key] = evt.sourceEvent.type == "keydown";
         }));
         scene.actionManager.registerAction(new
         ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
-            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+            let key = evt.sourceEvent.key;
+            if (!(this.specialKeys.includes(key))) {
+                key = key.toLowerCase()
+            }
+            this.inputMap[key] = evt.sourceEvent.type == "keydown";
         }));
 
         scene.onBeforeRenderObservable.add(() => {
@@ -68,17 +77,13 @@ export class PlayerInput {
             this.jumpKeyDown = false;
         }
 
-        if (this.inputMap["Shift"]) {
-            this.hoverKeyDown = true;
-        } else {
-            this.hoverKeyDown = false;
-        }
 
-        if (this.inputMap["z"] || this.inputMap["Z"]) {
+
+        if (this.inputMap["z"]) {
             this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
             this.verticalAxis = 1;
 
-        } else if (this.inputMap["s"] || this.inputMap["S"]) {
+        } else if (this.inputMap["s"]) {
             this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
             this.verticalAxis = -1;
 
@@ -87,17 +92,23 @@ export class PlayerInput {
             this.verticalAxis = 0;
         }
 
-        if (this.inputMap["q"] || this.inputMap["Q"]) {
+        if (this.inputMap["q"]) {
             this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
             this.horizontalAxis = -1;
 
-        } else if (this.inputMap["d"] || this.inputMap["D"]) {
+        } else if (this.inputMap["d"]) {
             this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
             this.horizontalAxis = 1;
 
         } else {
             this.horizontal = 0;
             this.horizontalAxis = 0;
+        }
+
+        if (this.inputMap["Shift"]) {
+            this.hoverKeyDown = true;
+        } else {
+            this.hoverKeyDown = false;
         }
 
     }
