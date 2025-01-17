@@ -6,17 +6,6 @@
     [x] Clamper le mouvement diagonal
     [x] Rotation du personnage
 
-[x] Corriger le bug de plannage
-    Pour déclencher le bug : Sauter, appuyer sur shift, relâcher shift avant la fin de l'hovering
-    Le bug est causé par les || keyMap[même lettre en majuscule]
-    En fait, on démarre l'action en minuscule, mais on l'annule avec une majuscule (donc elle continue indéfiniment)
-
-    Après avoir enlevé ces "ou",
-    On a toujours le même problème, car le fait de shifter fait qu'on relâche pas la "bonne" touche
-
-    La pseudo solution marche pas... pour l'instant
-
-
 ===================================
 Méthode pour déplacer le personnage
 ===================================
@@ -28,42 +17,15 @@ Méthode pour déplacer le personnage
 6. Annuler la valeur en y (pour être sûr que le perso s'envole pas)
 ===================================
 
+[x] Corriger le bug de plannage
+    Pour déclencher le bug : Sauter, appuyer sur shift, relâcher shift avant la fin de l'hovering
+    Le bug est causé par les || keyMap[même lettre en majuscule]
+    En fait, on démarre l'action en minuscule, mais on l'annule avec une majuscule (donc elle continue indéfiniment)
 
+    Après avoir enlevé ces "ou",
+    On a toujours le même problème, car le fait de shifter fait qu'on relâche pas la "bonne" touche
 
+    La pseudo solution marche pas... pour l'instant
+    Maintenant ça marche
 
-
-
-
-
-[x] Ajouter mécanique de Planage
-[x] Fluidifier le planage
-[x] Pouvoir planer après une chute (sans saut)
-    [x] Mettre _canHover à true quand on chute
-
-
-[] Lancer sable
-    [] input (a)
-
-[] Modifier caméra, pour qu'on puisse regarder autour de nous
-    [x] Ajouter l'input pour la caméra
-
-
-    [x] Monter la camera en y par rapport au player
-
-    [] Déplacer le player en fonction de l'orientation de la camera
-        [x] vers l'avant et l'arrière
-        [x] vers la droite
-        [] Mouvement diagonal
-
-    [] Corriger le problème de caméra qui passe sous le sol
-
-    [] Clamper la vitesse de déplacement
-
-[] Coder les déplacements comme dans le tuto
-    [] Régler le problème de camera (la camRoot n'a pas la rotation)
-        Il faut revoir la partie du tuto
-
-
-BUGS
-
-[] Quand on hover, on continue de se déplacer même après avoir relâché la touche de déplacement
+[x] Corriger le problème de caméra qui passe sous le sol

@@ -92,6 +92,7 @@ export class Player extends TransformNode {
         this.camera.lockedTarget = this._camRoot;
         //this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
+        this.camera.upperBetaLimit = Math.PI / 2 ; // Pour pas que la cam passe dans le sol (faire -0.1 pour remonter la limite)
         //this.camera.parent = yTilt;
 
 
