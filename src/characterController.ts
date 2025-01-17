@@ -230,10 +230,9 @@ export class Player extends TransformNode {
         this._h = this._input.horizontal; // input sur l'axe des x
         this._v = this._input.vertical; // input sur l'axe des z
 
-       // let fwd = this.camera.getTarget().subtract(this.camera.position).normalize();
-        let fwd = new Vector3(Math.cos(this.camera.alpha), 0, Math.sin(this.camera.alpha));
-        let right = new Vector3(Math.cos(this.camera.alpha - Math.PI / 2), 0, Math.sin(this.camera.alpha - Math.PI / 2));
-        console.log("camera direction : " + fwd);
+        let fwd = new Vector3(Math.cos(this.camera.alpha + Math.PI), 0, Math.sin(this.camera.alpha + Math.PI));
+        let right = new Vector3(Math.cos(this.camera.alpha + Math.PI / 2), 0, Math.sin(this.camera.alpha + Math.PI / 2));
+        //console.log("camera direction : " + fwd);
 
         let correctedVertical = fwd.scaleInPlace(this._v);
         let correctedHorizontal = right.scaleInPlace(this._h);
