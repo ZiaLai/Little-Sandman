@@ -1,0 +1,63 @@
+[x] Revoir la camera car si la camera est bugguée, alors les déplacements dont buggés
+    [x] Faire en sorte qu'on puisse obtenir l'orientation de la camera
+    En fait il faut juste utiliser l'alpha et de la trigo
+[x] Refaire déplacements en utilisant le tuto
+    [x] Ajuster les angles de trigo en ajoutant des PI pour qu'on avance dans le bon sens
+    [x] Clamper le mouvement diagonal
+    [x] Rotation du personnage
+
+[] Corriger le bug de plannage
+
+
+
+
+===================================
+Méthode pour déplacer le personnage
+===================================
+1. On récupère les valeurs des inputs sur les deux axes
+2. Trouver un vecteur forward, qui donne la direction vers laquelle la cam pointe
+3. Trouver un vecteur right, qui donne la direction à droite de la caméra
+4. "corriger" ces deux vecteurs en les scalant par les inputs
+5. Additionner les deux vecteurs
+6. Annuler la valeur en y (pour être sûr que le perso s'envole pas)
+===================================
+
+
+
+
+
+
+
+
+[x] Ajouter mécanique de Planage
+[x] Fluidifier le planage
+[x] Pouvoir planer après une chute (sans saut)
+    [x] Mettre _canHover à true quand on chute
+
+
+[] Lancer sable
+    [] input (a)
+
+[] Modifier caméra, pour qu'on puisse regarder autour de nous
+    [x] Ajouter l'input pour la caméra
+
+
+    [x] Monter la camera en y par rapport au player
+
+    [] Déplacer le player en fonction de l'orientation de la camera
+        [x] vers l'avant et l'arrière
+        [x] vers la droite
+        [] Mouvement diagonal
+
+    [] Corriger le problème de caméra qui passe sous le sol
+
+    [] Clamper la vitesse de déplacement
+
+[] Coder les déplacements comme dans le tuto
+    [] Régler le problème de camera (la camRoot n'a pas la rotation)
+        Il faut revoir la partie du tuto
+
+
+BUGS
+
+[] Quand on hover, on continue de se déplacer même après avoir relâché la touche de déplacement
