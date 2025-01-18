@@ -245,7 +245,7 @@ class App {
             // //parent the meshes
             // box.parent = body;
             // body.parent = outer;
-            return SceneLoader.ImportMeshAsync(null, "./models/", "player.glb", scene).then((result) => {
+            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_static2.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -280,7 +280,7 @@ class App {
         shadowGenerator.darkness = 0.4;
 
         //Create the player
-        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, this._input);
+        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
 
         const camera = this._player.activatePlayerCamera();
     }
@@ -292,7 +292,7 @@ class App {
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098); // a color that fit the overall color scheme better
 
         //--INPUT--
-        this._input = new PlayerInput(scene);
+       // this._input = new PlayerInput(scene);
 
         //--GUI--
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");

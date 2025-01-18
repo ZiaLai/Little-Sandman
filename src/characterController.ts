@@ -8,11 +8,15 @@ import {
     Vector3,
     Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera
 } from "@babylonjs/core";
+import {PlayerInput} from "./PlayerInput";
+import {KeyboardInput} from "./KeyboardInput";
+import {GamepadInput} from "./GamepadInput";
 
 export class Player extends TransformNode {
     public camera;
     public scene: Scene;
-    private _input;
+    private _inputs: PlayerInput[];
+    private _currentInput: number = 1; // 0 = keyboard, 1 = gamepad
     private _canvas: HTMLCanvasElement;
 
     //Player
@@ -53,7 +57,7 @@ export class Player extends TransformNode {
 
 
 
-    constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, input?) {
+    constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
         super("player", scene);
         this.scene = scene;
         this.mesh = assets.mesh;
@@ -66,7 +70,9 @@ export class Player extends TransformNode {
 
         shadowGenerator.addShadowCaster(assets.mesh); //the player mesh will cast shadows
 
-        this._input = input; //inputs we will get from inputController.ts
+        this._inputs = [new KeyboardInput(this.scene), new GamepadInput(this.scene)];
+        this._inputs[this._currentInput].isActive = true;
+        this._inputs[1 - this._currentInput].isActive = false;
     }
 
 
@@ -96,7 +102,7 @@ export class Player extends TransformNode {
         //this.camera.parent = yTilt;
 
 
-        this.camera.attachControl(this._canvas, true);
+        //this.camera.attachControl(this._canvas, true);
         return this.camera;
 
     }
@@ -105,7 +111,7 @@ export class Player extends TransformNode {
         let x = this.mesh.position.x;
         let y = this.mesh.position.y;
         let z = this.mesh.position.z;
-        this._camRoot.position = new Vector3(x, y + 5, z);
+        this._camRoot.position = new Vector3(x, y + 3, z);
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
         //console.log("yTilt : " + this._yTilt);
@@ -118,8 +124,8 @@ export class Player extends TransformNode {
         this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
 
         this._moveDirection = Vector3.Zero(); // vecteur du mouvement, qu'on recalcule à chaque frame
-        this._h = this._input.horizontal; // input sur l'axe des x
-        this._v = this._input.vertical; // input sur l'axe des z
+        this._h = this._inputs[this._currentInput].horizontal; // input sur l'axe des x
+        this._v = this._inputs[this._currentInput].vertical; // input sur l'axe des z
 
         let fwd = new Vector3(Math.cos(this.camera.alpha + Math.PI), 0, Math.sin(this.camera.alpha + Math.PI));
         let right = new Vector3(Math.cos(this.camera.alpha + Math.PI / 2), 0, Math.sin(this.camera.alpha + Math.PI / 2));
@@ -149,12 +155,12 @@ export class Player extends TransformNode {
 
         // Rotations
         // On vérifie s'il y a un mouvement pour déterminer si on a besoin de faire une rotation
-        let input = new Vector3(this._input.horizontalAxis, this._input.verticalAxis);
+        let input = new Vector3(this._inputs[this._currentInput].horizontalAxis, this._inputs[this._currentInput].verticalAxis);
         if (input.length() == 0) {
             return;
         }
         // rotation en fontion de l'input et de l'angle de la camera
-        let angle = Math.atan2(this._input.horizontalAxis, this._input.verticalAxis) + Math.PI;
+        let angle = Math.atan2(this._inputs[this._currentInput].horizontalAxis, this._inputs[this._currentInput].verticalAxis) + Math.PI;
         //angle += (this.camera.alpha) % (2 * Math.PI);
         angle += - this.camera.alpha + Math.PI / 2;
         let targ = Quaternion.FromEulerAngles(0, angle, 0);
@@ -236,7 +242,7 @@ export class Player extends TransformNode {
         }
         
         // Jump detection
-        if (this._input.jumpKeyDown && this._jumpCount > 0) {
+        if (this._inputs[this._currentInput].jumpKeyDown && this._jumpCount > 0) {
             this._gravity.y = Player.JUMP_FORCE;
             this._jumpCount--;
         }
@@ -245,13 +251,13 @@ export class Player extends TransformNode {
         // Detect if hovering is ending
         if (this._hovering) {
             this._hoverTimer -= 1;
-            if (this._hoverTimer <= 0 || !this._input.hoverKeyDown) {
+            if (this._hoverTimer <= 0 || !this._inputs[this._currentInput].hoverKeyDown) {
                 this._hovering = false;
             }
         }
 
         // Start hovering
-        if (this._input.hoverKeyDown && this._canHover && !this._grounded) {
+        if (this._inputs[this._currentInput].hoverKeyDown && this._canHover && !this._grounded) {
            this._canHover = false;
            this._hovering = true;
            this._hoverTimer = Player.HOVER_TIME;

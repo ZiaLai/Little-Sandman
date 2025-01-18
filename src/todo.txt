@@ -29,3 +29,14 @@ Méthode pour déplacer le personnage
     Maintenant ça marche
 
 [x] Corriger le problème de caméra qui passe sous le sol
+
+[x] Importer le sandman
+    [x] Ajuster la cam
+    [x] Modifier la capsule de collision
+    Pas besoin de faire tout ça en fait
+
+[] Gérer des interactions avec le monde (continuer le tuto)
+
+
+PROTO
+[] Faire un changement entre deux scènes
