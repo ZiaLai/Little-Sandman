@@ -35,8 +35,14 @@ Méthode pour déplacer le personnage
     [x] Modifier la capsule de collision
     Pas besoin de faire tout ça en fait
 
+[] Tourner la camera sans avoir besoin de cliquer
+
 [] Gérer des interactions avec le monde (continuer le tuto)
 
 
 PROTO
 [] Faire un changement entre deux scènes
+
+
+BUGS
+[] Bug Quand on clique, puis appuie sur échap

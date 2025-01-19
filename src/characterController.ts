@@ -6,17 +6,18 @@ import {
     UniversalCamera,
     ArcRotateCamera,
     Vector3,
-    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera
+    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
+import "hammerjs";
 
 export class Player extends TransformNode {
     public camera;
     public scene: Scene;
     private _inputs: PlayerInput[];
-    private _currentInput: number = 1; // 0 = keyboard, 1 = gamepad
+    private _currentInput: number = 0; // 0 = keyboard, 1 = gamepad
     private _canvas: HTMLCanvasElement;
 
     //Player
@@ -30,7 +31,7 @@ export class Player extends TransformNode {
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
     private static PLAYER_SPEED: number = 0.4;
     private static GRAVITY: number = -2.8;
-    private static JUMP_FORCE: number = 0.8;
+    private static JUMP_FORCE: number = 0.7;
     private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
 
     // player movement vars
@@ -70,7 +71,7 @@ export class Player extends TransformNode {
 
         shadowGenerator.addShadowCaster(assets.mesh); //the player mesh will cast shadows
 
-        this._inputs = [new KeyboardInput(this.scene), new GamepadInput(this.scene)];
+        this._inputs = [new KeyboardInput(this.scene, this._canvas), new GamepadInput(this.scene)];
         this._inputs[this._currentInput].isActive = true;
         this._inputs[1 - this._currentInput].isActive = false;
     }
@@ -91,18 +92,22 @@ export class Player extends TransformNode {
         yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
-        this.camera = new ArcRotateCamera("cam", 0, 0, 25, new Vector3(0, 0, 0), this.scene);
+        this.camera = new ArcRotateCamera("cam", 0, 0, 15, new Vector3(0, 0, 0), this.scene);
         
+
         this.scene.activeCamera = this.camera;
 
         this.camera.lockedTarget = this._camRoot;
         //this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
-        this.camera.upperBetaLimit = Math.PI / 2 ; // Pour pas que la cam passe dans le sol (faire -0.1 pour remonter la limite)
+        this.camera.upperBetaLimit = Math.PI / 2 + 0.2; // Pour pas que la cam passe dans le sol (faire +0.1 pour remonter la limite)
         //this.camera.parent = yTilt;
 
-
-        //this.camera.attachControl(this._canvas, true);
+        this.camera.attachControl(this._canvas, true);
+        if (this._currentInput == 1) {
+            //this.camera.inputs.clear();
+            //this.camera.inputs.removeByType("ArcRotateCameraPointersInput");
+        }
         return this.camera;
 
     }
@@ -114,6 +119,14 @@ export class Player extends TransformNode {
         this._camRoot.position = new Vector3(x, y + 3, z);
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
+
+        // if (this._currentInput == 1) {
+        //     let previousRot = this.camera.rotation;
+        //     let rotX = this._inputs[this._currentInput].camHorizontal;
+        //     let rotY = this._inputs[this._currentInput].camVertical;
+        //     let newRot = new Vector3(rotX, rotY, 0);
+        //     this.camera.rotation = previousRot.addInPlace(newRot);
+        // }
         //console.log("yTilt : " + this._yTilt);
         // this._camRoot.position = Vector3.Lerp(this._camRoot.position,
         //    new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);

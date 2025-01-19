@@ -11,6 +11,7 @@ export abstract class PlayerInput {
     public jumpKeyDown: boolean;
     public hoverKeyDown: boolean;
 
+
     // Camera values
     public camVertical : number;
     public camHorizontal: number;

@@ -34,7 +34,8 @@ export class GamepadInput extends PlayerInput {
                     this.updateLeftStick();
                 })
                 gamepad.onrightstickchanged((values) => {
-                    this.leftStick = values;
+                    this.rightStick = values;
+                    this.updateRightStick();
                 })
             }
         })
@@ -46,7 +47,7 @@ export class GamepadInput extends PlayerInput {
 
     private _updateFromGamepad() {
         if (this.isActive) {
-            console.log(this.leftStick + " " + this.leftStick.y);
+            console.log(this.rightStick + " " + this.rightStick.y);
             // if (this.inputMap["ArrowUp"]) {
             //     this.camVertical = Scalar.Lerp(this.camVertical, 1, 0.2);
             //     this.camVerticalAxis = 1;
@@ -110,5 +111,10 @@ export class GamepadInput extends PlayerInput {
             this.horizontalAxis = 0;
         }
 
+    }
+
+    private updateRightStick() {
+        this.camVertical = - this.rightStick.y;
+        this.camHorizontal = this.rightStick.x;
     }
 }

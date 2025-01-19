@@ -2,17 +2,31 @@ import {PlayerInput} from "./PlayerInput";
 import {ActionManager, ExecuteCodeAction, Scalar, Scene} from "@babylonjs/core";
 
 export class KeyboardInput extends PlayerInput {
-    private specialKeys: string[] = ["Shift"];
+    private _specialKeys: string[] = ["Shift"];
+    private _pointerLocked: boolean = false;
+    private _canvas: HTMLCanvasElement;
 
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, canvas: HTMLCanvasElement) {
         super();
+        this._canvas = canvas;
         scene.actionManager = new ActionManager();
 
         this.inputMap = {};
+
+        this._canvas.addEventListener("click", event => {
+            if(this._canvas.requestPointerLock) {
+                this._canvas.requestPointerLock();
+            }
+        }, false);
+        // scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (evt) => {
+        //     this._pointerLocked = true;
+        //
+        //
+        // }))
         scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
             let key = evt.sourceEvent.key;
-            if (!(this.specialKeys.includes(key))) {
+            if (!(this._specialKeys.includes(key))) {
                 key = key.toLowerCase()
             }
             this.inputMap[key] = evt.sourceEvent.type == "keydown";
@@ -20,7 +34,7 @@ export class KeyboardInput extends PlayerInput {
         scene.actionManager.registerAction(new
         ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
             let key = evt.sourceEvent.key;
-            if (!(this.specialKeys.includes(key))) {
+            if (!(this._specialKeys.includes(key))) {
                 key = key.toLowerCase()
             }
             this.inputMap[key] = evt.sourceEvent.type == "keydown";
@@ -100,5 +114,16 @@ export class KeyboardInput extends PlayerInput {
             }
 
         }
+
+        // if (this.inputMap["a"]) {
+        //     this._pointerLocked = false;
+        // }
+        //
+        // if (!this._pointerLocked) {
+        //     if (this._canvas.requestPointerLock) {
+        //         this._canvas.requestPointerLock();
+        //     }
+        // }
+
     }
 }
