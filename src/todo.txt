@@ -35,7 +35,9 @@ Méthode pour déplacer le personnage
     [x] Modifier la capsule de collision
     Pas besoin de faire tout ça en fait
 
-[] Tourner la camera sans avoir besoin de cliquer
+[x] Tourner la camera sans avoir besoin de cliquer
+[x] Empecher la camera de passer au travers des murs (collisions)
+    Idée : caster des rays vers l'arrière de la camera, pour repositionner la camera en la rapprochant du Player
 
 [] Gérer des interactions avec le monde (continuer le tuto)
 
