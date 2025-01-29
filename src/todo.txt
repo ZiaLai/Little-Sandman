@@ -39,12 +39,32 @@ Méthode pour déplacer le personnage
 [x] Empecher la camera de passer au travers des murs (collisions)
     Idée : caster des rays vers l'arrière de la camera, pour repositionner la camera en la rapprochant du Player
 
+
+
+
+
+XXX [x] Coder le déplacement sur une pente (tuto)
+
 [] Gérer des interactions avec le monde (continuer le tuto)
+
+[] Regarder comment faire pour mettre la startPosition dans la ville
 
 
 PROTO
 [] Faire un changement entre deux scènes
 
+SIDE QUESTS
+[] Empêcher la camera de passer sous le sol
+
+[] Limiter les fps ?
+
 
 BUGS
-[] Bug Quand on clique, puis appuie sur échap
+[x] Bug Quand on clique, puis appuie sur échap
+    Rattrappage de l'erreur
+
+
+ON OUBLIE
+[] Utiliser un character controller au lieux de le coder soi-même ?
+    Mais en fait, il faut utiliser un moteur physique pour pouvoir faire ça.
+    Du coup on oublie

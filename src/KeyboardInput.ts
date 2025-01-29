@@ -16,7 +16,7 @@ export class KeyboardInput extends PlayerInput {
 
         this._canvas.addEventListener("click", event => {
             if(this._canvas.requestPointerLock) {
-                this._canvas.requestPointerLock();
+                this._canvas.requestPointerLock().catch(err => console.error(err));
             }
         }, false);
         // scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (evt) => {

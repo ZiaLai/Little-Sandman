@@ -17,7 +17,7 @@ import {
     ShadowGenerator,
     Quaternion,
     Matrix,
-    SceneLoader
+    SceneLoader, SceneOptimizer
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -44,6 +44,8 @@ class App {
     private _state: number = 0;
     private _gamescene: Scene;
     private _cutScene: Scene;
+    private _lastFrameTime: number = 0;
+    private _sceneOptimizer;
 
     constructor() {
         this._canvas = this._createCanvas();
@@ -51,6 +53,7 @@ class App {
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
         this._scene = new Scene(this._engine);
+        this._sceneOptimizer = new SceneOptimizer(this._scene);
 
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
@@ -97,19 +100,20 @@ class App {
         await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
+
         this._engine.runRenderLoop(() => {
             switch (this._state) {
                 case State.START:
-                    this._scene.render();
+                    this.renderScene();
                     break;
                 case State.CUTSCENE:
-                    this._scene.render();
+                    this.renderScene();
                     break;
                 case State.GAME:
-                    this._scene.render();
+                    this.renderScene();
                     break;
                 case State.LOSE:
-                    this._scene.render();
+                    this.renderScene();
                     break;
                 default: break;
             }
@@ -120,6 +124,18 @@ class App {
             this._engine.resize();
         });
     }
+
+    private renderScene() {
+        // Essai pour limiter les fps
+        // const deltaTime = this._engine.getDeltaTime();
+        // if (performance.now() - this._lastFrameTime >= 1000 / 60) {
+        //     this._lastFrameTime = performance.now();
+        //     this._scene.render();
+        // }
+        this._scene.render();
+        console.log("fps" + this._sceneOptimizer.targetFrameRate);
+    }
+
     private async _goToStart(){
         this._engine.displayLoadingUI();
 
@@ -320,7 +336,7 @@ class App {
 
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
-        scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition() // move the player to the start position;
+        //scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition() // move the player to the start position;
         //get rid of start scene, switch to gamescene and change states
         this._scene.dispose();
         this._state = State.GAME;
