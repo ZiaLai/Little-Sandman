@@ -39,14 +39,12 @@ Méthode pour déplacer le personnage
 [x] Empecher la camera de passer au travers des murs (collisions)
     Idée : caster des rays vers l'arrière de la camera, pour repositionner la camera en la rapprochant du Player
 
-
-
-
-
-XXX [x] Coder le déplacement sur une pente (tuto)
+[x] Coder le déplacement sur une pente (tuto)
 
 [] Gérer des interactions avec le monde (continuer le tuto)
 
+
+AVEC ZIA
 [] Regarder comment faire pour mettre la startPosition dans la ville
 
 
@@ -56,8 +54,17 @@ PROTO
 SIDE QUESTS
 [] Empêcher la camera de passer sous le sol
 
-[] Limiter les fps ?
+[] Limiter les fps ? Quand on est uniquement sur le PC portable, ça passe en 120 fps.
+    C'est un problème avec les delta time
+    [x] Vitesse de déplacement
+    [x] Hauteur du saut
+    [] Durée du hovering
 
+
+POLISH
+[] Sauter plus haut si on laisse espace appuyé
+[] Empêcher de sauter à nouveau si on laisse espace appuyé sans relâcher
+[] Ajouter du momentum (tuto Griffpatch ?)
 
 BUGS
 [x] Bug Quand on clique, puis appuie sur échap

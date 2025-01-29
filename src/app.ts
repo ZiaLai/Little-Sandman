@@ -133,7 +133,7 @@ class App {
         //     this._scene.render();
         // }
         this._scene.render();
-        console.log("fps" + this._sceneOptimizer.targetFrameRate);
+        //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
 
     private async _goToStart(){

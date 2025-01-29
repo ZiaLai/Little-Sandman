@@ -29,9 +29,9 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 0.4;
-    private static GRAVITY: number = -1.5;
-    private static JUMP_FORCE: number = 0.5;
+    private static PLAYER_SPEED: number = 30;
+    private static GRAVITY: number = -150;
+    private static JUMP_FORCE: number = 50;
     private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
 
     // player movement vars
@@ -172,8 +172,6 @@ export class Player extends TransformNode {
     public _updateFromControls(): void { // Nouvelle version en suivant le tuto
         this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
 
-
-
         this._moveDirection = Vector3.Zero(); // vecteur du mouvement, qu'on recalcule à chaque frame
         this._h = this._inputs[this._currentInput].horizontal; // input sur l'axe des x
         this._v = this._inputs[this._currentInput].vertical; // input sur l'axe des z
@@ -203,7 +201,7 @@ export class Player extends TransformNode {
         }
         //console.log("inputAmt : " + this._inputAmt);
 
-        this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED);
+        this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED * this._deltaTime);
         //console.log("vertical : " + this._input.vertical
         //            + ", input : " + this._input.inputMap["z"]);
 
@@ -234,6 +232,7 @@ export class Player extends TransformNode {
     }
 
     private _beforeRenderUpdate(): void {
+        console.log("deltaTime : " + this._deltaTime);
         this._updateFromControls();
         this._updateGroundDetection();
     }
@@ -335,7 +334,7 @@ export class Player extends TransformNode {
         let moveVector = this._moveDirection;
         // moveVector.x *= this._horizontalVelocity;
         // moveVector.z *= this._verticalVelocity;
-        moveVector = moveVector.addInPlace(this._gravity);
+        moveVector = moveVector.addInPlace(this._gravity.scale(this._deltaTime));
         this.mesh.moveWithCollisions(moveVector);
 
         //console.log("moveVector : " + moveVector);
