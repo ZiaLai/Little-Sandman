@@ -8,8 +8,8 @@ export class Environment {
     }
 
     public async load() {
-        // var ground = Mesh.CreateBox("ground", 24, this._scene);
-        // ground.scaling = new Vector3(1, .02, 1);
+        var ground = Mesh.CreateBox("ground", 24, this._scene);
+        ground.scaling = new Vector3(1, .02, 1);
         const assets = await this._loadAsset();
         // Loop through all environment meshes that were imported
         assets.allMeshes.forEach((m) => {
@@ -19,9 +19,9 @@ export class Environment {
     }
 
     public async _loadAsset() {
-        // const result = await SceneLoader.ImportMeshAsync(null, "./models/", "city.glb",
-        //     this._scene);
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "envSetting.glb", this._scene);
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "city.glb",
+            this._scene);
+        //const result = await SceneLoader.ImportMeshAsync(null, "./models/", "envSetting.glb", this._scene);
 
         let env = result.meshes[0];
         let allMeshes = env.getChildMeshes();

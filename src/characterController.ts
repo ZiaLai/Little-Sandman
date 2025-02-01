@@ -29,9 +29,9 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 30;
-    private static GRAVITY: number = -150;
-    private static JUMP_FORCE: number = 50;
+    private static PLAYER_SPEED: number = 15;
+    private static GRAVITY: number = -50;
+    private static JUMP_FORCE: number = 16.6;
     private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
 
     // player movement vars
@@ -62,7 +62,7 @@ export class Player extends TransformNode {
         this.scene = scene;
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
-        this.mesh.position.y = 10 // Temporairement
+        this.mesh.position.y = 10 // Temporairement, en attendant qu'il y ait une startPos dans la ville
         this.mesh.parent = this;
 
         this._setupPlayerCamera();
@@ -125,11 +125,13 @@ export class Player extends TransformNode {
     private _updateCamera(): void {
 
         let x = this.mesh.position.x;
-        let y = this.mesh.position.y;
+        let y = this._lastGroundPos.y;
         let z = this.mesh.position.z;
         //this.camera.minZ = (Math.cos(this.camera.beta - Math.PI / 2) * this.camera.radius) -0.1;
         //console.log(this.camera.minZ);
-        this._camRoot.position = new Vector3(x, y + 3, z);
+        let targetPosition = new Vector3(x, y + 3, z);
+        //this._camRoot.position = new Vector3(x, y + 3, z);
+        this._camRoot.position = new Vector3(targetPosition.x, Vector3.Lerp(this._camRoot.position, targetPosition, 0.1).y, targetPosition.z);
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
 
@@ -145,7 +147,7 @@ export class Player extends TransformNode {
         // }
         //console.log("yTilt : " + this._yTilt);
         // this._camRoot.position = Vector3.Lerp(this._camRoot.position,
-        //    new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
+        //    new Vector3(this.mesh.position.x, this.mesh.position.y + 3, this.mesh.position.z), 0.4);
 
     }
 

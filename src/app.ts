@@ -24,7 +24,7 @@ import { Environment } from "./environment";
 import { Player } from "./characterController";
 import {PlayerInput} from "./PlayerInput";
 
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
+enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
 class App {
     // General Entire Application
