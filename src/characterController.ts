@@ -32,7 +32,7 @@ export class Player extends TransformNode {
     private static PLAYER_SPEED: number = 15;
     private static GRAVITY: number = -50;
     private static JUMP_FORCE: number = 16.6;
-    private static HOVER_TIME: number = 120; // Max duration of hovering (in frame)
+    private static HOVER_TIME: number = 1; // Durée max de l'hovering (en secondes)
 
     // player movement vars
     private _deltaTime: number = 0;
@@ -62,7 +62,7 @@ export class Player extends TransformNode {
         this.scene = scene;
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
-        this.mesh.position.y = 10 // Temporairement, en attendant qu'il y ait une startPos dans la ville
+        this.mesh.position.y = 30 // Temporairement, en attendant qu'il y ait une startPos dans la ville
         this.mesh.parent = this;
 
         this._setupPlayerCamera();
@@ -127,11 +127,21 @@ export class Player extends TransformNode {
         let x = this.mesh.position.x;
         let y = this._lastGroundPos.y;
         let z = this.mesh.position.z;
-        //this.camera.minZ = (Math.cos(this.camera.beta - Math.PI / 2) * this.camera.radius) -0.1;
-        //console.log(this.camera.minZ);
+
+        // Position vers laquelle se dirige la camera
         let targetPosition = new Vector3(x, y + 3, z);
-        //this._camRoot.position = new Vector3(x, y + 3, z);
-        this._camRoot.position = new Vector3(targetPosition.x, Vector3.Lerp(this._camRoot.position, targetPosition, 0.1).y, targetPosition.z);
+
+        let step = 0.1;
+
+        if (this.mesh.position.y - this._lastGroundPos.y < 0) { // Le joueur chute
+            // Vers la position du mesh
+            // On lerp uniquement sur les y
+            this._camRoot.position = new Vector3(this.mesh.position.x, Vector3.Lerp(this._camRoot.position, this.mesh.position, step).y, this.mesh.position.z);
+        } else {
+            // Vers la targetPosition
+            // On lerp aussi uniquement sur les y
+            this._camRoot.position = new Vector3(targetPosition.x, Vector3.Lerp(this._camRoot.position, targetPosition, step).y, targetPosition.z);
+        }
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
 
@@ -359,7 +369,7 @@ export class Player extends TransformNode {
 
         // Detecte la fin du plannage
         if (this._hovering) {
-            this._hoverTimer -= 1;
+            this._hoverTimer -= this._deltaTime;
             if (this._hoverTimer <= 0 || !this._inputs[this._currentInput].hoverKeyDown) {
                 this._hovering = false;
             }

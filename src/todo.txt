@@ -46,6 +46,14 @@ Méthode pour déplacer le personnage
 
 [x] Coder le déplacement sur une pente (tuto)
 
+CAMERA
+        [x] Ne pas bouger la caméra quand le joueur saute
+        [x] Enlever l'interpolation de la camera sur les côtés
+        [x] Faire en sorte que le joueur ne sorte pas du champ de vision de la camera quand on tombe d'un espace surélevé
+
+########################################################################################################################
+TODO
+########################################################################################################################
 
 [] Faire un changement entre deux scènes
     Par exemple entre la ville et le monde du tuto
@@ -56,15 +64,13 @@ Méthode pour déplacer le personnage
 AVEC ZIA
 [] Mettre la startPosition dans la ville
 
-PROTO
-
 
 SIDE QUESTS
 [] Limiter les fps ? Quand on est uniquement sur le PC portable, ça passe en 120 fps.
     C'est un problème avec les delta time
     [x] Vitesse de déplacement
     [x] Hauteur du saut
-    [] Durée du hovering
+    .[] Durée du hovering
 
 [] Empêcher la camera de passer sous le sol
 
@@ -73,11 +79,9 @@ POLISH
 [] Empêcher de sauter à nouveau si on laisse espace appuyé sans relâcher
 [] Ajouter du momentum (tuto Griffpatch ?)
 [] Faire un mini déplacement vers le haut quand on commence l'hovering
+[] Ajouter la ceiling detection
 
-    CAMERA
-        [x] Ne pas bouger la caméra quand le joueur saute
-        [x] Enlever l'interpolation de la camera sur les côtés
-        [] Faire en sorte que le joueur ne sorte pas du champ de vision de la camera quand on tombe d'un espace surélevé
+
 
 
 BUGS
