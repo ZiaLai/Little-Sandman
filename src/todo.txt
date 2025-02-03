@@ -85,9 +85,7 @@ POLISH
     Sinon:
         Doubler la gravité
 ==================================================================
-[] Reprogrammer la détection du sol/pentes comme Griffpatch car là on passe parfois au travers
-
-[] Empêcher de sauter à nouveau si on laisse espace appuyé sans relâcher
+[X] Empêcher de sauter à nouveau si on laisse espace appuyé sans relâcher
    Méthode
        #######
        Variable falling compte le nombre de frames passées dans les airs
@@ -100,11 +98,14 @@ POLISH
                On met jumpKey à 1w
        Sinon:
            On met jumpKey à 0
-
+==================================================================
 [] Ajouter du momentum (tuto Griffpatch ?)
-[] Faire un mini déplacement vers le haut quand on commence l'hovering
 
 [] Ajouter la ceiling detection
+    Faire des raycasts vers le haut comme pour la détection du sol ?
+
+[] Faire un mini déplacement vers le haut quand on commence l'hovering
+    Bof en fait ?
 
 
 BUGS
@@ -116,3 +117,6 @@ ON OUBLIE
 [] Utiliser un character controller au lieux de le coder soi-même ?
     Mais en fait, il faut utiliser un moteur physique pour pouvoir faire ça.
     Du coup on oublie
+
+[] Reprogrammer la détection du sol/pentes comme Griffpatch car là on passe parfois au travers
+    En fait, bof. Mieux vaut éviter les boucles infinies

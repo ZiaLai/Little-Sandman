@@ -30,8 +30,8 @@ export class Player extends TransformNode {
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
     private static PLAYER_SPEED: number = 15;
-    private static GRAVITY: number = -50;
-    private static JUMP_FORCE: number = 16.6;
+    private static GRAVITY: number = -30;
+    private static JUMP_FORCE: number = 15.6;
     private static HOVER_TIME: number = 1; // Durée max de l'hovering (en secondes)
 
     // player movement vars
@@ -55,6 +55,8 @@ export class Player extends TransformNode {
     private _horizontalVelocity: number;
     private _direction: Vector3 = Vector3.Zero();
     private _lastCollidedRay: Ray;
+    private _jumpKey: boolean;
+    private _falling: number;
 
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
@@ -250,6 +252,8 @@ export class Player extends TransformNode {
     }
 
     private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {
+        // Renvoie la position de la collision s'il y en a une
+        // ou le vecteur nul sinon
         let raycastFloorPos = new Vector3(this.mesh.position.x + offsetx, this.mesh.position.y + 0.5,
             this.mesh.position.z + offsetz);
         let ray = new Ray(raycastFloorPos, Vector3.Up().scale(-1), raycastlen);
@@ -333,15 +337,17 @@ export class Player extends TransformNode {
             else if (!this._hovering) {
                 // Calcul de la gravité
                 if (this._inputs[this._currentInput].jumpKeyDown || this._gravity.y < (1/3 * Player.JUMP_FORCE * this._deltaTime)) {
+                    // Gravité normale si on garde espace appuyée
                     this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
                 }
                 else {
-                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));
-                }
+                    // Gravité augmentée si on lâche la touche
+                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));                }
 
                 this._grounded = false;
             } else {
-                // Annule la gravité pendant l'hovering
+                // Hovering
+                // On annule la gravité
                 this._gravity.y = Scalar.Lerp(this._gravity.y, 0, 0.2);
             }
         }
@@ -358,20 +364,28 @@ export class Player extends TransformNode {
         this.mesh.moveWithCollisions(moveVector);
 
         //console.log("moveVector : " + moveVector);
-        
+
+        this._falling += 1;
+        // Contact avec le sol
         if (this._isGrounded()) {
             this._gravity.y = 0;
             this._grounded = true;
             this._lastGroundPos.copyFrom(this.mesh.position);
             this._canHover = true;
+            this._falling = 0;
 
             this._jumpCount = this._maxJumpCount;
         }
         
         // Détection de saut
-        if (this._inputs[this._currentInput].jumpKeyDown && this._jumpCount > 0) {
-            this._gravity.y = Player.JUMP_FORCE;
-            this._jumpCount--;
+        if (this._inputs[this._currentInput].jumpKeyDown) {
+            if (!this._jumpKey && this._falling < 3 && this._jumpCount > 0) {
+                this._gravity.y = Player.JUMP_FORCE;
+                this._jumpCount--;
+                this._jumpKey = true;
+            }
+        } else {
+            this._jumpKey = false;
         }
 
 
