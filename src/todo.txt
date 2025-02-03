@@ -51,6 +51,12 @@ CAMERA
         [x] Enlever l'interpolation de la camera sur les côtés
         [x] Faire en sorte que le joueur ne sorte pas du champ de vision de la camera quand on tombe d'un espace surélevé
 
+FPS
+    [x] Limiter les fps ? Quand on est uniquement sur le PC portable, ça passe en 120 fps.
+        C'est un problème avec les delta time
+        [x] Vitesse de déplacement
+        [x] Hauteur du saut
+        [x] Durée du hovering
 ########################################################################################################################
 TODO
 ########################################################################################################################
@@ -66,22 +72,39 @@ AVEC ZIA
 
 
 SIDE QUESTS
-[] Limiter les fps ? Quand on est uniquement sur le PC portable, ça passe en 120 fps.
-    C'est un problème avec les delta time
-    [x] Vitesse de déplacement
-    [x] Hauteur du saut
-    .[] Durée du hovering
+
 
 [] Empêcher la camera de passer sous le sol
 
 POLISH
-[] Sauter plus haut si on laisse espace appuyé (tuto Griffpatch ?)
+[x] Sauter plus haut si on laisse espace appuyé (tuto Griffpatch ?)
+    Méthode
+    #######
+    Si speedY < (1/3 de la jumpForce * dt) ou espace pressé:
+        Gravité normale
+    Sinon:
+        Doubler la gravité
+==================================================================
+[] Reprogrammer la détection du sol/pentes comme Griffpatch car là on passe parfois au travers
+
 [] Empêcher de sauter à nouveau si on laisse espace appuyé sans relâcher
+   Méthode
+       #######
+       Variable falling compte le nombre de frames passées dans les airs
+       Elle est remise à 0 dès qu'on touche le sol
+       jumpKey permet de vérifier si on relâche la touche de saut entre deux sauts
+       Si la touche de saut est pressée:
+           Si jumpKey = 0 ET falling < 3:
+               On booste le speedY
+               On met falling à 6 (ou n'importe quelle valeur > 3)
+               On met jumpKey à 1w
+       Sinon:
+           On met jumpKey à 0
+
 [] Ajouter du momentum (tuto Griffpatch ?)
 [] Faire un mini déplacement vers le haut quand on commence l'hovering
+
 [] Ajouter la ceiling detection
-
-
 
 
 BUGS

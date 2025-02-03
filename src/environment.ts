@@ -19,7 +19,7 @@ export class Environment {
     }
 
     public async _loadAsset() {
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "city.glb",
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "ville_b_corige_3.glb",
             this._scene);
         //const result = await SceneLoader.ImportMeshAsync(null, "./models/", "envSetting.glb", this._scene);
 

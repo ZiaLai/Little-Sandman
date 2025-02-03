@@ -331,9 +331,17 @@ export class Player extends TransformNode {
             }
 
             else if (!this._hovering) {
-                this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
+                // Calcul de la gravité
+                if (this._inputs[this._currentInput].jumpKeyDown || this._gravity.y < (1/3 * Player.JUMP_FORCE * this._deltaTime)) {
+                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
+                }
+                else {
+                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));
+                }
+
                 this._grounded = false;
             } else {
+                // Annule la gravité pendant l'hovering
                 this._gravity.y = Scalar.Lerp(this._gravity.y, 0, 0.2);
             }
         }
