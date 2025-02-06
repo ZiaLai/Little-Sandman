@@ -12,6 +12,7 @@ import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import "hammerjs";
+import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 
 export class Player extends TransformNode {
     public camera;
@@ -29,7 +30,7 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 15;
+    private static PLAYER_SPEED: number = 20;
     private static GRAVITY: number = -30;
     private static JUMP_FORCE: number = 15.6;
     private static HOVER_TIME: number = 1; // Durée max de l'hovering (en secondes)
@@ -57,6 +58,9 @@ export class Player extends TransformNode {
     private _lastCollidedRay: Ray;
     private _jumpKey: boolean;
     private _falling: number;
+    private _speed: number = 0;
+    private _acceleration: number = 1 / 7 * Player.PLAYER_SPEED;
+    private _moveVector: Vector3;
 
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
@@ -80,26 +84,25 @@ export class Player extends TransformNode {
     }
 
 
-    private _setupPlayerCamera(): ArcRotateCamera { //Ancienne version
-        //root camera parent that handles positioning of the camera to follow the player
+    private _setupPlayerCamera(): ArcRotateCamera {
+        // TransformNode permettant de positionner la camera
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0);
         // To face the player from behind (180 degrees)
         this._camRoot.rotation = new Vector3(0, Math.PI, 0);
 
         // rotations along the x-axis (up/down tilting)
-        let yTilt = new TransformNode("ytilt");
+        // let yTilt = new TransformNode("ytilt");
         // adjustments to camera view to point down at our player
-        yTilt.rotation = Player.ORIGINAL_TILT;
-        this._yTilt = yTilt;
-        yTilt.parent = this._camRoot;
+        // yTilt.rotation = Player.ORIGINAL_TILT;
+        // this._yTilt = yTilt;
+        // yTilt.parent = this._camRoot;
 
-        // our actual camera that's pointing at our root's position
+        // Propriétés de la camera
         let radius = 12;
         this.camera = new ArcRotateCamera("cam", 0, 0, radius, new Vector3(0, 0, 0), this.scene);
         this.camera.lowerRadiusLimit = 3;
         this.camera.upperRadiusLimit = radius;
-        
 
         this.scene.activeCamera = this.camera;
 
@@ -124,8 +127,8 @@ export class Player extends TransformNode {
 
     }
 
+    // Misa à jour de la camera
     private _updateCamera(): void {
-
         let x = this.mesh.position.x;
         let y = this._lastGroundPos.y;
         let z = this.mesh.position.z;
@@ -136,11 +139,11 @@ export class Player extends TransformNode {
         let step = 0.1;
 
         if (this.mesh.position.y - this._lastGroundPos.y < 0) { // Le joueur chute
-            // Vers la position du mesh
+            // La camera doit suivre la position du mesh
             // On lerp uniquement sur les y
             this._camRoot.position = new Vector3(this.mesh.position.x, Vector3.Lerp(this._camRoot.position, this.mesh.position, step).y, this.mesh.position.z);
         } else {
-            // Vers la targetPosition
+            // la camera suit la targetPosition
             // On lerp aussi uniquement sur les y
             this._camRoot.position = new Vector3(targetPosition.x, Vector3.Lerp(this._camRoot.position, targetPosition, step).y, targetPosition.z);
         }
@@ -163,6 +166,8 @@ export class Player extends TransformNode {
 
     }
 
+    //  Permet de vérifier s'il y a un mur derrière la camera
+    // Et de rapprocher la camera du player pour éviter qu'elle passe au travers du mur
     private _cameraRaycast() {
 
         // Raycast vers l'arrière
@@ -183,16 +188,16 @@ export class Player extends TransformNode {
         }
     }
 
-    public _updateFromControls(): void { // Nouvelle version en suivant le tuto
+    // Calculs en fonction des inputs
+    public _updateFromControls(): void {
         this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
 
-        this._moveDirection = Vector3.Zero(); // vecteur du mouvement, qu'on recalcule à chaque frame
+        this._moveDirection = Vector3.Zero(); // vecteur du mouvement du perso, qu'on recalcule à chaque frame
         this._h = this._inputs[this._currentInput].horizontal; // input sur l'axe des x
         this._v = this._inputs[this._currentInput].vertical; // input sur l'axe des z
 
         let fwd = new Vector3(Math.cos(this.camera.alpha + Math.PI), 0, Math.sin(this.camera.alpha + Math.PI));
         let right = new Vector3(Math.cos(this.camera.alpha + Math.PI / 2), 0, Math.sin(this.camera.alpha + Math.PI / 2));
-        //console.log("camera direction : " + fwd);
 
         let correctedVertical = fwd.scaleInPlace(this._v);
         let correctedHorizontal = right.scaleInPlace(this._h);
@@ -200,11 +205,12 @@ export class Player extends TransformNode {
         let move = correctedHorizontal.addInPlace(correctedVertical);
 
         this._moveDirection = new Vector3((move).normalize().x, 0, (move).normalize().z);
+
         if (!(this._moveDirection.equals(Vector3.Zero()))) {
             this._direction = this._moveDirection.clone();
         }
 
-
+        // Limite la vitesse du mouvement diagonal
         let inputMag = Math.abs(this._h) + Math.abs(this._v);
         if (inputMag < 0) {
             this._inputAmt = 0;
@@ -213,11 +219,28 @@ export class Player extends TransformNode {
         } else {
             this._inputAmt = inputMag;
         }
-        //console.log("inputAmt : " + this._inputAmt);
 
-        this._moveDirection = this._moveDirection.scaleInPlace(this._inputAmt * Player.PLAYER_SPEED * this._deltaTime);
-        //console.log("vertical : " + this._input.vertical
-        //            + ", input : " + this._input.inputMap["z"]);
+        // Gestion de la vitesse
+        // Acceleration
+        if (this._inputAmt > 0.1) {
+            this._speed += this._acceleration;
+        }
+        if (this._speed > Player.PLAYER_SPEED) {
+            this._speed = Player.PLAYER_SPEED;
+        }
+
+        let trueSpeed =  this._speed * this._deltaTime;
+
+        // On crée une copie, pour ne pas modifier la direction quand on scale
+        let direction = this._direction.clone();
+        this._moveVector = direction.scaleInPlace(trueSpeed);
+
+        // Décélération
+        this._speed *= 0.9;
+        if (this._speed < 0.01) {
+            this._speed = 0;
+        }
+
 
         // Rotations
         // On vérifie s'il y a un mouvement pour déterminer si on a besoin de faire une rotation
@@ -225,7 +248,7 @@ export class Player extends TransformNode {
         if (input.length() == 0) {
             return;
         }
-        // rotation en fontion de l'input et de l'angle de la camera
+        // rotation en fonction de l'input et de l'angle de la caméra
         let angle = Math.atan2(this._inputs[this._currentInput].horizontalAxis, this._inputs[this._currentInput].verticalAxis) + Math.PI;
         //angle += (this.camera.alpha) % (2 * Math.PI);
         angle += - this.camera.alpha + Math.PI / 2;
@@ -246,7 +269,7 @@ export class Player extends TransformNode {
     }
 
     private _beforeRenderUpdate(): void {
-        console.log("deltaTime : " + this._deltaTime);
+        //console.log("deltaTime : " + this._deltaTime);
         this._updateFromControls();
         this._updateGroundDetection();
     }
@@ -356,12 +379,11 @@ export class Player extends TransformNode {
         if (this._gravity.y < -Player.JUMP_FORCE) {
             this._gravity.y = -Player.JUMP_FORCE;
         }
-
-        let moveVector = this._moveDirection;
+        let move = this._moveVector;
         // moveVector.x *= this._horizontalVelocity;
         // moveVector.z *= this._verticalVelocity;
-        moveVector = moveVector.addInPlace(this._gravity.scale(this._deltaTime));
-        this.mesh.moveWithCollisions(moveVector);
+        move = move.addInPlace(this._gravity.scale(this._deltaTime));
+        this.mesh.moveWithCollisions(move);
 
         //console.log("moveVector : " + moveVector);
 

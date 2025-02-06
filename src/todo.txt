@@ -19,7 +19,8 @@ Méthode pour déplacer le personnage
 3. Trouver un vecteur right, qui donne la direction à droite de la caméra
 4. "corriger" ces deux vecteurs en les scalant par les inputs
 5. Additionner les deux vecteurs
-6. Annuler la valeur en y (pour être sûr que le perso s'envole pas)
+6. Scaler par la vitesse du perso (et le deltaTime)
+7. Annuler la valeur en y (pour être sûr que le perso s'envole pas)
 ===================================
 
 [x] Corriger le bug de plannage
@@ -57,13 +58,30 @@ FPS
         [x] Vitesse de déplacement
         [x] Hauteur du saut
         [x] Durée du hovering
+
 ########################################################################################################################
 TODO
 ########################################################################################################################
 
 [] Faire un changement entre deux scènes
     Par exemple entre la ville et le monde du tuto
+    Pour ça il faudra d'abord restructurer le code. Il ne faut pas utilliser une enum car c'est pas terrible.
+    Il va falloir faire des classes d'état.
+    [] GameState (classe mère)
+        [] GameplayState
+            Prend en paramètre une ressource graphique
+        [] MenuState
+            Il faut définir les menus dans le corps de la classe (et si on utilisait des classes anonymes ?
+                                                                  ça permettrait d'écrire tous les états dans un seul fichier)
 
+       QUESTION : Est-ce qu'il faut faire une structure qui permet de savoir quels sont les états voisins.
+                    Afin de les charger à l'avance ? On peut faire par exemple un graphe ou un arbre.
+                    ça a l'air intéressant, mais on verra ça plus tard...
+
+
+
+
+========================================================================================================================
 [] Gérer des interactions avec le monde (continuer le tuto)
 
 
@@ -99,13 +117,17 @@ POLISH
        Sinon:
            On met jumpKey à 0
 ==================================================================
-[] Ajouter du momentum (tuto Griffpatch ?)
+[x] Ajouter du momentum (tuto Griffpatch ?)
+    Pas besoin du tuto. Il suffit de rajouter de l'interpolation sur v et h
 
 [] Ajouter la ceiling detection
     Faire des raycasts vers le haut comme pour la détection du sol ?
 
-[] Faire un mini déplacement vers le haut quand on commence l'hovering
-    Bof en fait ?
+[] Faire en sorte qu'on puisse regarder vers le ciel
+    Il faut que la camera se rapproche du joueur quand la camera descend vers le sol
+    Dans genshin, le perso devient transparent aussi
+
+
 
 
 BUGS
@@ -113,8 +135,16 @@ BUGS
     Rattrappage de l'erreur
 
 
+
+
+INUTILE
+[] Faire un mini déplacement vers le haut quand on commence l'hovering
+    Bof en fait ?
+
+====================================================================
+====================================================================
 ON OUBLIE
-[] Utiliser un character controller au lieux de le coder soi-même ?
+[] Utiliser un character controller au lieu de le coder soi-même ?
     Mais en fait, il faut utiliser un moteur physique pour pouvoir faire ça.
     Du coup on oublie
 

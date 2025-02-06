@@ -233,13 +233,13 @@ class App {
 
         async function loadCharacter(){
             //collision mesh
-            const outer = MeshBuilder.CreateBox("outer", { width: 5, depth: 5, height: 5 }, scene);
+            const outer = MeshBuilder.CreateBox("outer", { width: 0.75, depth: 0.5, height: 2 }, scene);
             outer.isVisible = false;
             outer.isPickable = false;
             outer.checkCollisions = true;
 
             //move origin of box collider to the bottom of the mesh (to match player mesh)
-            outer.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0))
+            outer.bakeTransformIntoVertices(Matrix.Translation(0, 0.95, 0.33))
 
             //for collisions
             outer.ellipsoid = new Vector3(1, 1.5, 1);
