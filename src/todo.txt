@@ -63,6 +63,11 @@ FPS
 TODO
 ########################################################################################################################
 
+[] Résoudre les bugs de collision
+
+
+En vrai, est-ce que y a vraiment besoin de faire ça MAINTENANT ?
+Oui, parce que sinon, ça va devenir horrible avec l'enum
 [] Faire un changement entre deux scènes
     Par exemple entre la ville et le monde du tuto
     Pour ça il faudra d'abord restructurer le code. Il ne faut pas utilliser une enum car c'est pas terrible.
@@ -77,6 +82,17 @@ TODO
        QUESTION : Est-ce qu'il faut faire une structure qui permet de savoir quels sont les états voisins.
                     Afin de les charger à l'avance ? On peut faire par exemple un graphe ou un arbre.
                     ça a l'air intéressant, mais on verra ça plus tard...
+
+    Sinon on peut juste faire une classe SceneManager.
+    Il aurait une scene active. Et pourrait charger les autres scènes. En fait ça revient au même.
+    En fait on a besoin des deux. on pourrait plutôt l'appeler GameStateManager.
+    Et voilà.
+
+    De quoi a besoin une scène ?
+    1. d'être initialisée => Charger ressource graphique, et faire spawn des mobs par exemple
+    2. d'être update => boucle de jeu
+
+    On peut peut-être dissocier le chargement des ressources avec un RessourceManager ?
 
 
 

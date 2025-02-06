@@ -139,11 +139,11 @@ export class Player extends TransformNode {
         let step = 0.1;
 
         if (this.mesh.position.y - this._lastGroundPos.y < 0) { // Le joueur chute
-            // La camera doit suivre la position du mesh
+            // La caméra doit suivre la position du mesh
             // On lerp uniquement sur les y
             this._camRoot.position = new Vector3(this.mesh.position.x, Vector3.Lerp(this._camRoot.position, this.mesh.position, step).y, this.mesh.position.z);
         } else {
-            // la camera suit la targetPosition
+            // la caméra suit la targetPosition
             // On lerp aussi uniquement sur les y
             this._camRoot.position = new Vector3(targetPosition.x, Vector3.Lerp(this._camRoot.position, targetPosition, step).y, targetPosition.z);
         }

@@ -223,7 +223,7 @@ class App {
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene);
+        const environment = new Environment(scene, "city");
         this._environment = environment;
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene);
@@ -324,6 +324,21 @@ class App {
         loseBtn.thickness = 0;
         loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         playerUI.addControl(loseBtn);
+
+        // Bouton pour tester le changement d'environnement
+        const changeButton = Button.CreateSimpleButton("change", "CHANGE");
+        changeButton.width = 0.2
+        changeButton.height = "40px";
+        changeButton.color = "white";
+        changeButton.top = "14px";
+        changeButton.thickness = 0;
+        changeButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        playerUI.addControl(changeButton);
+
+        changeButton.onPointerDownObservable.add(() => {
+            this._environment.changeAsset("int_boulangerie_sans_textures");
+        })
+
 
         //this handles interactions with the start button attached to the scene
         loseBtn.onPointerDownObservable.add(() => {
