@@ -11,7 +11,6 @@ import {
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
-import "hammerjs";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 
 export class Player extends TransformNode {
