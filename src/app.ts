@@ -17,7 +17,7 @@ import {
     ShadowGenerator,
     Quaternion,
     Matrix,
-    SceneLoader, SceneOptimizer
+    SceneLoader, SceneOptimizer, Sound
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -134,6 +134,28 @@ class App {
         // }
         this._scene.render();
         //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
+    }
+
+    private _startMusic() {
+        let soundsReady = 0;
+        function soundReady() {
+            soundsReady++;
+            console.log("soundReady : " + soundsReady);
+            if (soundsReady === 7) {
+                for (let music of instruments) {
+                    music.play();
+                }
+            }
+        }
+        let instruments = [
+            new Sound("piano1", "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg", this._scene, soundReady, {loop : true}),
+            new Sound("piano2", "./musics/sugarlessBakery/sugarless_bakery-Piano_2.ogg", this._scene, soundReady, {loop : true}),
+            new Sound("bass", "./musics/sugarlessBakery/sugarless_bakery-Basse.ogg", this._scene, soundReady, {loop : true}),
+            new Sound("flute", "./musics/sugarlessBakery/sugarless_bakery-Flûte.ogg", this._scene, soundReady, {loop : true}),
+            new Sound("guitar", "./musics/sugarlessBakery/sugarless_bakery-Guitare_électrique.ogg", this._scene, soundReady, {loop : true}),
+            new Sound("battery", "./musics/sugarlessBakery/sugarless_bakery-Set_de_batterie.ogg", this._scene, soundReady, {loop : true}),
+            new Sound("violins", "./musics/sugarlessBakery/sugarless_bakery-Violons.ogg", this._scene, soundReady, {loop : true})
+        ]
     }
 
     private async _goToStart(){
@@ -336,7 +358,7 @@ class App {
         playerUI.addControl(changeButton);
 
         changeButton.onPointerDownObservable.add(() => {
-            this._environment.changeAsset("int_boulangerie_sans_textures");
+            this._environment.changeAsset("bakery_indoors_with_textures");
         })
 
 
@@ -358,7 +380,9 @@ class App {
         this._scene = scene;
         this._engine.hideLoadingUI();
         //the game is ready, attach control back
+        //this._startMusic();
         this._scene.attachControl();
+
     }
 
     private async _goToLose(): Promise<void> {

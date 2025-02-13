@@ -13,9 +13,11 @@ export class Environment {
 
     public async changeAsset(assetName: string) {
         this._currentAssetName = assetName;
+        // Suppression des assets précédents
         this._assets.allMeshes.forEach((m) => {
             m.dispose();
         })
+        // Chargement des nouveaux assets
         this.load();
     }
 
