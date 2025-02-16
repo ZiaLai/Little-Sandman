@@ -29,7 +29,7 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 20;
+    private static PLAYER_SPEED: number = 12;
     private static GRAVITY: number = -30;
     private static JUMP_FORCE: number = 15.6;
     private static HOVER_TIME: number = 1; // Durée max de l'hovering (en secondes)
@@ -82,6 +82,10 @@ export class Player extends TransformNode {
         this._inputs[1 - this._currentInput].isActive = false;
     }
 
+    public setPosition(position: Vector3): void {
+        console.log("set position", position);
+        this.mesh.position = position;
+    }
 
     private _setupPlayerCamera(): ArcRotateCamera {
         // TransformNode permettant de positionner la camera
@@ -100,7 +104,7 @@ export class Player extends TransformNode {
         // Propriétés de la camera
         let radius = 12;
         this.camera = new ArcRotateCamera("cam", 0, 0, radius, new Vector3(0, 0, 0), this.scene);
-        this.camera.lowerRadiusLimit = 3;
+        this.camera.lowerRadiusLimit = 0.5;
         this.camera.upperRadiusLimit = radius;
 
         this.scene.activeCamera = this.camera;
@@ -114,6 +118,9 @@ export class Player extends TransformNode {
         // this.camera.collisionRadius = new Vector3(10, 10, 10);
         //this.camera.zoomToMouseLocation = true;
         this.camera.panningSensibility = 0;
+        this.camera.inertia = 0.54;
+
+        this.camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
         //this.camera.minZ = 14;
 
 
@@ -129,22 +136,23 @@ export class Player extends TransformNode {
     // Misa à jour de la camera
     private _updateCamera(): void {
         let x = this.mesh.position.x;
-        let y = this._lastGroundPos.y;
+        let y = this._lastGroundPos.y; // Dernière position sur le sol en y, car la caméra reste fixe si on saute
         let z = this.mesh.position.z;
 
-        // Position vers laquelle se dirige la camera
-        let targetPosition = new Vector3(x, y + 3, z);
 
-        let step = 0.1;
+        // Position vers laquelle se dirige la camera
+        let targetPosition: Vector3 = new Vector3(x, y + 3, z);
+
+        let step: number = 0.1;
 
         if (this.mesh.position.y - this._lastGroundPos.y < 0) { // Le joueur chute
             // La caméra doit suivre la position du mesh
             // On lerp uniquement sur les y
-            this._camRoot.position = new Vector3(this.mesh.position.x, Vector3.Lerp(this._camRoot.position, this.mesh.position, step).y, this.mesh.position.z);
+            this._camRoot.position = new Vector3(this.mesh.position.x, Lerp(this._camRoot.position.y, this.mesh.position.y, step), this.mesh.position.z);
         } else {
             // la caméra suit la targetPosition
             // On lerp aussi uniquement sur les y
-            this._camRoot.position = new Vector3(targetPosition.x, Vector3.Lerp(this._camRoot.position, targetPosition, step).y, targetPosition.z);
+            this._camRoot.position = new Vector3(targetPosition.x, Lerp(this._camRoot.position.y, targetPosition.y, step), targetPosition.z);
         }
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
@@ -171,7 +179,7 @@ export class Player extends TransformNode {
 
         // Raycast vers l'arrière
         let direction = this.camera.getForwardRay().direction.normalize().scale(-1);
-        direction.y = 0;
+        //direction.y = 0;
         let ray = new Ray(this._camRoot.position, direction, this.camera.radius);
         let hit = this.scene.pickWithRay(ray);
         // let rayHelper = new RayHelper(ray);
@@ -179,9 +187,11 @@ export class Player extends TransformNode {
         // if (!hit.hit) {
         //     console.log("" + hit + this._deltaTime);
         // }
+
         if (hit.hit) {
             let distance = Vector3.Distance(this._camRoot.position, hit.pickedPoint);
-            this.camera.radius = Scalar.Lerp(this.camera.radius, Math.ceil(distance), 0.25);
+            console.log("distance : ", distance);
+            this.camera.radius = Scalar.Lerp(this.camera.radius, Math.max(Math.ceil(distance), this.camera.lowerRadiusLimit), 0.5);
         } else {
             this.camera.radius = Scalar.Lerp(this.camera.radius, 15, 0.1);
         }
@@ -261,9 +271,12 @@ export class Player extends TransformNode {
         this.scene.registerBeforeRender(() => {
 
             this._beforeRenderUpdate();
-            this._updateCamera();
             this._cameraRaycast();
+            this._updateCamera();
+
         })
+
+
         return this.camera;
     }
 

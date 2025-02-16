@@ -29,6 +29,23 @@ export class Environment {
         this._assets.allMeshes.forEach((m) => {
             m.receiveShadows = true;
             m.checkCollisions = true;
+
+
+            if (m.name.includes("collider")) {
+                // Les colliders sont invisibles et matériels
+                m.isVisible = false;
+                m.isPickable = true;
+            }
+            else {
+                // Tous les autres mesh ne vérifient pas les collisions
+               // m.isPickable = false;
+                m.checkCollisions = false;
+            }
+
+            // if (m.name.includes("immaterial")) {
+            //     m.isPickable = false;
+            //     m.checkCollisions = false;
+            // }
         })
     }
 
