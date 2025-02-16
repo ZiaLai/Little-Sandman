@@ -30,23 +30,16 @@ export class Environment {
             m.receiveShadows = true;
             m.checkCollisions = true;
 
-            let state;
+
             if (m.name.includes("collider")) {
+                // Les colliders sont invisibles et matériels
                 m.isVisible = false;
                 m.isPickable = true;
-                state = "collider"
             }
             else {
-                m.isPickable = false;
+                // Tous les autres mesh ne vérifient pas les collisions
+               // m.isPickable = false;
                 m.checkCollisions = false;
-                state = "immaterial"
-            }
-            if (state === "collider") {
-                console.log(m.name, state);
-
-            }
-            if (m.name.includes("startPosition")) {
-                console.log("startPosition : ", m.getAbsolutePosition());
             }
 
             // if (m.name.includes("immaterial")) {

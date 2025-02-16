@@ -1,7 +1,7 @@
 import {AbstractLevel} from "./Levels/AbstractLevel";
 import {Level1_1_1} from "./Levels/Level1_1_1";
 import {Environment} from "./environment";
-import {Scene, TransformNode, Vector3} from "@babylonjs/core";
+import {Engine, Scene, TransformNode, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
 import {CityLevel} from "./Levels/CityLevel";
 
@@ -16,8 +16,10 @@ export class Game {
         new Level1_1_1(this, 1)
     ];
     private _currentLevel : number;
+    private _engine: Engine;
 
-    constructor(scene: Scene, player: Player, environment: Environment) {
+    constructor(engine: Engine, scene: Scene, player: Player, environment: Environment) {
+        this._engine = engine;
         this._player = player;
         this.environment = environment;
         this._scene = scene;
@@ -48,7 +50,19 @@ export class Game {
         const startNode: TransformNode = this._scene.getTransformNodeByName("START POSITION");
         if (startNode === null) {console.log("start position is null")}
         // todo : supprimer la ligne suivante quand Zia aura remonté la start pos (là on spawn sous la ville)
-        return new Vector3(0, 30, 0);
+        return new Vector3(0, 12, 0);
         return startNode !== null ? startNode.getAbsolutePosition() : new Vector3(0, 30, 0);
+    }
+
+    public displayLoadingUI() {
+        this._engine.displayLoadingUI();
+    }
+
+    public hideLoadingUI(): void {
+        this._engine.hideLoadingUI();
+    }
+
+    public getScene() {
+        return this._scene;
     }
 }

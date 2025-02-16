@@ -378,7 +378,7 @@ class App {
         //get rid of start scene, switch to gamescene and change states
 
         // Instanciation de la classe game
-        this._game = new Game(scene, this._player, this._environment);
+        this._game = new Game(this._engine, scene, this._player, this._environment);
 
         this._game.setActiveLevel(0);
         this._game.initializeLevel();

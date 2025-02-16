@@ -19,15 +19,17 @@ export abstract class AbstractLevel {
     // Charge la ressource graphique du niveau
     protected async load() {
         this._loading = true;
+        this._game.displayLoadingUI();
+        // Désactivation de la scène
+        this._game.getScene().detachControl();
         await this._game.environment.changeAsset(this._ressourceName).then(()=> {
             // On déplace le joueur à la position de départ
-            console.log("in load, before getting startPosition");
             const position = this._game.getStartPosition();
-            console.log(position);
-            console.log(this._game.getPlayer());
             this._game.getPlayer().setPosition(position);
-            console.log("après");
             this._loading = false;
+            // Réactivation de la scène quand le chargement est fini (évite au joueur de passer sous la map s'il charge avant)
+            this._game.hideLoadingUI();
+            this._game.getScene().attachControl();
         });
 
 
