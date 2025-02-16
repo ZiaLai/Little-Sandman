@@ -29,6 +29,30 @@ export class Environment {
         this._assets.allMeshes.forEach((m) => {
             m.receiveShadows = true;
             m.checkCollisions = true;
+
+            let state;
+            if (m.name.includes("collider")) {
+                m.isVisible = false;
+                m.isPickable = true;
+                state = "collider"
+            }
+            else {
+                m.isPickable = false;
+                m.checkCollisions = false;
+                state = "immaterial"
+            }
+            if (state === "collider") {
+                console.log(m.name, state);
+
+            }
+            if (m.name.includes("startPosition")) {
+                console.log("startPosition : ", m.getAbsolutePosition());
+            }
+
+            // if (m.name.includes("immaterial")) {
+            //     m.isPickable = false;
+            //     m.checkCollisions = false;
+            // }
         })
     }
 

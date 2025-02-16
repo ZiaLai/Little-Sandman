@@ -82,6 +82,10 @@ export class Player extends TransformNode {
         this._inputs[1 - this._currentInput].isActive = false;
     }
 
+    public setPosition(position: Vector3): void {
+        console.log("set position", position);
+        this.mesh.position = position;
+    }
 
     private _setupPlayerCamera(): ArcRotateCamera {
         // TransformNode permettant de positionner la camera

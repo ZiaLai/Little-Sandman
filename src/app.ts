@@ -21,8 +21,9 @@ import {
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import { Environment } from "./environment";
-import { Player } from "./characterController";
+import { Player } from "./Player";
 import {PlayerInput} from "./PlayerInput";
+import {Game} from "./game";
 
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
@@ -38,6 +39,7 @@ class App {
     public assets;
     private _environment;
     private _player: Player;
+    private _game: Game;
 
 
     //Scene - related
@@ -53,6 +55,7 @@ class App {
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
         this._scene = new Scene(this._engine);
+
         this._sceneOptimizer = new SceneOptimizer(this._scene);
 
         // hide/show the Inspector
@@ -110,6 +113,7 @@ class App {
                     this.renderScene();
                     break;
                 case State.GAME:
+                    this._game.update();
                     this.renderScene();
                     break;
                 case State.LOSE:
@@ -126,12 +130,6 @@ class App {
     }
 
     private renderScene() {
-        // Essai pour limiter les fps
-        // const deltaTime = this._engine.getDeltaTime();
-        // if (performance.now() - this._lastFrameTime >= 1000 / 60) {
-        //     this._lastFrameTime = performance.now();
-        //     this._scene.render();
-        // }
         this._scene.render();
         //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
@@ -245,10 +243,12 @@ class App {
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene, "city");
+        const environment = new Environment(scene, "ville_corrige_4");
         this._environment = environment;
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene);
+
+
     }
 
     private async _loadCharacterAssets(scene){
@@ -358,7 +358,8 @@ class App {
         playerUI.addControl(changeButton);
 
         changeButton.onPointerDownObservable.add(() => {
-            this._environment.changeAsset("bakery_indoors_with_textures");
+            //this._environment.changeAsset("bakery_indoors_with_textures");
+            this._game.setActiveLevel(1);
         })
 
 
@@ -375,6 +376,13 @@ class App {
         await scene.whenReadyAsync();
         //scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition() // move the player to the start position;
         //get rid of start scene, switch to gamescene and change states
+
+        // Instanciation de la classe game
+        this._game = new Game(scene, this._player, this._environment);
+
+        this._game.setActiveLevel(0);
+        this._game.initializeLevel();
+
         this._scene.dispose();
         this._state = State.GAME;
         this._scene = scene;
