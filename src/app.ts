@@ -24,6 +24,7 @@ import { Environment } from "./environment";
 import { Player } from "./Player";
 import {PlayerInput} from "./PlayerInput";
 import {Game} from "./game";
+import {TestRunner} from "./Test/TestRunner";
 
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
@@ -49,7 +50,14 @@ class App {
     private _lastFrameTime: number = 0;
     private _sceneOptimizer;
 
+    private EXECUTE_TEST = true;
+
     constructor() {
+        if (this.EXECUTE_TEST) {
+            new TestRunner().main();
+        }
+
+
         this._canvas = this._createCanvas();
 
         // initialize babylon scene and engine

@@ -12,6 +12,7 @@ import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
+import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
 
 export class Player extends TransformNode {
     public camera;
@@ -60,6 +61,8 @@ export class Player extends TransformNode {
     private _speed: number = 0;
     private _acceleration: number = 1 / 7 * Player.PLAYER_SPEED;
     private _moveVector: Vector3;
+    private _originalCameraRadius: number;
+    private _cameraRadiusFunction = new CameraRadiusFunction();
 
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
@@ -103,6 +106,7 @@ export class Player extends TransformNode {
 
         // Propriétés de la camera
         let radius = 12;
+        this._originalCameraRadius = radius;
         this.camera = new ArcRotateCamera("cam", 0, 0, radius, new Vector3(0, 0, 0), this.scene);
         this.camera.lowerRadiusLimit = 0.5;
         this.camera.upperRadiusLimit = radius;
@@ -112,7 +116,7 @@ export class Player extends TransformNode {
         this.camera.lockedTarget = this._camRoot;
         //this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
-        this.camera.upperBetaLimit = Math.PI / 2 + 0.2; // Pour pas que la cam passe dans le sol (faire +0.1 pour remonter la limite)
+        this.camera.upperBetaLimit = 3*Math.PI / 4 //Math.PI / 2 + 0.2; // Pour pas que la cam passe dans le sol (faire +0.1 pour remonter la limite)
         //this.camera.parent = yTilt;
         // this.camera.checkCollision = true;
         // this.camera.collisionRadius = new Vector3(10, 10, 10);
@@ -121,7 +125,7 @@ export class Player extends TransformNode {
         this.camera.inertia = 0.54;
 
         this.camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
-        //this.camera.minZ = 14;
+        //this.camera.wheelPrecision = 100;
 
 
         this.camera.attachControl(this._canvas, true);
@@ -152,10 +156,24 @@ export class Player extends TransformNode {
         } else {
             // la caméra suit la targetPosition
             // On lerp aussi uniquement sur les y
+
+            if (this.camera.beta >= 1.75) {
+                this.camera.radius = this._cameraRadiusFunction.apply(this.camera.beta);
+                //this.camera.radius = 30.43 - 11.1001 * this.camera.beta;//-11.1147 * this.camera.beta + 28.3241 //-11.5474 * this.camera.beta + 32.208;
+                            //this.camera.upperBetaLimit = Math.PI / 2 - 0.2;
+            }
+            else {
+
+            }
+
             this._camRoot.position = new Vector3(targetPosition.x, Lerp(this._camRoot.position.y, targetPosition.y, step), targetPosition.z);
+
         }
         this._yTilt = this.camera.beta;
         this._camRoot.rotation = this.camera.rotation;
+
+
+        console.log("cam beta : ", this.camera.beta, " radius : ", this.camera.radius);
 
 
 
@@ -188,7 +206,7 @@ export class Player extends TransformNode {
         //     console.log("" + hit + this._deltaTime);
         // }
 
-        if (hit.hit) {
+        if (hit.hit && this.camera.beta < 1.75) {
             let distance = Vector3.Distance(this._camRoot.position, hit.pickedPoint);
             console.log("distance : ", distance);
             this.camera.radius = Scalar.Lerp(this.camera.radius, Math.max(Math.ceil(distance), this.camera.lowerRadiusLimit), 0.5);
