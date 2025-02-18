@@ -70,7 +70,10 @@ export class Player extends TransformNode {
         this.scene = scene;
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
+
         this.mesh.position.y = 30 // Temporairement, en attendant qu'il y ait une startPos dans la ville
+        //this.mesh.position = new Vector3(51, 18, 11);
+
         this.mesh.parent = this;
 
         this._setupPlayerCamera();
@@ -173,7 +176,7 @@ export class Player extends TransformNode {
         this._camRoot.rotation = this.camera.rotation;
 
 
-        console.log("cam beta : ", this.camera.beta, " radius : ", this.camera.radius);
+        //console.log("cam beta : ", this.camera.beta, " radius : ", this.camera.radius);
 
 
 
@@ -208,7 +211,7 @@ export class Player extends TransformNode {
 
         if (hit.hit && this.camera.beta < 1.75) {
             let distance = Vector3.Distance(this._camRoot.position, hit.pickedPoint);
-            console.log("distance : ", distance);
+            //console.log("distance : ", distance);
             this.camera.radius = Scalar.Lerp(this.camera.radius, Math.max(Math.ceil(distance), this.camera.lowerRadiusLimit), 0.5);
         } else {
             this.camera.radius = Scalar.Lerp(this.camera.radius, 15, 0.1);
@@ -287,7 +290,7 @@ export class Player extends TransformNode {
 
     public activatePlayerCamera(): UniversalCamera {
         this.scene.registerBeforeRender(() => {
-
+            console.log(this.mesh.position);
             this._beforeRenderUpdate();
             this._cameraRaycast();
             this._updateCamera();
@@ -406,8 +409,8 @@ export class Player extends TransformNode {
         }
 
         // limit the speed of gravity to the negative of the jump power
-        if (this._gravity.y < -Player.JUMP_FORCE) {
-            this._gravity.y = -Player.JUMP_FORCE;
+        if (this._gravity.y < -2*Player.JUMP_FORCE) {
+            this._gravity.y = -2*Player.JUMP_FORCE;
         }
         let move = this._moveVector;
         // moveVector.x *= this._horizontalVelocity;

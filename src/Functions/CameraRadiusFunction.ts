@@ -16,28 +16,14 @@ export class CameraRadiusFunction implements MyFunction {
 
         let startEnd= this.findStartEnd(x);
 
-        console.log("startEnd", startEnd);
-
         let start = startEnd[0];
         let end = startEnd[1];
 
         // longueur de start à x divisée par la longueur de start à end (sur les betas)
         let stepPercentage = Math.abs(this.betaValues[start] - x) / Math.abs(this.betaValues[end] - this.betaValues[start]);
 
-        console.log("percentage", stepPercentage);
-
         let radiusStep = Math.abs(this.radiusValues[end] - this.radiusValues[start]) * stepPercentage;
-
-        console.log("radiusStep", radiusStep);
-
-
-        console.log(this.radiusValues[start], this.radiusValues[end], radiusStep);
-        console.log(this.radiusValues[start] - radiusStep)
-
-
         return this.radiusValues[start] - radiusStep;
-
-
     }
 
     // Renvoie les indices dans lesquels x est compris

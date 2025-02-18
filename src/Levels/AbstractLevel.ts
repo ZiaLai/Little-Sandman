@@ -52,4 +52,8 @@ export abstract class AbstractLevel {
             object.destroy();
         }
     }
+
+    getName() {
+        return this._name;
+    }
 }

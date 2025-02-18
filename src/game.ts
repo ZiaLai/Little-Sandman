@@ -4,6 +4,7 @@ import {Environment} from "./environment";
 import {Engine, Scene, TransformNode, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
 import {CityLevel} from "./Levels/CityLevel";
+import {BakersBedroom} from "./Levels/BakersBedroom";
 
 export class Game {
 
@@ -11,33 +12,53 @@ export class Game {
     private _scene: Scene;
     private _player: Player;
 
-    private levels: AbstractLevel[] = [
-        new CityLevel(this, 0),
-        new Level1_1_1(this, 1)
-    ];
-    private _currentLevel : number;
+    private _levels: {};
+
+    private _currentLevel : string;
     private _engine: Engine;
 
     constructor(engine: Engine, scene: Scene, player: Player, environment: Environment) {
+        let levels: AbstractLevel[] = [
+            new CityLevel(this, 0),
+            new BakersBedroom(this, 1),
+            new Level1_1_1(this, 2)
+
+        ];
+        this._levels = {};
+        this._makeLevelDictionary(levels);
+        console.log(this._levels);
+
         this._engine = engine;
         this._player = player;
         this.environment = environment;
         this._scene = scene;
-        this._currentLevel = 0;
+        this._currentLevel = "city";
+    }
+
+    private _makeLevelDictionary(levels: AbstractLevel[]): void {
+        for (let level of levels) {
+            this._levels[level.getName()] = level;
+        }
     }
 
     public update(): void {
-        this.levels[this._currentLevel].update();
+        this._levels[this._currentLevel].update();
     }
 
     public initializeLevel(): void {
-        this.levels[this._currentLevel].initialize();
+        this._levels[this._currentLevel].initialize();
     }
 
-    public setActiveLevel(levelIndex: number): void {
-        this._currentLevel = levelIndex;
-        this.levels[this._currentLevel].setActive();
+    public setActiveLevel(name: string): void {
+        if (Object.keys(this._levels).includes(name)) {
+            this._currentLevel = name;
+            this._levels[this._currentLevel].setActive();
+        }
+        else {
+            throw new Error(`The level name "${name}" does not exist`);
+        }
     }
+
 
     public getPlayer(): Player {
         return this._player;
@@ -50,6 +71,7 @@ export class Game {
         const startNode: TransformNode = this._scene.getTransformNodeByName("START POSITION");
         if (startNode === null) {console.log("start position is null")}
         // todo : supprimer la ligne suivante quand Zia aura remonté la start pos (là on spawn sous la ville)
+        return new Vector3(30, 12, 28); // Devant fenetre boulangerie
         return new Vector3(0, 12, 0);
         return startNode !== null ? startNode.getAbsolutePosition() : new Vector3(0, 30, 0);
     }
@@ -64,5 +86,9 @@ export class Game {
 
     public getScene() {
         return this._scene;
+    }
+
+    getEnvironment() {
+        return this.environment;
     }
 }

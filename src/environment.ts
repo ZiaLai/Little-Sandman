@@ -4,6 +4,7 @@ export class Environment {
     private _scene: Scene;
     private _currentAssetName: string;
     private _assets: { allMeshes: any; env?: AbstractMesh; };
+    private _triggers: Mesh[] = [];
 
     constructor(scene: Scene, assetName: string) {
         this._scene = scene;
@@ -17,8 +18,9 @@ export class Environment {
         this._assets.allMeshes.forEach((m) => {
             m.dispose();
         })
+        this._triggers = [];
         // Chargement des nouveaux assets
-        this.load();
+        await this.load();
     }
 
     public async load() {
@@ -33,13 +35,21 @@ export class Environment {
 
             if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                m.isVisible = false;
+                //m.isVisible = false;
                 m.isPickable = true;
+            }
+            else if (m.name.includes("trigger")) {
+                // m.visible = false;
+                m.isPickable = false;
+                m.checkCollisions = false;
+                this._triggers.push(m);
             }
             else {
                 // Tous les autres mesh ne vérifient pas les collisions
                // m.isPickable = false;
+                m.isVisible = false;
                 m.checkCollisions = false;
+                m.isPickable = false;
             }
 
             // if (m.name.includes("immaterial")) {
@@ -59,5 +69,13 @@ export class Environment {
             env: env, // reference to our entire imported glb (meshes and transform nodes)
             allMeshes: allMeshes // all of the meshes that are in the environment
         }
+    }
+
+    public getAssets() {
+        return this._assets;
+    }
+
+    public getTriggers() {
+        return this._triggers;
     }
 }

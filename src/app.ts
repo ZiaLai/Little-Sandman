@@ -251,7 +251,7 @@ class App {
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene, "ville_corrige_4");
+        const environment = new Environment(scene, "city");
         this._environment = environment;
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene);
@@ -367,7 +367,7 @@ class App {
 
         changeButton.onPointerDownObservable.add(() => {
             //this._environment.changeAsset("bakery_indoors_with_textures");
-            this._game.setActiveLevel(1);
+            this._game.setActiveLevel("bakers_bedroom");
         })
 
 
@@ -388,7 +388,7 @@ class App {
         // Instanciation de la classe game
         this._game = new Game(this._engine, scene, this._player, this._environment);
 
-        this._game.setActiveLevel(0);
+        this._game.setActiveLevel("city");
         this._game.initializeLevel();
 
         this._scene.dispose();

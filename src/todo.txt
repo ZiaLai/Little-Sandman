@@ -59,58 +59,6 @@ FPS
         [x] Hauteur du saut
         [x] Durée du hovering
 
-########################################################################################################################
-TODO
-########################################################################################################################
-
-[] Résoudre les bugs de collision
-
-
-En vrai, est-ce que y a vraiment besoin de faire ça MAINTENANT ?
-Oui, parce que sinon, ça va devenir horrible avec l'enum
-[] Faire un changement entre deux scènes
-    Par exemple entre la ville et le monde du tuto
-    Pour ça il faudra d'abord restructurer le code. Il ne faut pas utilliser une enum car c'est pas terrible.
-    Il va falloir faire des classes d'état.
-    [] GameState (classe mère)
-        [] GameplayState
-            Prend en paramètre une ressource graphique
-        [] MenuState
-            Il faut définir les menus dans le corps de la classe (et si on utilisait des classes anonymes ?
-                                                                  ça permettrait d'écrire tous les états dans un seul fichier)
-
-       QUESTION : Est-ce qu'il faut faire une structure qui permet de savoir quels sont les états voisins.
-                    Afin de les charger à l'avance ? On peut faire par exemple un graphe ou un arbre.
-                    ça a l'air intéressant, mais on verra ça plus tard...
-
-    Sinon on peut juste faire une classe SceneManager.
-    Il aurait une scene active. Et pourrait charger les autres scènes. En fait ça revient au même.
-    En fait on a besoin des deux. on pourrait plutôt l'appeler GameStateManager.
-    Et voilà.
-
-    De quoi a besoin une scène ?
-    1. d'être initialisée => Charger ressource graphique, et faire spawn des mobs par exemple
-    2. d'être update => boucle de jeu
-
-    On peut peut-être dissocier le chargement des ressources avec un RessourceManager ?
-
-
-
-
-========================================================================================================================
-[] Gérer des interactions avec le monde (continuer le tuto)
-
-
-AVEC ZIA
-[] Mettre la startPosition dans la ville
-
-
-SIDE QUESTS
-
-
-[] Empêcher la camera de passer sous le sol
-
-POLISH
 [x] Sauter plus haut si on laisse espace appuyé (tuto Griffpatch ?)
     Méthode
     #######
@@ -136,12 +84,101 @@ POLISH
 [x] Ajouter du momentum (tuto Griffpatch ?)
     Pas besoin du tuto. Il suffit de rajouter de l'interpolation sur v et h
 
+########################################################################################################################
+
+########################################################################################################################
+
+Petit problème : dans un niveau, on change de scènes entre la cuisine et les brèches. Il faut qu'on garde en mémoire
+l'état de la scène précédente, pour ne pas faire respawn tous les éléments.
+
+[] Faire une classe Level
+    [] constructeur avec ressource d'environnement
+    [] load() charge les ressources : environnement, musiques, sprites des objets
+    [] initialize(), initialise les objets du niveau
+    [] setActive(), rend le niveau actif
+    [] destruct(), détruit les ressources
+    [] update(), met à jour tous les objets du niveau
+
+
+[] Pour créer les niveaux, on fera des sous classes implémentant Level (par ex Level1_1_1, Level1_1_2, Level1_1_3)
+
+[] Démarrer le niveau ville, en créant la game.
+
+
+
+[] Pour utiliser les fonctions update, il faudra mettre les update en beforeRender
+https://forum.babylonjs.com/t/which-best-method-for-mesh-rendering-updated-every-frame/2834/2
+En fait, je sais pas...
+
+
+
+
+
+========================================================================================================================
+todo
+
+[x] mettre le joueur à la start position quand on charge le niveau
+    On abandonne ?
+    On peut juste hard code la position de départ sinon.
+    Il faudrait quand même qu'on puisse récupérer la position, parce qu'on aura besoin de placer
+    d'autres éléments à part le joueur.
+    - soit en utilisant des meshs
+    - soit en essayant de récupérer la position d'un TransformNode
+
+[x] Modifier la liste d'AbstractLevel en dico pour y accéder par nom
+
+[x] Créer le niveau "chambre boulangère"
+
+[x] Y accéder avec le bouton "change"
+
+[] Y accéder avec une collision avec un trigger
+
+[] Voir avec Zia pour ajuster la startPosition (là on spawn sous la ville)
+
+========================================================================================================================
+[x] Réactiver le raycast pour les objets immatériels
+
+[x] Réduire vitesse de déplacement
+[x] Vérifier/enlever interpolation de la cam pour éviter les bugs quand on se déplace
+    En fait le problème vient du fait que le sol n'est pas parfaitement plat
+    Bug de camera quand on marche vers l'arrière en se regardant
+
+[x] Corriger bug camera qui passe dans les murs (Laisser plus d'espace entre le mur et la cam)
+    Ajouter d'autres raycasts ?
+
+[] Bug : on peut spawner dans le sol.
+    Il faut s'assurer que la map soit chargée avant qu'on place le player.
+
+
+[] Gérer la lumière (trop de lumière dans la cuisine)
+[] Ajouter un plafond artificiel (il faudra donc coder la ceiling detection)
+
+
+
+
+AVEC ZIA
+[] Mettre la startPosition dans la ville
+[] Résoudre les bugs de collision
+    En fait, c'est la géométrie de psychopathe qui cause ces problèmes.
+    Dans la première version de la ville, les collisions sont complètement ok.
+
+
+SIDE QUESTS
+[] Empêcher la caméra de passer sous le sol
+
+POLISH
+
 [] Ajouter la ceiling detection
     Faire des raycasts vers le haut comme pour la détection du sol ?
 
-[] Faire en sorte qu'on puisse regarder vers le ciel
+[x] Faire en sorte qu'on puisse regarder vers le ciel
     Il faut que la camera se rapproche du joueur quand la camera descend vers le sol
     Dans genshin, le perso devient transparent aussi
+
+    Il faut pas Lerper vers une position fixe. Il faudrait une fonction qui au beta associe le radius.
+
+    On est pas loin, il faut juste recalculer une fonction qui zoome un peu plus (On avait pris 5 comme radius)
+    On peut essayer avec 4.
 
 
 
@@ -149,6 +186,17 @@ POLISH
 BUGS
 [x] Bug Quand on clique, puis appuie sur échap
     Rattrappage de l'erreur
+
+[] Bugs de camera. Vérifier l'interpolation ?
+
+
+SON
+Babylon js ne prend pas en charge les fichiers midi.
+Il faudra exporter les pistes individuellement en .wav par exemple
+Dans la doc : Playing several sounds simultaneously and synchronized
+On démarre tous les sons en même temps, mais on met le volume sonore à 0 pour les pistes qu'on n'utilise pas encore.
+
+
 
 
 
@@ -166,3 +214,39 @@ ON OUBLIE
 
 [] Reprogrammer la détection du sol/pentes comme Griffpatch car là on passe parfois au travers
     En fait, bof. Mieux vaut éviter les boucles infinies
+
+#hammerjs
+
+En vrai, est-ce que y a vraiment besoin de faire ça MAINTENANT ?
+Oui, parce que sinon, ça va devenir horrible avec l'enum
+[] Faire un changement entre deux scènes
+    Par exemple entre la ville et le monde du tuto
+    Pour ça il faudra d'abord restructurer le code. Il ne faut pas utiliser une enum car c'est pas terrible.
+    Il va falloir faire des classes d'état.
+    [] GameState (classe mère)
+        [] GameplayState
+            Prend en paramètre une ressource graphique
+        [] MenuState
+            Il faut définir les menus dans le corps de la classe (et si on utilisait des classes anonymes ?
+                                                                  ça permettrait d'écrire tous les états dans un seul fichier)
+
+       QUESTION : Est-ce qu'il faut faire une structure qui permet de savoir quels sont les états voisins.
+                    Afin de les charger à l'avance ? On peut faire par exemple un graphe ou un arbre.
+                    ça a l'air intéressant, mais on verra ça plus tard...
+
+    Sinon on peut juste faire une classe SceneManager.
+    Il aurait une scene active. Et pourrait charger les autres scènes. En fait ça revient au même.
+    En fait on a besoin des deux. on pourrait plutôt l'appeler GameStateManager.
+    Et voilà.
+
+    De quoi a besoin une scène ?
+    1. d'être initialisée => Charger ressource graphique, et faire spawn des mobs par exemple
+    2. d'être update => boucle de jeu
+
+    On peut peut-être dissocier le chargement des ressources avec un RessourceManager ?
+
+
+RECAP
+    En fait une scene a besoin de :
+        - start : actions exécutées quand on démarre la scène
+        - update : la boucle de jeu de la scene
