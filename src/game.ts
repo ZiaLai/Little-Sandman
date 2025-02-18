@@ -71,7 +71,7 @@ export class Game {
         const startNode: TransformNode = this._scene.getTransformNodeByName("START POSITION");
         if (startNode === null) {console.log("start position is null")}
         // todo : supprimer la ligne suivante quand Zia aura remonté la start pos (là on spawn sous la ville)
-        return new Vector3(30, 12, 28); // Devant fenetre boulangerie
+        //return new Vector3(30, 12, 28); // Devant fenetre boulangerie
         return new Vector3(0, 12, 0);
         return startNode !== null ? startNode.getAbsolutePosition() : new Vector3(0, 30, 0);
     }

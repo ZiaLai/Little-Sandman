@@ -251,7 +251,7 @@ class App {
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene, "city");
+        const environment = new Environment(scene, "city_v8");
         this._environment = environment;
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene);

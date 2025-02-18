@@ -115,7 +115,6 @@ En fait, je sais pas...
 
 
 ========================================================================================================================
-todo
 
 [x] mettre le joueur à la start position quand on charge le niveau
     On abandonne ?
@@ -131,9 +130,31 @@ todo
 
 [x] Y accéder avec le bouton "change"
 
-[] Y accéder avec une collision avec un trigger
+[x] Y accéder avec une collision avec un trigger
+
+
+========================================================================================================================
+
+[] Supprimer anciens modèles
+
+[] Séparer la camera du player dans une autre classe
+
+[] Faire du raycasting sur des meshs invisibles
+
+
+========================================================================================================================
 
 [] Voir avec Zia pour ajuster la startPosition (là on spawn sous la ville)
+    En fait le problème vient probablement du fait que le joueur peut charger avant la ville
+    et donc passer sous le sol.
+    Il faut faire de l'asynchrone
+
+[] Faire en sorte qu'il puisse y avoir plusieurs positions de départ.
+    Passer la position en argument de setActiveLevel ?
+    On pourrait avoir une position par default, mais pouvoir changer si nécessaire
+    (Quand on sort de la baker's bedroom on doit spawner derrière la fenêtre)
+
+
 
 ========================================================================================================================
 [x] Réactiver le raycast pour les objets immatériels
