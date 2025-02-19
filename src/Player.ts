@@ -13,9 +13,10 @@ import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
+import {PlayerCamera} from "./PlayerCamera";
 
 export class Player extends TransformNode {
-    public camera;
+    public camera: PlayerCamera;
     public scene: Scene;
     private _inputs: PlayerInput[];
     private _currentInput: number = 0; // 0 = keyboard, 1 = gamepad
@@ -24,9 +25,6 @@ export class Player extends TransformNode {
     //Player
     public mesh: Mesh; //outer collisionbox of player
 
-    // Camera
-    private _camRoot: TransformNode;
-    private _yTilt: TransformNode;
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
@@ -46,7 +44,7 @@ export class Player extends TransformNode {
     //gravity, ground detection, jumping
     private _gravity: Vector3 = new Vector3();
     private _grounded: boolean;
-    private _lastGroundPos: Vector3 = Vector3.Zero();
+    lastGroundPos: Vector3 = Vector3.Zero();
     private _maxJumpCount : number = 1;
     private _jumpCount: number = 1;
     private _canHover: boolean = false;
@@ -61,8 +59,6 @@ export class Player extends TransformNode {
     private _speed: number = 0;
     private _acceleration: number = 1 / 7 * Player.PLAYER_SPEED;
     private _moveVector: Vector3;
-    private _originalCameraRadius: number;
-    private _cameraRadiusFunction = new CameraRadiusFunction();
 
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
@@ -76,7 +72,7 @@ export class Player extends TransformNode {
 
         this.mesh.parent = this;
 
-        this._setupPlayerCamera();
+        this.camera = new PlayerCamera(this, this.scene, canvas);
         this._canvas = canvas;
 
         this.scene.getLightByName("sparklight").parent = this.scene.getTransformNodeByName("Empty");
@@ -93,131 +89,6 @@ export class Player extends TransformNode {
         this.mesh.position = position;
     }
 
-    private _setupPlayerCamera(): ArcRotateCamera {
-        // TransformNode permettant de positionner la camera
-        this._camRoot = new TransformNode("root");
-        this._camRoot.position = new Vector3(0, 0, 0);
-        // To face the player from behind (180 degrees)
-        this._camRoot.rotation = new Vector3(0, Math.PI, 0);
-
-        // rotations along the x-axis (up/down tilting)
-        // let yTilt = new TransformNode("ytilt");
-        // adjustments to camera view to point down at our player
-        // yTilt.rotation = Player.ORIGINAL_TILT;
-        // this._yTilt = yTilt;
-        // yTilt.parent = this._camRoot;
-
-        // Propriétés de la camera
-        let radius = 12;
-        this._originalCameraRadius = radius;
-        this.camera = new ArcRotateCamera("cam", 0, 0, radius, new Vector3(0, 0, 0), this.scene);
-        this.camera.lowerRadiusLimit = 0.5;
-        this.camera.upperRadiusLimit = radius;
-
-        this.scene.activeCamera = this.camera;
-
-        this.camera.lockedTarget = this._camRoot;
-        //this.camera.lockedTarget = this._camRoot.position;
-        this.camera.fov = 0.47350045992678597;
-        this.camera.upperBetaLimit = 3*Math.PI / 4 //Math.PI / 2 + 0.2; // Pour pas que la cam passe dans le sol (faire +0.1 pour remonter la limite)
-        //this.camera.parent = yTilt;
-        // this.camera.checkCollision = true;
-        // this.camera.collisionRadius = new Vector3(10, 10, 10);
-        //this.camera.zoomToMouseLocation = true;
-        this.camera.panningSensibility = 0;
-        this.camera.inertia = 0.54;
-
-        this.camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
-        //this.camera.wheelPrecision = 100;
-
-
-        this.camera.attachControl(this._canvas, true);
-        if (this._currentInput == 1) {
-            //this.camera.inputs.clear();
-            //this.camera.inputs.removeByType("ArcRotateCameraPointersInput");
-        }
-        return this.camera;
-
-    }
-
-    // Misa à jour de la camera
-    private _updateCamera(): void {
-        let x = this.mesh.position.x;
-        let y = this._lastGroundPos.y; // Dernière position sur le sol en y, car la caméra reste fixe si on saute
-        let z = this.mesh.position.z;
-
-
-        // Position vers laquelle se dirige la camera
-        let targetPosition: Vector3 = new Vector3(x, y + 3, z);
-
-        let step: number = 0.1;
-
-        if (this.mesh.position.y - this._lastGroundPos.y < 0) { // Le joueur chute
-            // La caméra doit suivre la position du mesh
-            // On lerp uniquement sur les y
-            this._camRoot.position = new Vector3(this.mesh.position.x, Lerp(this._camRoot.position.y, this.mesh.position.y, step), this.mesh.position.z);
-        } else {
-            // la caméra suit la targetPosition
-            // On lerp aussi uniquement sur les y
-
-            if (this.camera.beta >= 1.75) {
-                this.camera.radius = this._cameraRadiusFunction.apply(this.camera.beta);
-                //this.camera.radius = 30.43 - 11.1001 * this.camera.beta;//-11.1147 * this.camera.beta + 28.3241 //-11.5474 * this.camera.beta + 32.208;
-                            //this.camera.upperBetaLimit = Math.PI / 2 - 0.2;
-            }
-            else {
-
-            }
-
-            this._camRoot.position = new Vector3(targetPosition.x, Lerp(this._camRoot.position.y, targetPosition.y, step), targetPosition.z);
-
-        }
-        this._yTilt = this.camera.beta;
-        this._camRoot.rotation = this.camera.rotation;
-
-
-        //console.log("cam beta : ", this.camera.beta, " radius : ", this.camera.radius);
-
-
-
-
-        // if (this._currentInput == 1) {
-        //     let previousRot = this.camera.rotation;
-        //     let rotX = this._inputs[this._currentInput].camHorizontal;
-        //     let rotY = this._inputs[this._currentInput].camVertical;
-        //     let newRot = new Vector3(rotX, rotY, 0);
-        //     this.camera.rotation = previousRot.addInPlace(newRot);
-        // }
-        //console.log("yTilt : " + this._yTilt);
-        // this._camRoot.position = Vector3.Lerp(this._camRoot.position,
-        //    new Vector3(this.mesh.position.x, this.mesh.position.y + 3, this.mesh.position.z), 0.4);
-
-    }
-
-    //  Permet de vérifier s'il y a un mur derrière la camera
-    // Et de rapprocher la camera du player pour éviter qu'elle passe au travers du mur
-    private _cameraRaycast() {
-
-        // Raycast vers l'arrière
-        let direction = this.camera.getForwardRay().direction.normalize().scale(-1);
-        //direction.y = 0;
-        let ray = new Ray(this._camRoot.position, direction, this.camera.radius);
-        let hit = this.scene.pickWithRay(ray);
-        // let rayHelper = new RayHelper(ray);
-        // rayHelper.show(this.scene);
-        // if (!hit.hit) {
-        //     console.log("" + hit + this._deltaTime);
-        // }
-
-        if (hit.hit && this.camera.beta < 1.75) {
-            let distance = Vector3.Distance(this._camRoot.position, hit.pickedPoint);
-            //console.log("distance : ", distance);
-            this.camera.radius = Scalar.Lerp(this.camera.radius, Math.max(Math.ceil(distance), this.camera.lowerRadiusLimit), 0.5);
-        } else {
-            this.camera.radius = Scalar.Lerp(this.camera.radius, 15, 0.1);
-        }
-    }
-
     // Calculs en fonction des inputs
     public _updateFromControls(): void {
         this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
@@ -226,8 +97,8 @@ export class Player extends TransformNode {
         this._h = this._inputs[this._currentInput].horizontal; // input sur l'axe des x
         this._v = this._inputs[this._currentInput].vertical; // input sur l'axe des z
 
-        let fwd = new Vector3(Math.cos(this.camera.alpha + Math.PI), 0, Math.sin(this.camera.alpha + Math.PI));
-        let right = new Vector3(Math.cos(this.camera.alpha + Math.PI / 2), 0, Math.sin(this.camera.alpha + Math.PI / 2));
+        let fwd = new Vector3(Math.cos(this.camera.getAlpha() + Math.PI), 0, Math.sin(this.camera.getAlpha() + Math.PI));
+        let right = new Vector3(Math.cos(this.camera.getAlpha() + Math.PI / 2), 0, Math.sin(this.camera.getAlpha() + Math.PI / 2));
 
         let correctedVertical = fwd.scaleInPlace(this._v);
         let correctedHorizontal = right.scaleInPlace(this._h);
@@ -281,27 +152,15 @@ export class Player extends TransformNode {
         // rotation en fonction de l'input et de l'angle de la caméra
         let angle = Math.atan2(this._inputs[this._currentInput].horizontalAxis, this._inputs[this._currentInput].verticalAxis) + Math.PI;
         //angle += (this.camera.alpha) % (2 * Math.PI);
-        angle += - this.camera.alpha + Math.PI / 2;
+        angle += - this.camera.getAlpha() + Math.PI / 2;
         let targ = Quaternion.FromEulerAngles(0, angle, 0);
         this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
 
 
     }
 
-    public activatePlayerCamera(): UniversalCamera {
-        this.scene.registerBeforeRender(() => {
-            console.log(this.mesh.position);
-            this._beforeRenderUpdate();
-            this._cameraRaycast();
-            this._updateCamera();
 
-        })
-
-
-        return this.camera;
-    }
-
-    private _beforeRenderUpdate(): void {
+    beforeRenderUpdate(): void {
         //console.log("deltaTime : " + this._deltaTime);
         this._updateFromControls();
         this._updateGroundDetection();
@@ -425,7 +284,7 @@ export class Player extends TransformNode {
         if (this._isGrounded()) {
             this._gravity.y = 0;
             this._grounded = true;
-            this._lastGroundPos.copyFrom(this.mesh.position);
+            this.lastGroundPos.copyFrom(this.mesh.position);
             this._canHover = true;
             this._falling = 0;
 

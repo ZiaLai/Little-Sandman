@@ -135,9 +135,9 @@ En fait, je sais pas...
 
 ========================================================================================================================
 
-[] Supprimer anciens modèles
+[x] Supprimer anciens modèles
 
-[] Séparer la camera du player dans une autre classe
+[x] Séparer la camera du player dans une autre classe
 
 [] Faire du raycasting sur des meshs invisibles
 
