@@ -2,16 +2,17 @@ import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 import {MyFunction} from "./MyFunction";
 
 export class CameraRadiusFunction implements MyFunction {
-    private betaValues = [1.75, 1.9, 1.91, 1.93, 1.94, 1.95, 1.96, 1.99, 2.02, 2.07, 2.13, 2.20, 2.23, 2.33, 2.35];
+    private betaValues = [0.01, 1.3, 1.75, 1.81, 1.9, 2.02, 2.35];
     // Valeurs maximales du radius pour chaque beta
-    private radiusValues = [12, 9.6, 9.39, 9.08, 8.87, 8.61, 8.36, 7.93, 7.4, 6.93, 6.39, 5.87, 5.50, 5.12, 5.07];
+    private radiusValues = [20, 15.8, 10, 7, 6.12,  4.82, 3];
+    private _minimalRadius = 3;
 
     apply(x: number): number {
         if (this.betaValues.includes(x)) {
             return this.radiusValues[this.betaValues.indexOf(x)];
         }
         if (x > 2.35) {
-            return 5;
+            return this._minimalRadius;
         }
 
         let startEnd= this.findStartEnd(x);

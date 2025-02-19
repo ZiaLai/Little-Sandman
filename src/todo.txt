@@ -139,7 +139,9 @@ En fait, je sais pas...
 
 [x] Séparer la camera du player dans une autre classe
 
-[] Faire du raycasting sur des meshs invisibles
+[x] Faire du raycasting sur des meshs invisibles
+
+[] Équilibrer la camera à la Mario
 
 
 ========================================================================================================================

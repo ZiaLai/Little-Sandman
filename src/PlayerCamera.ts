@@ -1,4 +1,4 @@
-import {ArcRotateCamera, Ray, Scene, TransformNode, UniversalCamera, Vector3} from "@babylonjs/core";
+import {ArcRotateCamera, Ray, RayHelper, Scene, TransformNode, UniversalCamera, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
@@ -13,6 +13,10 @@ export class PlayerCamera {
 
     private _player: Player;
     private _cameraRadiusFunction: CameraRadiusFunction;
+    private _raycastCollision: boolean = false;
+    private _groundDetectionRadius: number;
+    private _raycastRadius: number;
+
 
 
      constructor(player: Player, scene: Scene, canvas: HTMLCanvasElement) {
@@ -38,7 +42,7 @@ export class PlayerCamera {
         // yTilt.parent = this._camRoot;
 
         // Propriétés de la camera
-        let radius = 12;
+        let radius = 20;
         this._originalCameraRadius = radius;
         this._camera = new ArcRotateCamera("cam", 0, 0, radius, new Vector3(0, 0, 0), this._scene);
         this._camera.lowerRadiusLimit = 0.5;
@@ -57,8 +61,9 @@ export class PlayerCamera {
         this._camera.panningSensibility = 0;
         this._camera.inertia = 0.54;
 
-        this._camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
-        //this.camera.wheelPrecision = 100;
+        // todo : désactiver zoom
+        //this._camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
+        this._camera.wheelPrecision = 25;
 
 
         this._camera.attachControl(canvas, true);
@@ -76,28 +81,24 @@ export class PlayerCamera {
 
 
         // Position vers laquelle se dirige la camera
-        let targetPosition: Vector3 = new Vector3(x, y + 3, z);
+        let targetPosition: Vector3 = new Vector3(x, y + 2, z);
 
-        let step: number = 0.1;
+        let upwardStep: number = 0.025;
+        let downwardStep: number = 0.1;
 
         if (this._player.mesh.position.y - this._player.lastGroundPos.y < 0) { // Le joueur chute
             // La caméra doit suivre la position du mesh
             // On lerp uniquement sur les y
-            this._camRoot.position = new Vector3(this._player.mesh.position.x, Lerp(this._camRoot.position.y, this._player.mesh.position.y, step), this._player.mesh.position.z);
+            this._camRoot.position = new Vector3(this._player.mesh.position.x, Lerp(this._camRoot.position.y, this._player.mesh.position.y, downwardStep), this._player.mesh.position.z);
         } else {
             // la caméra suit la targetPosition
             // On lerp aussi uniquement sur les y
 
-            if (this._camera.beta >= 1.75) {
-                this._camera.radius = this._cameraRadiusFunction.apply(this._camera.beta);
+            this._groundDetectionRadius = this._cameraRadiusFunction.apply(this._camera.beta);
                 //this.camera.radius = 30.43 - 11.1001 * this.camera.beta;//-11.1147 * this.camera.beta + 28.3241 //-11.5474 * this.camera.beta + 32.208;
                 //this.camera.upperBetaLimit = Math.PI / 2 - 0.2;
-            }
-            else {
 
-            }
-
-            this._camRoot.position = new Vector3(targetPosition.x, Lerp(this._camRoot.position.y, targetPosition.y, step), targetPosition.z);
+            this._camRoot.position = new Vector3(targetPosition.x, Lerp(this._camRoot.position.y, targetPosition.y, upwardStep), targetPosition.z);
 
         }
         //this._yTilt = this.camera.beta;
@@ -128,14 +129,20 @@ export class PlayerCamera {
 
         // Raycast vers l'arrière
         let direction = this._camera.getForwardRay().direction.normalize().scale(-1);
-        //direction.y = 0;
-        let ray = new Ray(this._camRoot.position, direction, this._camera.radius);
+        console.log("direction", direction)
+        //direction.y = 0;t
+        let pos: Vector3 = new Vector3(0, 0, 0);
+        pos.copyFrom(this._camRoot.position);
+        pos.addInPlace(direction);
+        pos.addInPlace(direction);
+        pos.addInPlace(direction);
+
+        let ray = new Ray(pos, direction, this._camera.radius - 3* direction.length());
 
         // let rayHelper = new RayHelper(ray);
-        // rayHelper.show(this.scene);
-        // if (!hit.hit) {
-        //     console.log("" + hit + this._deltaTime);
-        // }
+
+        // rayHelper.show(this._scene);
+
         let predicate = function (mesh) {
             return mesh.isPickable && mesh.isEnabled();
         }
@@ -143,18 +150,21 @@ export class PlayerCamera {
         let hit = this._scene.pickWithRay(ray, predicate);
 
         if (hit.hit && this._camera.beta < 1.75) {
+            this._raycastCollision = true;
             let distance = Vector3.Distance(this._camRoot.position, hit.pickedPoint);
             //console.log("distance : ", distance);
-            this._camera.radius = Lerp(this._camera.radius, Math.max(Math.ceil(distance), this._camera.lowerRadiusLimit), 0.5);
+            this._raycastRadius = Lerp(this._camera.radius, Math.max(Math.ceil(distance), this._camera.lowerRadiusLimit), 0.5);
         } else {
-            this._camera.radius = Lerp(this._camera.radius, 15, 0.1);
+            this._raycastRadius = Lerp(this._camera.radius, 15, 0.1);
         }
     }
 
     public update(): void {
         this._updatePosition();
         this._raycast();
-        console.log("beta", this._camera.beta);
+        this._camera.radius = Math.min(this._raycastRadius, this._groundDetectionRadius);
+
+        //console.log("beta", this._camera.beta, "radius", this._camera.radius);
     }
 
     public activate(): ArcRotateCamera {

@@ -318,4 +318,8 @@ export class Player extends TransformNode {
            this._hoverTimer = Player.HOVER_TIME;
         }
     }
+
+    getDeltaTime() {
+        return this._deltaTime;
+    }
 }
