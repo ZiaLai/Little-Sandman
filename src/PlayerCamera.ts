@@ -130,12 +130,17 @@ export class PlayerCamera {
         let direction = this._camera.getForwardRay().direction.normalize().scale(-1);
         //direction.y = 0;
         let ray = new Ray(this._camRoot.position, direction, this._camera.radius);
-        let hit = this._scene.pickWithRay(ray);
+
         // let rayHelper = new RayHelper(ray);
         // rayHelper.show(this.scene);
         // if (!hit.hit) {
         //     console.log("" + hit + this._deltaTime);
         // }
+        let predicate = function (mesh) {
+            return mesh.isPickable && mesh.isEnabled();
+        }
+
+        let hit = this._scene.pickWithRay(ray, predicate);
 
         if (hit.hit && this._camera.beta < 1.75) {
             let distance = Vector3.Distance(this._camRoot.position, hit.pickedPoint);
@@ -149,6 +154,7 @@ export class PlayerCamera {
     public update(): void {
         this._updatePosition();
         this._raycast();
+        console.log("beta", this._camera.beta);
     }
 
     public activate(): ArcRotateCamera {
