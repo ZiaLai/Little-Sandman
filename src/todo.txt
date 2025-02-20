@@ -141,7 +141,8 @@ En fait, je sais pas...
 
 [x] Faire du raycasting sur des meshs invisibles
 
-[] Équilibrer la camera à la Mario
+[x] Équilibrer la camera à la Mario
+
 
 
 ========================================================================================================================
@@ -151,11 +152,16 @@ En fait, je sais pas...
     et donc passer sous le sol.
     Il faut faire de l'asynchrone
 
-[] Faire en sorte qu'il puisse y avoir plusieurs positions de départ.
+.[] Faire en sorte qu'il puisse y avoir plusieurs positions de départ.
     Passer la position en argument de setActiveLevel ?
     On pourrait avoir une position par default, mais pouvoir changer si nécessaire
     (Quand on sort de la baker's bedroom on doit spawner derrière la fenêtre)
 
+[] Arriver proprement dans la bakers_bedroom
+
+[] Détection de proximité avec la boulangère
+
+[] Démarrer le niveau
 
 
 ========================================================================================================================

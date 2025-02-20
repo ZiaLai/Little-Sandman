@@ -164,6 +164,7 @@ export class Player extends TransformNode {
         //console.log("deltaTime : " + this._deltaTime);
         this._updateFromControls();
         this._updateGroundDetection();
+        console.log("Player pos", this.mesh.position);
     }
 
     private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {

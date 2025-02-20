@@ -129,7 +129,7 @@ export class PlayerCamera {
 
         // Raycast vers l'arrière
         let direction = this._camera.getForwardRay().direction.normalize().scale(-1);
-        console.log("direction", direction)
+        // console.log("direction", direction)
         //direction.y = 0;t
         let pos: Vector3 = new Vector3(0, 0, 0);
         pos.copyFrom(this._camRoot.position);
