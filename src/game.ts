@@ -5,6 +5,7 @@ import {Engine, Scene, TransformNode, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
 import {CityLevel} from "./Levels/CityLevel";
 import {BakersBedroom} from "./Levels/BakersBedroom";
+import {Breach1} from "./Levels/Breach1";
 
 export class Game {
 
@@ -21,7 +22,8 @@ export class Game {
         let levels: AbstractLevel[] = [
             new CityLevel(this, 0),
             new BakersBedroom(this, 1),
-            new Level1_1_1(this, 2)
+            new Level1_1_1(this, 2),
+            new Breach1(this, 3)
 
         ];
         this._levels = {};
