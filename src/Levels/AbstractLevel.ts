@@ -1,13 +1,15 @@
-import {Scene} from "@babylonjs/core";
+import {ActionManager, ExecuteCodeAction, Mesh, Scene} from "@babylonjs/core";
 import {Environment} from "../environment";
 import {Game} from "../game";
+import {GameObject} from "../GameObjects/GameObject";
+
 
 export abstract class AbstractLevel {
     protected _name: string;
     protected _ressourceName: string;
     protected _game: Game;
 
-    protected _objects = [];
+    protected _objects: GameObject[] = [];
     private _id: number;
     private _loading: boolean;
 
@@ -55,5 +57,19 @@ export abstract class AbstractLevel {
 
     getName() {
         return this._name;
+    }
+
+    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string) {
+        m.actionManager.registerAction(
+            new ExecuteCodeAction(
+                {
+                    trigger: ActionManager.OnIntersectionEnterTrigger,
+                    parameter: this._game.getScene().getMeshByName("outer")
+                },
+                () => {
+                    this._game.setActiveLevel(destination);
+                },
+            ),
+        );
     }
 }

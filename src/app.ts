@@ -367,7 +367,7 @@ class App {
 
         changeButton.onPointerDownObservable.add(() => {
             //this._environment.changeAsset("bakery_indoors_with_textures");
-            this._game.setActiveLevel("bakers_bedroom");
+            this._game.setActiveLevel("breach_1");
         })
 
 
@@ -388,7 +388,7 @@ class App {
         // Instanciation de la classe game
         this._game = new Game(this._engine, scene, this._player, this._environment);
 
-        this._game.setActiveLevel("city");
+        this._game.setActiveLevel("breach_1");
         this._game.initializeLevel();
 
         this._scene.dispose();
