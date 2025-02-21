@@ -6,8 +6,13 @@ export abstract class GameObject {
     protected _game: Game;
 
     constructor(game: Game, mesh: Mesh) {
+        console.log("Creating GameObject");
+
         this._game = game;
         this._mesh = mesh;
+        if (this._mesh === undefined) {
+            throw new Error("Undefined mesh when creating a GameObject");
+        }
     }
 
     public abstract update(): void;

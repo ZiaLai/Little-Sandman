@@ -6,12 +6,14 @@ import {Player} from "./Player";
 import {CityLevel} from "./Levels/CityLevel";
 import {BakersBedroom} from "./Levels/BakersBedroom";
 import {Breach1} from "./Levels/Breach1";
+import {SpriteLoader} from "./SpriteLoader";
 
 export class Game {
 
     public environment: Environment;
     private _scene: Scene;
     private _player: Player;
+    spriteLoader: SpriteLoader;
 
     private _levels: {};
 
@@ -32,6 +34,7 @@ export class Game {
 
         this._engine = engine;
         this._player = player;
+        this.spriteLoader = new SpriteLoader(this);
         this.environment = environment;
         this._scene = scene;
         this._currentLevel = "city";
@@ -67,9 +70,9 @@ export class Game {
     }
 
     public getStartPosition(): Vector3 {
-        console.log("transform nodes : ", this._scene.transformNodes);
-        console.log("Meshes : ", this._scene.meshes);
-        console.log("Game scene :", this._scene);
+        // console.log("transform nodes : ", this._scene.transformNodes);
+        // console.log("Meshes : ", this._scene.meshes);
+        // console.log("Game scene :", this._scene);
         const startNode: TransformNode = this._scene.getTransformNodeByName("START POSITION");
         if (startNode === null) {console.log("start position is null")}
         // todo : supprimer la ligne suivante quand Zia aura remonté la start pos (là on spawn sous la ville)

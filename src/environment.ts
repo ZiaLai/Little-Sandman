@@ -35,7 +35,6 @@ export class Environment {
 
             if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                // todo : Comprendre pourquoi les raycasts marchent pas sur les meshs invisibles
 
                 m.isVisible = false;
                 m.isPickable = true;

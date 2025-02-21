@@ -9,6 +9,7 @@ export abstract class AbstractLevel {
     protected _ressourceName: string;
     protected _game: Game;
 
+    protected _objectsMeshes: {};
     protected _objects: GameObject[] = [];
     private _id: number;
     private _loading: boolean;

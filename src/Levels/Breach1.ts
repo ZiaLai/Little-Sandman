@@ -6,10 +6,17 @@ import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 export class Breach1 extends AbstractLevel {
     private _startPosition: Vector3;
 
+    private _modelRessourcesByNames: {} = {
+        "breadSlice": "bread_slice.glb"
+    }
+
+
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "breach_1";
         this._ressourceName = "BRECHE1";
+
+
         //this._startPosition = new Vector3(3.74, 0.91, -3.28);
 
     }
@@ -19,15 +26,26 @@ export class Breach1 extends AbstractLevel {
 
         let breadMesh: Mesh;
 
-        this._game.getEnvironment().getAssets().allMeshes.forEach((m) => {
-            console.log(m.name);
-            if (m.name.includes("bread_slice")) {
-                breadMesh = m;
-            }
-        })
+        this._objectsMeshes = {};
 
-        console.log(breadMesh);
-        this._objects = [new BreadSlicePlatform(this._game, breadMesh)]
+        for (let key in this._modelRessourcesByNames) {
+            await this._game.spriteLoader.loadSprite(this._modelRessourcesByNames[key]).then(result => {
+                this._objectsMeshes[key] = result;
+                console.log("Mesh loaded");
+                console.log(this._objectsMeshes);
+            });
+        }
+
+        console.log("objectsMeshes", this._objectsMeshes);
+
+        // this._game.getEnvironment().getAssets().allMeshes.forEach((m) => {
+        //     console.log(m.name);
+        //     if (m.name.includes("bread_slice")) {
+        //         breadMesh = m;
+        //     }
+        // })
+
+        this._objects = [new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"])]
 
 
 

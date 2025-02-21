@@ -3,12 +3,13 @@ import {Vector3} from "@babylonjs/core";
 
 export class BreadSlicePlatform extends GameObject {
     private _states = ["rotating", "moving"];
-    private _currentState = "rotating";
+    private _currentState = "moving";
     private _speed: Vector3 = new Vector3(0, 0, 0.5);
     private _rotationSpeed: number = 0.2;
 
 
     update(): void {
+        console.log("breadSlice update, mesh ", this._mesh);
         switch(this._currentState) {
             case "moving":
                 this._move();
