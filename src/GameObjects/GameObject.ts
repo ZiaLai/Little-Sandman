@@ -20,4 +20,8 @@ export abstract class GameObject {
     public destroy(): void {
 
     }
+
+    public getMesh(): Mesh {
+        return this._mesh;
+    }
 }

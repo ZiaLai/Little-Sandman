@@ -1,11 +1,14 @@
 import {GameObject} from "./GameObject";
 import {Vector3} from "@babylonjs/core";
+import {Game} from "../game";
 
 export class BreadSlicePlatform extends GameObject {
     private _states = ["rotating", "moving"];
-    private _currentState = "moving";
-    private _speed: Vector3 = new Vector3(0, 0, 0.5);
+    private _currentState = "rotating";
+    private _speed: Vector3 = new Vector3(-1.5, 0, 0);
     private _rotationSpeed: number = 0.2;
+
+
 
 
     update(): void {
@@ -27,5 +30,6 @@ export class BreadSlicePlatform extends GameObject {
 
     private _rotate() {
         this._mesh.rotation.x += this._rotationSpeed * this._game.getPlayer().getDeltaTime();
+        console.log("bread rotation", this._mesh.rotation.x);
     }
 }

@@ -30,9 +30,7 @@ export abstract class AbstractLevel {
             const position = this._game.getStartPosition();
             this._game.getPlayer().setPosition(position);
             this._loading = false;
-            // Réactivation de la scène quand le chargement est fini (évite au joueur de passer sous la map s'il charge avant)
-            this._game.hideLoadingUI();
-            this._game.getScene().attachControl();
+
         });
 
 
@@ -45,8 +43,9 @@ export abstract class AbstractLevel {
     public abstract update(): void;
 
     // Rend le niveau actif
-    public setActive() {
-        this.load();
+    public async setActive() {
+        console.log("AbstractLevel, In setActive");
+        await this.load();
     }
 
     // Détruit la ressource du niveau, et ses objets

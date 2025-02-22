@@ -19,6 +19,7 @@ export class Game {
 
     private _currentLevel : string;
     private _engine: Engine;
+    private frameCount: number;
 
     constructor(engine: Engine, scene: Scene, player: Player, environment: Environment) {
         let levels: AbstractLevel[] = [
@@ -48,16 +49,17 @@ export class Game {
 
     public update(): void {
         this._levels[this._currentLevel].update();
+
     }
 
     public initializeLevel(): void {
         this._levels[this._currentLevel].initialize();
     }
 
-    public setActiveLevel(name: string): void {
+    public async setActiveLevel(name: string): Promise<void> {
         if (Object.keys(this._levels).includes(name)) {
             this._currentLevel = name;
-            this._levels[this._currentLevel].setActive();
+            await this._levels[this._currentLevel].setActive();
         }
         else {
             throw new Error(`The level name "${name}" does not exist`);

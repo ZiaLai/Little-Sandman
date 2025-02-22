@@ -2,6 +2,7 @@ import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {Mesh, Vector3} from "@babylonjs/core";
 import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
+import {GameObject} from "../GameObjects/GameObject";
 
 export class Breach1 extends AbstractLevel {
     private _startPosition: Vector3;
@@ -45,7 +46,18 @@ export class Breach1 extends AbstractLevel {
         //     }
         // })
 
-        this._objects = [new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"])]
+        console.log("before loading asset");
+        await this._loadObjects().then((result)=> {
+            this._objects = result;
+            // Réactivation de la scène quand le chargement est fini (évite au joueur de passer sous la map s'il charge avant)
+            this._game.hideLoadingUI();
+            this._game.getScene().attachControl();
+            console.log("after loading asset");
+        })
+
+
+
+
 
 
 
@@ -54,13 +66,20 @@ export class Breach1 extends AbstractLevel {
     }
 
     initialize(): void {
+        console.log("Object type", typeof(this._objects[0]));
+        console.log(this._objects);
+        this._objects[0].getMesh().position = new Vector3(-10, 0, 0);
     }
 
     update(): void {
         for (let object of this._objects) {
             object.update();
         }
+        //console.log("Object type", typeof(this._objects["breadSlice"]));
     }
 
 
+    private async _loadObjects(): Promise<GameObject[]> {
+        return [new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"])];
+    }
 }
