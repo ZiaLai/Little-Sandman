@@ -1,4 +1,4 @@
-import {ActionManager, ExecuteCodeAction, Mesh, Scene} from "@babylonjs/core";
+import {ActionManager, ExecuteCodeAction, Mesh, Scene, Vector3} from "@babylonjs/core";
 import {Environment} from "../environment";
 import {Game} from "../game";
 import {GameObject} from "../GameObjects/GameObject";
@@ -59,7 +59,14 @@ export abstract class AbstractLevel {
         return this._name;
     }
 
-    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string) {
+    protected _finishedLoading() {
+        this._game.hideLoadingUI();
+        this._game.getScene().attachControl();
+    }
+
+    protected abstract _addTriggers(): void;
+
+    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, playerPosition?: Vector3) {
         m.actionManager.registerAction(
             new ExecuteCodeAction(
                 {
@@ -67,9 +74,10 @@ export abstract class AbstractLevel {
                     parameter: this._game.getScene().getMeshByName("outer")
                 },
                 () => {
-                    this._game.setActiveLevel(destination);
+                        this._game.setActiveLevel(destination, playerPosition);
                 },
             ),
         );
     }
+
 }

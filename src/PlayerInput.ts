@@ -18,4 +18,5 @@ export abstract class PlayerInput {
     public camVerticalAxis: number;
     public camHorizontalAxis: number;
 
+    public abstract reset(): void;
 }

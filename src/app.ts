@@ -388,7 +388,7 @@ class App {
         // Instanciation de la classe game
         this._game = new Game(this._engine, scene, this._player, this._environment);
 
-        await this._game.setActiveLevel("breach_1");
+        await this._game.setActiveLevel("city");
         console.log("finished Loading?");
         this._game.initializeLevel();
 

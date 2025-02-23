@@ -56,10 +56,15 @@ export class Game {
         this._levels[this._currentLevel].initialize();
     }
 
-    public async setActiveLevel(name: string): Promise<void> {
+    public async setActiveLevel(name: string, playerPosition?: Vector3): Promise<void> {
         if (Object.keys(this._levels).includes(name)) {
             this._currentLevel = name;
             await this._levels[this._currentLevel].setActive();
+            this._player.reset();
+            if (playerPosition !== undefined) {
+                this._player.setPosition(playerPosition);
+            }
+
         }
         else {
             throw new Error(`The level name "${name}" does not exist`);

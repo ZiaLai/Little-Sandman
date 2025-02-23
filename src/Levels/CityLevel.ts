@@ -17,7 +17,7 @@ export class CityLevel extends AbstractLevel{
         this._addTriggers();
 
 
-
+        this._finishedLoading();
     }
 
     initialize(): void {
@@ -27,7 +27,7 @@ export class CityLevel extends AbstractLevel{
     update(): void {
     }
 
-    private _addTriggers() {
+    protected _addTriggers() {
         this._game.getEnvironment().getTriggers().forEach(m => {
             if (m.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", m.name);

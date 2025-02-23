@@ -25,4 +25,7 @@ export class Level1_1_1 extends AbstractLevel{
     public initialize() {
 
     }
+
+    protected _addTriggers(): void {
+    }
 }

@@ -117,4 +117,9 @@ export class GamepadInput extends PlayerInput {
         this.camVertical = - this.rightStick.y;
         this.camHorizontal = this.rightStick.x;
     }
+
+    public reset() {
+
+    }
+
 }

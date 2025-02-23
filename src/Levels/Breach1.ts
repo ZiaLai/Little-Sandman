@@ -50,8 +50,7 @@ export class Breach1 extends AbstractLevel {
         await this._loadObjects().then((result)=> {
             this._objects = result;
             // Réactivation de la scène quand le chargement est fini (évite au joueur de passer sous la map s'il charge avant)
-            this._game.hideLoadingUI();
-            this._game.getScene().attachControl();
+            this._finishedLoading();
             console.log("after loading asset");
         })
 
@@ -81,5 +80,8 @@ export class Breach1 extends AbstractLevel {
 
     private async _loadObjects(): Promise<GameObject[]> {
         return [new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"])];
+    }
+
+    protected _addTriggers(): void {
     }
 }

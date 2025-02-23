@@ -126,4 +126,10 @@ export class KeyboardInput extends PlayerInput {
         // }
 
     }
+
+    public reset() {
+        for (let key in this.inputMap) {
+            this.inputMap[key] = false;
+        }
+    }
 }
