@@ -111,6 +111,72 @@ https://forum.babylonjs.com/t/which-best-method-for-mesh-rendering-updated-every
 En fait, je sais pas...
 
 
+========================================================================================================================
+BRECHE 1
+
+[] Il faut modifier la liste objects (de la super classe) par un dictionnaire car on aimerait accéder aux objets par leur nom
+   Mais c'est ppas ce qu'on fait déjà dans Breach1 ? J'ai l'impression que j'ai fait un mix des deux.
+   J'ai une liste objects, et un dico meshObjects...
+   En fait le dico objectMeshes contient uniquement les meshs des objets, pas les instances
+   CE QU'ON VEUT FAIRE :
+   Changer le type de objects en dictionnaire. Il faudra mettre un id dans le nom car on peut avoir plusieurs breadSlices, couteaux, etc
+   D'ailleurs c'est à cause de cette incohérence que j'avais des erreurs la dernière fois. Dans ma tête, c'était logique
+   que objects était un dictionnaire.
+   On peut peut-être mettre en clé un nom d'objet, et en valeur la liste des instances de cet objet.
+   Oui c'est bien ça.
+
+   [] Refaire load_objects dans Breach1
+
+Pour placer les objets, etc, il faut le faire dans la classe niveau implémentant AbstractLevel.
+ (Et pas dans le classe de l'objet). J'avais pensé à faire un système d'identifiant, qui fait tourner des boucles updates
+ différentes. Mais il faut peut-être éviter de faire ça. À la limite on pourrait avoir 2-3 types de plateformes différents
+ et les gérer dans la classe de l'objet. Mais on va pas rajouter un case à chaque fois qu'on crée une plateforme. Non ?
+ En fait, si on veut que l'objet ait un comportement spécial, on est un peu obligé de faire ça.
+ Pour faire ça, il faudrait ajouter un paramètre booléen "personalized" qui fait tourner une boucle update personnalisée.
+ Si il est à false, c'est l'update par défaut qui va tourner.
+
+BREAD SLICE
+.[] Rotation de la breadSlice
+    .[] Placer la breadSlice au bon endroit
+        [] Faire en sorte qu'on récupère la position du game object dans l'environment
+        De manière à ce que si on change sa pos sur Blender, ça change sa pos dans Babylon
+            [] On utilise un blenderId pour différentier les meshs. Il faut garder en mémoire la position pour chaque mesh.
+                Dans Environment, mémoriser les GameObjects dans un attribut. Il faudra donc mettre un tag GAME_OBJECT sur ces meshs dans blender
+
+                On a un problème de positionnement des meshs. Problème d'axe avec Blender
+                Et peut-être aussi un problème d'origine de l'environnement.
+                Mettre un mesh à l'origine dans blender ? Mais est-ce que c'est vraiment utile ?
+
+
+    On a compliqué pour rien.
+    Il suffit juste de récupérer le mesh qui est dans l'environnement et de le passer en paramètre quand on crée l'objet.
+    Donc dans Breach1
+
+    Changer de scène quand on change d'environnement ? Bof en fait...
+    On revient à l'idée de placer les éléments "à la main"
+
+
+
+    [] Lui appliquer le bon centre de rotation
+[] On peut monter sur la breadSlice
+[] Le déplacement de la breadSlice s'applique au joueur
+
+KNIFE
+[] Créer une classe couteau implémentant GameObjects
+[] Animation du couteau
+[] Placer les couteaux à la fin du niveau
+
+[] Ajouter un couteau qui tranche le pain
+[] Génération périodique de breadSlice
+
+
+BUG
+Quand on va dans la bakersbedroom, qu'on retourne dans la ville, et qu'on retourne dans la bakersbedroom,
+on tombe systématiquement dans un vide sans fond...
+
+En fait il faudrait peut-être penser à destruct les modèles dont on n'a plus besoin,
+ça pourrait peut-être régler le problème
+
 
 
 
@@ -152,7 +218,7 @@ En fait, je sais pas...
     et donc passer sous le sol.
     Il faut faire de l'asynchrone
 
-.[] Faire en sorte qu'il puisse y avoir plusieurs positions de départ.
+[x] Faire en sorte qu'il puisse y avoir plusieurs positions de départ.
     Passer la position en argument de setActiveLevel ?
     On pourrait avoir une position par default, mais pouvoir changer si nécessaire
     (Quand on sort de la baker's bedroom on doit spawner derrière la fenêtre)

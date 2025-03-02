@@ -57,6 +57,9 @@ export class Game {
     }
 
     public async setActiveLevel(name: string, playerPosition?: Vector3): Promise<void> {
+
+        this._levels[this._currentLevel].destroy();
+
         if (Object.keys(this._levels).includes(name)) {
             this._currentLevel = name;
             await this._levels[this._currentLevel].setActive();
@@ -85,6 +88,7 @@ export class Game {
         // todo : supprimer la ligne suivante quand Zia aura remonté la start pos (là on spawn sous la ville)
         //return new Vector3(30, 12, 28); // Devant fenetre boulangerie
         return new Vector3(0, 12, 0);
+        console.log("START POSITION", startNode.getAbsolutePosition());
         return startNode !== null ? startNode.getAbsolutePosition() : new Vector3(0, 30, 0);
     }
 

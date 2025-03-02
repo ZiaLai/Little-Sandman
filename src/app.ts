@@ -51,6 +51,7 @@ class App {
     private _sceneOptimizer;
 
     private EXECUTE_TEST = true;
+    private START_LEVEL = "breach_1";
 
     constructor() {
         if (this.EXECUTE_TEST) {
@@ -69,7 +70,7 @@ class App {
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
             // Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
+            if (ev.shiftKey && ev.ctrlKey && ev.altKey) {
                 if (this._scene.debugLayer.isVisible()) {
                     this._scene.debugLayer.hide();
                 } else {
@@ -388,7 +389,7 @@ class App {
         // Instanciation de la classe game
         this._game = new Game(this._engine, scene, this._player, this._environment);
 
-        await this._game.setActiveLevel("city");
+        await this._game.setActiveLevel(this.START_LEVEL);
         console.log("finished Loading?");
         this._game.initializeLevel();
 

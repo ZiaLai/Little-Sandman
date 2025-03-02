@@ -7,6 +7,7 @@ import {GameObject} from "../GameObjects/GameObject";
 export class Breach1 extends AbstractLevel {
     private _startPosition: Vector3;
 
+    // On liste les noms des ressources graphiques des objets dont on a besoin par leur nom
     private _modelRessourcesByNames: {} = {
         "breadSlice": "bread_slice.glb"
     }
@@ -27,6 +28,7 @@ export class Breach1 extends AbstractLevel {
 
         let breadMesh: Mesh;
 
+        // Dictionnaire contenant les ressources graphiques de chaque objet
         this._objectsMeshes = {};
 
         for (let key in this._modelRessourcesByNames) {
@@ -65,21 +67,35 @@ export class Breach1 extends AbstractLevel {
     }
 
     initialize(): void {
-        console.log("Object type", typeof(this._objects[0]));
         console.log(this._objects);
-        this._objects[0].getMesh().position = new Vector3(-10, 0, 0);
+
+        for (let key in this._objects) {
+            for (let object of this._objects[key]) {
+                console.log("INitializing object", object);
+                object.initialize();
+                console.log("Bread Slice Position", this._objects["breadSlice"][0]);
+            }
+        }
+        //this._objects["breadSlice"][0].getMesh().position = new Vector3(10, 0, -30);
     }
 
     update(): void {
-        for (let object of this._objects) {
-            object.update();
+        for (let key in this._objects) {
+            for (let object of this._objects[key]) {
+                object.update();
+            }
         }
-        //console.log("Object type", typeof(this._objects["breadSlice"]));
     }
 
 
-    private async _loadObjects(): Promise<GameObject[]> {
-        return [new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"])];
+    private async _loadObjects(): Promise<{}> {
+
+        // Dictionnaire des objets. nom de l'objet : [liste des objets de ce type]
+        return {
+            "breadSlice" : [
+                new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"], new Vector3(13, 0, -31), "bread_slice")
+            ]
+            };
     }
 
     protected _addTriggers(): void {

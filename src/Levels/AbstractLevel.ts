@@ -10,7 +10,7 @@ export abstract class AbstractLevel {
     protected _game: Game;
 
     protected _objectsMeshes: {};
-    protected _objects: GameObject[] = [];
+    protected _objects: {} = {}; // Dictionnaire de string name vers une liste de GameObjects
     private _id: number;
     private _loading: boolean;
 
@@ -50,8 +50,11 @@ export abstract class AbstractLevel {
 
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
-        for (let object of this._objects) {
-            object.destroy();
+        for (let key in this._objects) {
+            for (let object of this._objects[key]) {
+                object.destroy();
+            }
+
         }
     }
 

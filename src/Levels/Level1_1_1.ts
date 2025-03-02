@@ -16,9 +16,11 @@ export class Level1_1_1 extends AbstractLevel{
         // todo : charger la musique
     }
 
-    public update() {
-        for (let object of this._objects) {
-            object.update();
+    update(): void {
+        for (let key in this._objects) {
+            for (let object of this._objects[key]) {
+                object.update();
+            }
         }
     }
 
