@@ -8,8 +8,10 @@ export class Breach1 extends AbstractLevel {
     private _startPosition: Vector3;
 
     // On liste les noms des ressources graphiques des objets dont on a besoin par leur nom
+    // todo : Pourquoi on fait pas ça ailleurs ? Si on fait ça là on va devoir tout réecrire à chaque niveau
+    // Pourtant le modèle de tranche de pain ne change pas d'un niveau à l'autre. Le mettre dans game ?
     private _modelRessourcesByNames: {} = {
-        "breadSlice": "bread_slice.glb"
+        "breadSlice": "bread_slice_v2.glb"
     }
 
 
@@ -31,6 +33,7 @@ export class Breach1 extends AbstractLevel {
         // Dictionnaire contenant les ressources graphiques de chaque objet
         this._objectsMeshes = {};
 
+        // Chargement des sprites des meshs
         for (let key in this._modelRessourcesByNames) {
             await this._game.spriteLoader.loadSprite(this._modelRessourcesByNames[key]).then(result => {
                 this._objectsMeshes[key] = result;
@@ -93,7 +96,7 @@ export class Breach1 extends AbstractLevel {
         // Dictionnaire des objets. nom de l'objet : [liste des objets de ce type]
         return {
             "breadSlice" : [
-                new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"], new Vector3(13, 0, -31), "bread_slice")
+                new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"], new Vector3(7, 6, -15), "bread_slice")
             ]
             };
     }

@@ -155,9 +155,30 @@ BREAD SLICE
     Changer de scène quand on change d'environnement ? Bof en fait...
     On revient à l'idée de placer les éléments "à la main"
 
+    Problème de rotation : on bouge le transform node au lieu de bouger le mesh
+
+    Problème réglé : le mesh de la bread slice n'était pas à l'origine sur blender
+
+    Maintenant, on peut en fait revenir à la version où on récupère les meshs de l'environnement.  ?
+    Quoique... Est-ce qu'on arrive à récupérer le transformNode parent quand on fait ça ?
+    NE SURTOUT PAS FAIRE ça : Le centre du transform node du mesh ne sera plus l'origine et on aura des problèmes de rotation.
 
 
-    [] Lui appliquer le bon centre de rotation
+    Au pire, la méthode actuelle devrait fonctionner : OUI, utiliser cette méthode.
+    à la limite, on peut récupérer les positions des meshs de l'environnement et placer nos meshs crées individuellement à ces emplacements
+
+    IMPORTANT : Quand on applique une rotation, les valeurs sont en radians (contrairement aux valeurs affichées dans l'inspecteur)
+
+    [x] Lui appliquer le bon centre de rotation
+
+    .[] Peaufiner la rotation (ajouter du déplacement pour pas que la tranche n'intersecte avec le gros bout de pain)
+        [X] Utiliser des quaternions (j'ai l'impression qu'on peut obtenir la bonne rotation dans le cas actuel)
+        .[x] Mettre une limite à la rotation, puis passer à l'état move
+            On est en train de galérer à mettre une limite car la rotation passe de positif à négaitf...
+
+            En fait en réduisant la vitesse ça marche
+
+        [] Ajouter un déplacement en même temps que la tranche tourne
 [] On peut monter sur la breadSlice
 [] Le déplacement de la breadSlice s'applique au joueur
 

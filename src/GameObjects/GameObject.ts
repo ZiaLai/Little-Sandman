@@ -1,4 +1,12 @@
-import {Mesh, RichTypeVector2, RichTypeVector3, Vector3} from "@babylonjs/core";
+import {
+    AbstractMesh,
+    Mesh,
+    Quaternion,
+    RichTypeVector2,
+    RichTypeVector3,
+    TransformNode,
+    Vector3
+} from "@babylonjs/core";
 import {Game} from "../game";
 
 export abstract class GameObject {
@@ -6,12 +14,17 @@ export abstract class GameObject {
     protected _game: Game;
     protected _blenderId: string;
     private _startPosition: Vector3;
+    protected _child: TransformNode;
 
     constructor(game: Game, mesh: Mesh, startPosition: Vector3, blenderId: string) {
         console.log("Creating GameObject");
 
         this._game = game;
         this._mesh = mesh.clone(blenderId);
+
+        //this._child = this._mesh.getChildTransformNodes()[0];
+
+        console.log("Game object child", this._child);
       //  this._mesh = root.getChildMeshes()[0];
         this._blenderId = blenderId;
         this._startPosition = startPosition;

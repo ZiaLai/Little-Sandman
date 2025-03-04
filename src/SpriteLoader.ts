@@ -13,6 +13,7 @@ export class SpriteLoader {
 
             const mesh = result.meshes[0];
             mesh.rotationQuaternion = null;
+            mesh.position = Vector3.Zero();
             return mesh;
         })
     }
