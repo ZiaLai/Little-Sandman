@@ -6,7 +6,8 @@ import {
     UniversalCamera,
     ArcRotateCamera,
     Vector3,
-    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput, RayHelper
+    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput, RayHelper,
+    AbstractMesh
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -45,7 +46,7 @@ export class Player extends TransformNode {
     private _gravity: Vector3 = new Vector3();
     private _grounded: boolean;
     lastGroundPos: Vector3 = Vector3.Zero();
-    private _maxJumpCount : number = 1;
+    private _maxJumpCount: number = 1;
     private _jumpCount: number = 1;
     private _canHover: boolean = false;
     private _hoverTimer: number = 0;
@@ -60,12 +61,26 @@ export class Player extends TransformNode {
     private _acceleration: number = 1 / 7 * Player.PLAYER_SPEED;
     private _moveVector: Vector3;
 
+    private _isJumping: boolean;
+    private _isWalking: boolean;
+
+
+    private _animations: {};
+    private _currentAnim;
+    private _prevAnim;
+
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
         super("player", scene);
         this.scene = scene;
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
+
+        this.mesh.subMeshes.forEach(m=>{
+            console.log(m);
+
+        })
+        console.log("mesh", this.mesh);
 
         this.mesh.position.y = 30 // Temporairement, en attendant qu'il y ait une startPos dans la ville
         //this.mesh.position = new Vector3(51, 18, 11);
@@ -82,8 +97,44 @@ export class Player extends TransformNode {
         this._inputs = [new KeyboardInput(this.scene, this._canvas), new GamepadInput(this.scene)];
         this._inputs[this._currentInput].isActive = true;
         this._inputs[1 - this._currentInput].isActive = false;
-    }
 
+        this._animations = {"idle": assets.animationGroups[3],
+            "jump": assets.animationGroups[6],
+            "sand":assets.animationGroups[4],
+            "walk": assets.animationGroups[2],
+            "tiptoes": assets.animationGroups[10],
+            "scarf": assets.animationGroups[11]};
+        this._setUpAnimations();
+    }
+private _setUpAnimations(){
+        this.scene.stopAllAnimations();
+        // indique quelles anim bouclent
+        this._animations["idle"].loopAnimation = true;
+        this._animations["walk"].loopAnimation = true;
+        this._animations["tiptoes"].loopAnimation = true;
+        //init anim
+        this._currentAnim = this._animations["idle"];
+        this._prevAnim = this._animations["walk"];
+        this._animations["scarf"].play(true);
+    this._animations["jump"].play(true);
+}
+private _animatePlayer(){
+        if (this._isJumping){
+            this._currentAnim = this._animations["jump"];
+        }
+        else if (this._isWalking){
+            this._currentAnim = this._animations["walk"];
+        }
+        else {
+            this._currentAnim = this._animations["idle"];
+        }
+
+        if (this._currentAnim != null && this._prevAnim !== this._currentAnim){
+            this._prevAnim.stop();
+            this._currentAnim.play(this._currentAnim.loopAnimation);
+            this._prevAnim = this._currentAnim
+        }
+}
     public setPosition(position: Vector3): void {
         console.log("set position", position);
         this.mesh.position = position;
@@ -142,11 +193,12 @@ export class Player extends TransformNode {
             this._speed = 0;
         }
 
-
+        this._isWalking = true;
         // Rotations
         // On vérifie s'il y a un mouvement pour déterminer si on a besoin de faire une rotation
         let input = new Vector3(this._inputs[this._currentInput].horizontalAxis, this._inputs[this._currentInput].verticalAxis);
         if (input.length() == 0) {
+            this._isWalking = false;
             return;
         }
         // rotation en fonction de l'input et de l'angle de la caméra
@@ -162,8 +214,14 @@ export class Player extends TransformNode {
 
     beforeRenderUpdate(): void {
         //console.log("deltaTime : " + this._deltaTime);
+        if (this._isJumping){
+            console.log("walking", this._isWalking, "jumping", this._isJumping);
+            console.log("prev anim ", this._prevAnim, " current anim ", this._currentAnim)
+
+        }
         this._updateFromControls();
         this._updateGroundDetection();
+        this._animatePlayer();
         //console.log("Player pos", this.mesh.position);
     }
 
@@ -283,6 +341,7 @@ export class Player extends TransformNode {
         this._falling += 1;
         // Contact avec le sol
         if (this._isGrounded()) {
+            this._isJumping = false;
             this._gravity.y = 0;
             this._grounded = true;
             this.lastGroundPos.copyFrom(this.mesh.position);
@@ -295,6 +354,8 @@ export class Player extends TransformNode {
         // Détection de saut
         if (this._inputs[this._currentInput].jumpKeyDown) {
             if (!this._jumpKey && this._falling < 3 && this._jumpCount > 0) {
+                this._isJumping = true;
+                this._currentAnim = this._animations["jump"];
                 this._gravity.y = Player.JUMP_FORCE;
                 this._jumpCount--;
                 this._jumpKey = true;

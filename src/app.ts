@@ -19,7 +19,7 @@ import {
     Matrix,
     SceneLoader, SceneOptimizer, Sound
 } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
 import { Player } from "./Player";
 import {PlayerInput} from "./PlayerInput";
@@ -173,19 +173,28 @@ class App {
         let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
         camera.setTarget(Vector3.Zero());
 
-        //create a fullscreen ui for all of our GUI elements
+        //--------GUI---------
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720; //fit our fullscreen ui to this height
+        guiMenu.idealHeight = 720;
 
-        //create a simple button
+        //background image
+        const imageRect = new Rectangle("titleContainer");
+        imageRect.width = 1;
+        imageRect.thickness = 0;
+        guiMenu.addControl(imageRect);
+
+        const startbg = new Image("startbg", "models/title_screen2.jpg");
+        imageRect.addControl(startbg);
+
         const startBtn = Button.CreateSimpleButton("start", "PLAY");
+        startBtn.fontFamily = "Viga";
         startBtn.width = 0.2
         startBtn.height = "40px";
         startBtn.color = "white";
         startBtn.top = "-14px";
         startBtn.thickness = 0;
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(startBtn);
+        imageRect.addControl(startBtn);
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => {
@@ -200,6 +209,8 @@ class App {
         this._scene.dispose();
         this._scene = scene;
         this._state = State.START;
+
+
     }
 
     private async _goToCutScene(): Promise<void> {
@@ -291,7 +302,8 @@ class App {
             // //parent the meshes
             // box.parent = body;
             // body.parent = outer;
-            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_static2.glb", scene).then((result) => {
+            // TODO lancer anim idle
+            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman - avec-anim2.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -301,7 +313,8 @@ class App {
                     m.isPickable = false;
                 })
                 return {
-                    mesh: outer as Mesh
+                    mesh: outer as Mesh,
+                    animationGroups : result.animationGroups
                 }
             })
 
@@ -388,7 +401,7 @@ class App {
         // Instanciation de la classe game
         this._game = new Game(this._engine, scene, this._player, this._environment);
 
-        await this._game.setActiveLevel("breach_1");
+        await this._game.setActiveLevel("city");
         console.log("finished Loading?");
         this._game.initializeLevel();
 
@@ -399,6 +412,7 @@ class App {
         //the game is ready, attach control back
         //this._startMusic();
         this._scene.attachControl();
+
 
     }
 
