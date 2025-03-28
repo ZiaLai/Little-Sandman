@@ -11,7 +11,7 @@ export class Breach1 extends AbstractLevel {
     // todo : Pourquoi on fait pas ça ailleurs ? Si on fait ça là on va devoir tout réecrire à chaque niveau
     // Pourtant le modèle de tranche de pain ne change pas d'un niveau à l'autre. Le mettre dans game ?
     private _modelRessourcesByNames: {} = {
-        "breadSlice": "bread_slice_v2.glb"
+        "breadSlice": "bread_slice.glb"
     }
 
 
