@@ -65,7 +65,8 @@ export class PlayerCamera {
         //this._camera.inputs.removeByType("ArcRotateCameraMouseWheelInput");
         this._camera.wheelPrecision = 25;
 
-
+        this._camera.alpha = 1.6;
+        this._camera.beta = 1.4;
         this._camera.attachControl(canvas, true);
 
 

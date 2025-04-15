@@ -20,19 +20,28 @@ export class BreadSlicePlatform extends GameObject {
         // }
     }
 
-
-
-
     update(): void {
         //console.log("breadSlice update, position", this._mesh.position);
         switch(this._currentState) {
             case "moving":
                 this._move();
+                if (this._detectPlayerFeet()) {
+                    console.log("touching player", this._game.getPlayer().getDeltaTime());
+                }
                 break;
             case "rotating":
                 this._rotate();
                 break;
         }
+
+    }
+
+    private _detectPlayerFeet(): boolean {
+        let ray = this._game.getPlayer().getFloorRay();
+
+        let result = ray.intersectsMesh(this._mesh)
+        console.log("pick result", result);
+        return ray.intersectsMesh(this._mesh).hit;
 
     }
 
@@ -43,6 +52,9 @@ export class BreadSlicePlatform extends GameObject {
     private _rotate() {
         // let rotation = Quaternion.FromEulerAngles(this._mesh.rotationQuaternion.toEulerAngles().x + this._rotationSpeed * this._game.getPlayer().getDeltaTime(), 0, 0);
         // this._mesh.rotationQuaternion = rotation;
+        this._mesh.position.addInPlace(this._speed.scale(this._game.getPlayer().getDeltaTime()));
+        this._mesh.position.addInPlace(new Vector3(0, -1 * this._game.getPlayer().getDeltaTime(), 0));
+
         this._mesh.rotate(new Vector3(-1, 0, 0), this._rotationSpeed * this._game.getPlayer().getDeltaTime());
 
         // La rotation en x descend jusqu'à -90, puis elle remonte. Elle ne dépasse jamais 90

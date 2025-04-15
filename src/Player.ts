@@ -1,18 +1,7 @@
-import {
-    TransformNode,
-    ShadowGenerator,
-    Scene,
-    Mesh,
-    UniversalCamera,
-    ArcRotateCamera,
-    Vector3,
-    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput, RayHelper
-} from "@babylonjs/core";
+import {Mesh, Quaternion, Ray, Scalar, Scene, ShadowGenerator, TransformNode, Vector3} from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
-import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
-import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
 import {PlayerCamera} from "./PlayerCamera";
 
 export class Player extends TransformNode {
@@ -168,12 +157,19 @@ export class Player extends TransformNode {
         //console.log(this._inputs[0]);
     }
 
-    private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {
+    public getFloorRay(): Ray {
+        let offsetX = 0;
+        let offsetZ = 0;
+        let raycastLen = 0.6
+        let raycastFloorPos = new Vector3(this.mesh.position.x + offsetX, this.mesh.position.y + 0.5,
+            this.mesh.position.z + offsetZ);
+        return new Ray(raycastFloorPos, Vector3.Up().scale(-1), raycastLen)
+    }
+
+    private _floorRaycast(): Vector3 {
         // Renvoie la position de la collision s'il y en a une
         // ou le vecteur nul sinon
-        let raycastFloorPos = new Vector3(this.mesh.position.x + offsetx, this.mesh.position.y + 0.5,
-            this.mesh.position.z + offsetz);
-        let ray = new Ray(raycastFloorPos, Vector3.Up().scale(-1), raycastlen);
+        let ray = this.getFloorRay();
 
         let predicate = function (mesh) {
             return mesh.isPickable && mesh.isEnabled();
@@ -235,7 +231,7 @@ export class Player extends TransformNode {
     }
 
     private _isGrounded(): boolean {
-        if (this._floorRaycast(0, 0, 0.6).equals(Vector3.Zero())) {
+        if (this._floorRaycast().equals(Vector3.Zero())) {
             return false;
         } else {
             return true;

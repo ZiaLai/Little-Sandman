@@ -176,13 +176,38 @@ BREAD SLICE
         .[x] Mettre une limite à la rotation, puis passer à l'état move
             On est en train de galérer à mettre une limite car la rotation passe de positif à négaitf...
 
-            En fait en réduisant la vitesse ça marche
+            En fait en réduisant la vitesse ça marche (à peu près)
 
-        [] Ajouter un déplacement en même temps que la tranche tourne
-[] On peut monter sur la breadSlice
+            En calculant correctement la limite en soustrayant la vitesse ça marche à tous les coups
+
+        [x] Ajouter un déplacement en même temps que la tranche tourne
+
+.[] On peut monter sur la breadSlice
+    Il faut réussir à faire ça proprement.
+    Là on peut le faire, mais c'est à cause d'une sorte de bug de raycast.
+    Et quand ça arrive, on a aucun moyen de savoir que c'est sur ce mesh qu'on fait un raycast...
+
+    On pourrait ajouter une hitbox à la bread slice
+
+    CE QU'ON VEUT FAIRE : Détecter si les pieds du joueur touchent la breadSlice
+    =====================
+     Créer une footbox au Player ?
+     ça a l'air bien ça
+     Quoique en fait le raycast est plus performant, on pourrait juste récupérer le ray et calculer avec la hitbox de la breadSlice
+     OUI c'est ça !
+
+     [x] Faire un get ray dans Player (pour pouvoir l'obtenir dans BreadSlice)
+     [] Vérifier la collision entre le ray et la hitbox de la breadSlice
+        En fait, pas besoin de hitbox pour la breadSlice. Sa géométrie par défaut est déjà ok.
+
+        Je sais pas pourquoi, la détection du joueur sur la breadSlice ne fonctionne pas...
+
 [] Le déplacement de la breadSlice s'applique au joueur
 
+
 KNIFE
+[] Recentrer le mesh sur blender
+
 [] Créer une classe couteau implémentant GameObjects
 [] Animation du couteau
 [] Placer les couteaux à la fin du niveau
@@ -197,6 +222,9 @@ on tombe systématiquement dans un vide sans fond...
 
 En fait il faudrait peut-être penser à destruct les modèles dont on n'a plus besoin,
 ça pourrait peut-être régler le problème
+Ou alors utiliser des scènes pour faciliter la gestion des ressources
+En fait ça pose pas trop de problème qu'on doive recharger le Player, car ses ressources graphiques
+sont chargées globalement
 
 
 
