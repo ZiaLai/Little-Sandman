@@ -63,11 +63,16 @@ export class Player extends TransformNode {
 
     private _isJumping: boolean;
     private _isWalking: boolean;
+    private _isLanding: boolean;
+    private _isHovering: boolean;
+    private _isFalling: boolean;
 
 
     private _animations: {};
     private _currentAnim;
     private _prevAnim;
+
+    private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
 
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
@@ -98,42 +103,83 @@ export class Player extends TransformNode {
         this._inputs[this._currentInput].isActive = true;
         this._inputs[1 - this._currentInput].isActive = false;
 
-        this._animations = {"idle": assets.animationGroups[3],
-            "jump": assets.animationGroups[6],
-            "sand":assets.animationGroups[4],
-            "walk": assets.animationGroups[2],
-            "tiptoes": assets.animationGroups[10],
-            "scarf": assets.animationGroups[11]};
+        this._animations = { "end_sand" : assets.animationGroups[0],
+            "fall_loop" : assets.animationGroups[1],
+            "idle": assets.animationGroups[2],
+            "jump": assets.animationGroups[4],
+            "land" : assets.animationGroups[5],
+            "sand_back": assets.animationGroups[6],
+            "sand_forward": assets.animationGroups[7],
+            "sand_idle": assets.animationGroups[8],
+            "sand_left": assets.animationGroups[9],
+            "sand_right": assets.animationGroups[10],
+            "start_sand": assets.animationGroups[11],
+            "walk": assets.animationGroups[13],
+            "tiptoes": assets.animationGroups[14],
+            "scarf": assets.animationGroups[15]};
         this._setUpAnimations();
     }
 private _setUpAnimations(){
         this.scene.stopAllAnimations();
-        // indique quelles anim bouclent
+        // indique quelles anim bouclent // utile dans anim player
         this._animations["idle"].loopAnimation = true;
         this._animations["walk"].loopAnimation = true;
         this._animations["tiptoes"].loopAnimation = true;
+        this._animations["scarf"].loopAnimation = true;
+        this._animations["fall_loop"].loopAnimation = true;
+        /*zthis._animations["sand_forward"].loopAnimation = true;
+        this._animations["sand_idle"].loopAnimation = true;
+        this._animations["sand_left"].loopAnimation = true;
+        this.animations["sand_right"].loopAnimation = true;
+        this.animations["sand_back"].loopAnimation = true;*/
+
         //init anim
         this._currentAnim = this._animations["idle"];
         this._prevAnim = this._animations["walk"];
         this._animations["scarf"].play(true);
-    this._animations["jump"].play(true);
+        this._animations["idle"].play(false);
 }
 private _animatePlayer(){
-        if (this._isJumping){
+         if (this._isFalling){// TODO le fait pas forcément dans la chute
+             this._currentAnim = this._animations["fall_loop"];
+         }
+        else if (this._isJumping){
             this._currentAnim = this._animations["jump"];
         }
-        else if (this._isWalking){
-            this._currentAnim = this._animations["walk"];
-        }
+        else if (this._hovering ){
+            this._currentAnim = this._animations["fall_loop"];
+    }
+
+     else if (this._isWalking){
+         this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
+         this._currentAnim = this._animations["walk"];
+     }
+
+        else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {// TODO marche pas
+            this._currentAnim = this._animations["land"];
+    }
+
         else {
             this._currentAnim = this._animations["idle"];
         }
 
+
+        if (this._currentAnim === this._animations["land"]) {
+            this._landAnimationTimer += this._deltaTime;
+        }
+
+        if ((! this._isGrounded()) && (this._prevAnim == this._animations["fall_loop"])) {
+            this._landAnimationTimer = 0;
+        }
+
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim){
+
             this._prevAnim.stop();
             this._currentAnim.play(this._currentAnim.loopAnimation);
             this._prevAnim = this._currentAnim
         }
+
+
 }
     public setPosition(position: Vector3): void {
         console.log("set position", position);
@@ -214,15 +260,20 @@ private _animatePlayer(){
 
     beforeRenderUpdate(): void {
         //console.log("deltaTime : " + this._deltaTime);
-        if (this._isJumping){
-            console.log("walking", this._isWalking, "jumping", this._isJumping);
-            console.log("prev anim ", this._prevAnim, " current anim ", this._currentAnim)
 
-        }
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
         //console.log("Player pos", this.mesh.position);
+        this.updateStates();
+    }
+
+    private updateStates() {
+        if (this._gravity.y <= 0) {
+            this._isJumping = false;
+        }
+
+        this._isFalling = (!this._isJumping) && this._falling > 0;
     }
 
     private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {
@@ -301,13 +352,12 @@ private _animatePlayer(){
 
     private _updateGroundDetection(): void {
         if (!this._isGrounded()) {
-            // Vérifie si on est sur une pente
+            // Vérifie si on est sur une pente => isoler fonction pour plus de clarté ?
             if (this._checkSlope() && this._gravity.y <= 0) {
                 this._gravity.y = 0;
                 this._jumpCount = 1;
                 this._grounded = true;
             }
-
             else if (!this._hovering) {
                 // Calcul de la gravité
                 if (this._inputs[this._currentInput].jumpKeyDown || this._gravity.y < (1/3 * Player.JUMP_FORCE * this._deltaTime)) {
@@ -316,10 +366,13 @@ private _animatePlayer(){
                 }
                 else {
                     // Gravité augmentée si on lâche la touche
-                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));                }
-
+                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));
+                    this._isJumping = false;
+                    this._isFalling = true;
+                }
                 this._grounded = false;
-            } else {
+            }
+            else {
                 // Hovering
                 // On annule la gravité
                 this._gravity.y = Scalar.Lerp(this._gravity.y, 0, 0.2);
@@ -342,6 +395,7 @@ private _animatePlayer(){
         // Contact avec le sol
         if (this._isGrounded()) {
             this._isJumping = false;
+            this._isFalling = false;
             this._gravity.y = 0;
             this._grounded = true;
             this.lastGroundPos.copyFrom(this.mesh.position);
@@ -355,13 +409,12 @@ private _animatePlayer(){
         if (this._inputs[this._currentInput].jumpKeyDown) {
             if (!this._jumpKey && this._falling < 3 && this._jumpCount > 0) {
                 this._isJumping = true;
-                this._currentAnim = this._animations["jump"];
                 this._gravity.y = Player.JUMP_FORCE;
                 this._jumpCount--;
                 this._jumpKey = true;
             }
         } else {
-            this._jumpKey = false;
+            this._jumpKey = false; //jumpkey evite de sauter en boucke en mainteant le bouton appyer
         }
 
 

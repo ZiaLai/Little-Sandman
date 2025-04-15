@@ -25,6 +25,7 @@ import { Player } from "./Player";
 import {PlayerInput} from "./PlayerInput";
 import {Game} from "./game";
 import {TestRunner} from "./Test/TestRunner";
+//import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
@@ -62,6 +63,8 @@ class App {
 
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
+        // todo change loading screen
+        //this._engine.loadingScreen = new CustomLoadingScreen("loading");
         this._scene = new Scene(this._engine);
 
         this._sceneOptimizer = new SceneOptimizer(this._scene);
@@ -302,8 +305,7 @@ class App {
             // //parent the meshes
             // box.parent = body;
             // body.parent = outer;
-            // TODO lancer anim idle
-            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman - avec-anim2.glb", scene).then((result) => {
+            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_anim8.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
