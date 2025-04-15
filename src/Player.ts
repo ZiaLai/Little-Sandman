@@ -67,6 +67,13 @@ export class Player extends TransformNode {
     private _isHovering: boolean;
     private _isFalling: boolean;
 
+    private _isShooting: boolean;
+    private _isStartingShooting: boolean;
+    private _isEndingShooting: boolean = false;
+    private _wasShootingLastFrame: boolean = false;
+    private _shootAnimationTimer: number;
+
+
 
     private _animations: {};
     private _currentAnim;
@@ -140,7 +147,21 @@ private _setUpAnimations(){
         this._animations["idle"].play(false);
 }
 private _animatePlayer(){
-         if (this._isFalling){// TODO le fait pas forcément dans la chute
+
+
+        if (this._isStartingShooting) {
+            this._currentAnim = this._animations["start_sand"]    ;
+        }
+
+        else if (this._isEndingShooting) {
+            this._currentAnim = this._animations["end_sand"];
+        }
+
+        else if (this._isShooting) {
+            this._currentAnim = this._animations["sand_idle"]
+        }
+
+        else if (this._isFalling){// TODO le fait pas forcément dans la chute
              this._currentAnim = this._animations["fall_loop"];
          }
         else if (this._isJumping){
@@ -148,16 +169,17 @@ private _animatePlayer(){
         }
         else if (this._hovering ){
             this._currentAnim = this._animations["fall_loop"];
-    }
+        }
 
-     else if (this._isWalking){
-         this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
-         this._currentAnim = this._animations["walk"];
-     }
+         else if (this._isWalking){
+             this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
+             this._currentAnim = this._animations["walk"];
+         }
 
         else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {// TODO marche pas
             this._currentAnim = this._animations["land"];
-    }
+        }
+
 
         else {
             this._currentAnim = this._animations["idle"];
@@ -274,6 +296,38 @@ private _animatePlayer(){
         }
 
         this._isFalling = (!this._isJumping) && this._falling > 0;
+
+        if (this._inputs[this._currentInput].isShooting && !this._wasShootingLastFrame) { // Le joueur commence à shooter
+            this._shootAnimationTimer = 0;
+            this._wasShootingLastFrame = true;
+            this._isStartingShooting = true
+        }
+
+        else if (this._inputs[this._currentInput].isShooting && this._wasShootingLastFrame && !this._isShooting) { // Le joueur continue de shooter
+            this._shootAnimationTimer += this._deltaTime;
+            this._wasShootingLastFrame = true;
+
+            if (this._shootAnimationTimer > 1) {
+                this._isShooting = true;
+            }
+        }
+
+        else if (this._wasShootingLastFrame && (! this._inputs[this._currentInput].isShooting)) { // Le joueur s'arrête de shooter
+            this._shootAnimationTimer = 0;
+            this._isEndingShooting = true;
+        }
+
+        else if (this._isEndingShooting) { // En train de s'arrêter de shooter
+            this._shootAnimationTimer += this._deltaTime;
+            if (this._shootAnimationTimer > 1) {
+                this._isEndingShooting = false;
+            }
+        }
+
+
+        if (! this._inputs[this._currentInput].isShooting) { // Arrête de shooter
+            this._wasShootingLastFrame = false;
+        }
     }
 
     private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {
