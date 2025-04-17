@@ -17,7 +17,7 @@ import {
     ShadowGenerator,
     Quaternion,
     Matrix,
-    SceneLoader, SceneOptimizer, Sound
+    SceneLoader, SceneOptimizer, Sound,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -50,6 +50,9 @@ class App {
     private _cutScene: Scene;
     private _lastFrameTime: number = 0;
     private _sceneOptimizer;
+    
+    // MONOLOG
+    private start_monolog = new Monolog(["Plonges dans le sommeil les éveillés... repeuple le pays des rêves.", "Va, jeune sable. Pour cette première mission, je te guiderai.", "Plusieurs âmes dans les environs n'ont pas envoure rejoint le rêve...", "Cherche-les..."])
 
     private EXECUTE_TEST = true;
 
@@ -216,8 +219,8 @@ class App {
 
     }
 
-    private async _goToCutScene(): Promise<void> {
-        this._engine.displayLoadingUI();
+    private async _goToCutScene(): Promise<void> {// TODO change to add monolog
+        /*this._engine.displayLoadingUI();
         //--SETUP SCENE--
         //dont detect any inputs from this ui while the game is loading
         this._scene.detachControl();
@@ -258,6 +261,18 @@ class App {
             finishedLoading = true;
             this._goToGame();
         });
+        */
+        this._scene.detachControl();
+        let scene = this._gamescene; // TODO esce que c'est bien ca ?
+        let text1 = new TextBlock();
+        text1.text = this.start_monolog[0]; // TODO add une boucle sur les differents dialogues
+        text1.color = "black"; // TODO changer ihm
+        text1.fontSize = 18;
+        //advancedTexture.addControl(text1);
+
+        this._scene.dispose();
+        this._state = State.GAME;
+        this._scene = scene;
     }
 
     private async _setUpGame() {
