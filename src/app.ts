@@ -52,7 +52,16 @@ class App {
     private _sceneOptimizer;
     
     // MONOLOG
-    private start_monolog = new Monolog(["Plonges dans le sommeil les éveillés... repeuple le pays des rêves.", "Va, jeune sable. Pour cette première mission, je te guiderai.", "Plusieurs âmes dans les environs n'ont pas envoure rejoint le rêve...", "Cherche-les..."])
+    private start_monolog = ["Plonges dans le sommeil les éveillés... repeuple le pays des rêves.",
+        "Va, jeune sable. Pour cette première mission, je te guiderai.",
+        "Plusieurs âmes dans les environs n'ont pas envoure rejoint le rêve...",
+        "Cherche-les..."];
+    private allMonolog = [this.start_monolog];
+    private current_monolog_index = 0;
+    private current_sentence_index = 0;
+    private timer = 0;
+    private timeAlloued = 0;
+    private monolog_played= [false]
 
     private EXECUTE_TEST = true;
 
@@ -219,21 +228,50 @@ class App {
 
     }
 
-    private async _goToCutScene(): Promise<void> {// TODO change to add monolog
-        /*this._engine.displayLoadingUI();
-        //--SETUP SCENE--
-        //dont detect any inputs from this ui while the game is loading
+    private async _goToCutScene(): Promise<void> {
+
         this._scene.detachControl();
-        this._cutScene = new Scene(this._engine);
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._cutScene);
+        //await this._goToGame(); // TODO add test if _gamescene null
+        let scene = new Scene(this._engine);
+        scene.clearColor = new Color4(0,0,0,1);
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
         camera.setTarget(Vector3.Zero());
-        this._cutScene.clearColor = new Color4(0, 0, 0, 1);
+        //this._cutScene.clearColor = new Color4(0, 0, 0, 1);
 
         //--GUI--
-        const cutScene = AdvancedDynamicTexture.CreateFullscreenUI("cutscene");
 
-        //--PROGRESS DIALOGUE--
-        const next = Button.CreateSimpleButton("next", "NEXT");
+        //let scene = this._gamescene; // TODO esce que c'est bien ca ? ca bug...
+        const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("cutscene")
+        let text1 = new TextBlock();
+        let dialog_ended = false;
+        /*if (this.timer > this.timeAlloued){ // todo add un timer. et un time alloued. temps alloué dépend de la longueur de la phrase
+            this.current_sentence_index += 1;
+            this.timeAlloued = 1;//this.allMonolog[this.current_monolog_index][this.current_sentence_index].length *2;
+            this.timer = -1;
+        }
+        if (this.timer < this.timeAlloued /3){
+            text1.alpha = this.timer/100; // TODO trouver un ratio correct
+        }
+        if (this.timer > 2*this.timeAlloued/3){
+            text1.alpha = this.timer/100; // TODO trouver un ratio correct
+        }*/
+
+        //this.timer+=1;
+        text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
+        text1.color = "#FFFDB6FF";
+        text1.fontSize = 34;
+        text1.fontFamily = "Trebuchet MS";
+        text1.shadowOffsetX = 1;
+        text1.shadowBlur= 15;
+        text1.shadowColor= "#594000FF";
+        text1.fontWeight = "bold";
+        text1.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
+        text1.paddingBottom = 100;
+        advancedTexture.addControl(text1);
+        this._cutScene = scene;
+
+
+        const next = Button.CreateSimpleButton("next", "NEXT"); // TODO changer pour click souris
         next.color = "white";
         next.thickness = 0;
         next.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -242,37 +280,37 @@ class App {
         next.height = "64px";
         next.top = "-3%";
         next.left = "-12%";
-        cutScene.addControl(next);
+        advancedTexture.addControl(next); // TODO add variation alpha
 
         next.onPointerUpObservable.add(() => {
-            //this._goToGame();
+            this.current_sentence_index++;
+            if (this.current_monolog_index <= this.allMonolog.length - 1) {
+                if (this.current_sentence_index > this.allMonolog[this.current_monolog_index].length - 1) {
+                    this.monolog_played[this.current_monolog_index] = true;
+                    this.current_monolog_index += 1;
+                    this.current_sentence_index = 0;
+                    this._goToGame();
+                }
+                else {
+                    text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
+                    advancedTexture.addControl(text1); // TODO add variation de alpha
+                }
+            }
         })
-
-        //--WHEN SCENE IS FINISHED LOADING--
+        //await scene.whenReadyAsync();
         await this._cutScene.whenReadyAsync();
         this._engine.hideLoadingUI();
         this._scene.dispose();
         this._state = State.CUTSCENE;
         this._scene = this._cutScene;
-
-        //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
-        var finishedLoading = false;
-        await this._setUpGame().then(res =>{
-            finishedLoading = true;
-            this._goToGame();
-        });
-        */
-        this._scene.detachControl();
-        let scene = this._gamescene; // TODO esce que c'est bien ca ?
-        let text1 = new TextBlock();
-        text1.text = this.start_monolog[0]; // TODO add une boucle sur les differents dialogues
-        text1.color = "black"; // TODO changer ihm
-        text1.fontSize = 18;
-        //advancedTexture.addControl(text1);
-
-        this._scene.dispose();
-        this._state = State.GAME;
-        this._scene = scene;
+        let index = this.current_monolog_index;
+        if (this.current_monolog_index > this.allMonolog.length - 1) {
+            index = this.current_monolog_index - 1;}
+        if (this.monolog_played[index] == true) {
+            await this._setUpGame().then(res =>{
+                this._goToGame();
+            });
+        }
     }
 
     private async _setUpGame() {
@@ -376,14 +414,14 @@ class App {
         scene.detachControl();
 
         //create a simple button
-        const loseBtn = Button.CreateSimpleButton("lose", "LOSE");
+        /*const loseBtn = Button.CreateSimpleButton("lose", "LOSE");
         loseBtn.width = 0.2
         loseBtn.height = "40px";
         loseBtn.color = "white";
         loseBtn.top = "-14px";
         loseBtn.thickness = 0;
         loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        playerUI.addControl(loseBtn);
+        playerUI.addControl(loseBtn);*/
 
         // Bouton pour tester le changement d'environnement
         const changeButton = Button.CreateSimpleButton("change", "CHANGE");
@@ -402,10 +440,10 @@ class App {
 
 
         //this handles interactions with the start button attached to the scene
-        loseBtn.onPointerDownObservable.add(() => {
+        /*loseBtn.onPointerDownObservable.add(() => {
             this._goToLose();
             scene.detachControl(); //observables disabled
-        });
+        });*/
 
         //primitive character and setting
         await this._initializeGameAsync(scene);

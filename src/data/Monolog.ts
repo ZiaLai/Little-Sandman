@@ -8,6 +8,9 @@ class Monolog{
             this.print_sentence(sentence);
         }
     }
+    public get_sentence(index : number){
+        return this.sentences[index];
+    }
     public print_sentence(sentence:string){
         // TODO implémenter
         // affiche la phrase un certain temps avec l'ihm ...
