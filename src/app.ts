@@ -25,8 +25,9 @@ import { Player } from "./Player";
 import {PlayerInput} from "./PlayerInput";
 import {Game} from "./game";
 import {TestRunner} from "./Test/TestRunner";
+import {AllMonolog} from "./data/AllMonolog";
+import {FadeText} from "./util/FadeText";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
-
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
 class App {
@@ -51,17 +52,13 @@ class App {
     private _lastFrameTime: number = 0;
     private _sceneOptimizer;
     
-    // MONOLOG
-    private start_monolog = ["Plonges dans le sommeil les éveillés... repeuple le pays des rêves.",
-        "Va, jeune sable. Pour cette première mission, je te guiderai.",
-        "Plusieurs âmes dans les environs n'ont pas envoure rejoint le rêve...",
-        "Cherche-les..."];
-    private allMonolog = [this.start_monolog];
+    // -- Monolog
+
+    private readonly allMonolog : string[][];
     private current_monolog_index = 0;
     private current_sentence_index = 0;
-    private timer = 0;
-    private timeAlloued = 0;
-    private monolog_played= [false]
+    private readonly monolog_played : boolean[];
+    private isPlayingMonolog: boolean = true;
 
     private EXECUTE_TEST = true;
 
@@ -69,7 +66,9 @@ class App {
         if (this.EXECUTE_TEST) {
             new TestRunner().main();
         }
-
+        // -- Monolog data
+        this.monolog_played = AllMonolog.getIsPlayed();
+        this.allMonolog =  AllMonolog.getAllMonolog();
 
         this._canvas = this._createCanvas();
 
@@ -212,8 +211,10 @@ class App {
         imageRect.addControl(startBtn);
 
         //this handles interactions with the start button attached to the scene
-        startBtn.onPointerDownObservable.add(() => {
-            this._goToCutScene();
+        startBtn.onPointerDownObservable.add(async() => {
+            await this._setUpGame().then(res =>{
+                this._goToGame();
+            });
             scene.detachControl(); //observables disabled
         });
 
@@ -226,91 +227,6 @@ class App {
         this._state = State.START;
 
 
-    }
-
-    private async _goToCutScene(): Promise<void> {
-
-        this._scene.detachControl();
-        //await this._goToGame(); // TODO add test if _gamescene null
-        let scene = new Scene(this._engine);
-        scene.clearColor = new Color4(0,0,0,1);
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
-        camera.setTarget(Vector3.Zero());
-        //this._cutScene.clearColor = new Color4(0, 0, 0, 1);
-
-        //--GUI--
-
-        //let scene = this._gamescene; // TODO esce que c'est bien ca ? ca bug...
-        const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("cutscene")
-        let text1 = new TextBlock();
-        let dialog_ended = false;
-        /*if (this.timer > this.timeAlloued){ // todo add un timer. et un time alloued. temps alloué dépend de la longueur de la phrase
-            this.current_sentence_index += 1;
-            this.timeAlloued = 1;//this.allMonolog[this.current_monolog_index][this.current_sentence_index].length *2;
-            this.timer = -1;
-        }
-        if (this.timer < this.timeAlloued /3){
-            text1.alpha = this.timer/100; // TODO trouver un ratio correct
-        }
-        if (this.timer > 2*this.timeAlloued/3){
-            text1.alpha = this.timer/100; // TODO trouver un ratio correct
-        }*/
-
-        //this.timer+=1;
-        text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-        text1.color = "#FFFDB6FF";
-        text1.fontSize = 34;
-        text1.fontFamily = "Trebuchet MS";
-        text1.shadowOffsetX = 1;
-        text1.shadowBlur= 15;
-        text1.shadowColor= "#594000FF";
-        text1.fontWeight = "bold";
-        text1.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
-        text1.paddingBottom = 100;
-        advancedTexture.addControl(text1);
-        this._cutScene = scene;
-
-
-        const next = Button.CreateSimpleButton("next", "NEXT"); // TODO changer pour click souris
-        next.color = "white";
-        next.thickness = 0;
-        next.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        next.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        next.width = "64px";
-        next.height = "64px";
-        next.top = "-3%";
-        next.left = "-12%";
-        advancedTexture.addControl(next); // TODO add variation alpha
-
-        next.onPointerUpObservable.add(() => {
-            this.current_sentence_index++;
-            if (this.current_monolog_index <= this.allMonolog.length - 1) {
-                if (this.current_sentence_index > this.allMonolog[this.current_monolog_index].length - 1) {
-                    this.monolog_played[this.current_monolog_index] = true;
-                    this.current_monolog_index += 1;
-                    this.current_sentence_index = 0;
-                    this._goToGame();
-                }
-                else {
-                    text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-                    advancedTexture.addControl(text1); // TODO add variation de alpha
-                }
-            }
-        })
-        //await scene.whenReadyAsync();
-        await this._cutScene.whenReadyAsync();
-        this._engine.hideLoadingUI();
-        this._scene.dispose();
-        this._state = State.CUTSCENE;
-        this._scene = this._cutScene;
-        let index = this.current_monolog_index;
-        if (this.current_monolog_index > this.allMonolog.length - 1) {
-            index = this.current_monolog_index - 1;}
-        if (this.monolog_played[index] == true) {
-            await this._setUpGame().then(res =>{
-                this._goToGame();
-            });
-        }
     }
 
     private async _setUpGame() {
@@ -422,7 +338,56 @@ class App {
         loseBtn.thickness = 0;
         loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         playerUI.addControl(loseBtn);*/
+        if (this.isPlayingMonolog){
+            const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("cutscene")
+            let text1 = new TextBlock();
+            text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
+            text1.color = "#FFFDB6FF";
+            text1.fontSize = 34;
+            text1.fontFamily = "Trebuchet MS";
+            text1.shadowOffsetX = 1;
+            text1.shadowBlur= 15;
+            text1.shadowColor= "#594000FF";
+            text1.fontWeight = "bold";
+            text1.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
+            text1.paddingBottom = 100;
+            /*for (let i = 0; i < 1500; i++){ // TODO comment varier alpha ?
+                text1.alpha = 0.5;
+                advancedTexture.addControl(text1);
+            }*/
+            advancedTexture.addControl(text1)
+            await FadeText.fadeIn(text1);
 
+            const next = Button.CreateSimpleButton("next", ""); // TODO changer pour click souris ou tgimer
+            next.width = 100;
+            next.height = 100;
+            advancedTexture.addControl(next);
+
+            next.onPointerUpObservable.add(async () => {
+                this.current_sentence_index++;
+                advancedTexture.addControl(text1);
+                await FadeText.fadeOut(text1);
+                if (this.current_monolog_index <= this.allMonolog.length - 1) {
+
+                    if (this.current_sentence_index > this.allMonolog[this.current_monolog_index].length - 1) {
+                        this.monolog_played[this.current_monolog_index] = true;
+                        this.current_monolog_index += 1;
+                        this.current_sentence_index = 0;
+                        this.isPlayingMonolog = false;
+                        text1.text = "";
+                        advancedTexture.addControl(text1);
+                        next.isVisible = false;
+                        advancedTexture.addControl(next); // TODO travailler les variables pour pouvoir afficher un autre dialogue à un autre moment.
+                    }
+                    else {
+                        text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
+                        advancedTexture.addControl(text1);
+                        await FadeText.fadeIn(text1);
+                    }
+                }
+            })
+
+        }
         // Bouton pour tester le changement d'environnement
         const changeButton = Button.CreateSimpleButton("change", "CHANGE");
         changeButton.width = 0.2
