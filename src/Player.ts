@@ -134,7 +134,8 @@ private _setUpAnimations(){
         this._animations["tiptoes"].loopAnimation = true;
         this._animations["scarf"].loopAnimation = true;
         this._animations["fall_loop"].loopAnimation = true;
-        /*zthis._animations["sand_forward"].loopAnimation = true;
+
+        /*this._animations["sand_forward"].loopAnimation = true;
         this._animations["sand_idle"].loopAnimation = true;
         this._animations["sand_left"].loopAnimation = true;
         this.animations["sand_right"].loopAnimation = true;
@@ -150,7 +151,7 @@ private _animatePlayer(){
 
 
         if (this._isStartingShooting) {
-            this._currentAnim = this._animations["start_sand"]    ;
+            this._currentAnim = this._animations["start_sand"];
         }
 
         else if (this._isEndingShooting) {
@@ -161,7 +162,7 @@ private _animatePlayer(){
             this._currentAnim = this._animations["sand_idle"]
         }
 
-        else if (this._isFalling){// TODO le fait pas forcément dans la chute
+        else if (this._isFalling){
              this._currentAnim = this._animations["fall_loop"];
          }
         else if (this._isJumping){
