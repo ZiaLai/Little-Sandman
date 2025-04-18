@@ -297,7 +297,7 @@ export class Player extends TransformNode {
         this._animatePlayer();
         //console.log("Player pos", this.mesh.position);
         this.updateStates();
-        this.updateSandEmetterPosition();
+        this.updateSandEmetter();
     }
 
     private updateStates() {
@@ -507,9 +507,18 @@ export class Player extends TransformNode {
         return this._deltaTime;
     }
 
-    private updateSandEmetterPosition(){
+    private updateSandEmetter(){
+        // -- POSITION
         let copy = new Vector3().copyFrom(this.mesh.position);
         let position = copy.addInPlace(new Vector3(0,1.25,-1));
         this.sandEmetter.emitter = position;
+        //-- ANGLE
+        let x = this._direction._x;
+        let z = this._direction._z;
+        let orthogonal = new Vector3(-z,0.1,x).scale(1/3);
+        let copyDirection = new Vector3().copyFrom(this._direction);
+        let copyDirection2 = new Vector3().copyFrom(this._direction);
+        this.sandEmetter.createPointEmitter(copyDirection.subtract(orthogonal), copyDirection2.addInPlace(orthogonal)); // TODO modif que z et x...en fonction de _direction... mais comment ? on veut que le diamettre du cone soit toujours le meme...
     }
+
 }
