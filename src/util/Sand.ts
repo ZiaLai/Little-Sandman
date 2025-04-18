@@ -43,7 +43,7 @@ export class Sand {
         particleSystem.emitRate = 1000;
 
         /******* Emission Space ********/
-        particleSystem.createPointEmitter(new Vector3(-0.1,-0.1,-1), new Vector3(0.1,0.1,-1) ); // TODO changer direction : changer uniquement z
+        particleSystem.createPointEmitter(new Vector3(-0.1,-0.1,-1), new Vector3(0.1,0.1,-1)); // TODO changer direction : changer uniquement z et x
 
         // Speed
         particleSystem.minEmitPower = 2;

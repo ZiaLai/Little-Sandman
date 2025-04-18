@@ -127,7 +127,7 @@ export class Player extends TransformNode {
         this._setUpAnimations();
         this.sandEmetter = Sand.getParticleSystem(this.scene);
     }
-private _setUpAnimations(){
+    private _setUpAnimations(){
         this.scene.stopAllAnimations();
         // indique quelles anim bouclent // utile dans anim player
         this._animations["idle"].loopAnimation = true;
@@ -148,7 +148,7 @@ private _setUpAnimations(){
         this._animations["scarf"].play(true);
         this._animations["idle"].play(false);
 }
-private _animatePlayer(){
+    private _animatePlayer(){
 
 
         if (this._isStartingShooting) {
@@ -297,6 +297,7 @@ private _animatePlayer(){
         this._animatePlayer();
         //console.log("Player pos", this.mesh.position);
         this.updateStates();
+        this.updateSandEmetterPosition();
     }
 
     private updateStates() {
@@ -504,5 +505,11 @@ private _animatePlayer(){
 
     getDeltaTime() {
         return this._deltaTime;
+    }
+
+    private updateSandEmetterPosition(){
+        let copy = new Vector3().copyFrom(this.mesh.position);
+        let position = copy.addInPlace(new Vector3(0,1.25,-1));
+        this.sandEmetter.emitter = position;
     }
 }
