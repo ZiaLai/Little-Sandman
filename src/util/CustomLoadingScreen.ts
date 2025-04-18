@@ -20,7 +20,8 @@ export class CustomLoadingScreen implements ILoadingScreen {
         this._loadingDiv.style.justifyContent = "center";
         this._loadingDiv.style.alignItems = "center";
         let path = LoadingScreen64.getData();
-        this._loadingDiv.innerHTML = `<img src="${path}" style="width: auto; height: auto;"  alt=""/>`;
+        this._loadingDiv.innerHTML = `<img src="${path}" style="width: auto; height: auto;"  alt=""/>`; // TODO comment fit au screen ?
+        //TODO c'est moche 
     }
 
     displayLoadingUI() {
