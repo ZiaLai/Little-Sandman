@@ -15,6 +15,7 @@ import {GamepadInput} from "./GamepadInput";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
 import {PlayerCamera} from "./PlayerCamera";
+import {Sand} from "./util/Sand";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -67,7 +68,7 @@ export class Player extends TransformNode {
     private _isHovering: boolean;
     private _isFalling: boolean;
 
-    private _isShooting: boolean;
+    private _isShooting: boolean = false;
     private _isStartingShooting: boolean;
     private _isEndingShooting: boolean = false;
     private _wasShootingLastFrame: boolean = false;
@@ -78,9 +79,8 @@ export class Player extends TransformNode {
     private _animations: {};
     private _currentAnim;
     private _prevAnim;
-
+    private sandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
-
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
         super("player", scene);
@@ -125,6 +125,7 @@ export class Player extends TransformNode {
             "tiptoes": assets.animationGroups[14],
             "scarf": assets.animationGroups[15]};
         this._setUpAnimations();
+        this.sandEmetter = Sand.getParticleSystem(this.scene);
     }
 private _setUpAnimations(){
         this.scene.stopAllAnimations();
@@ -152,14 +153,21 @@ private _animatePlayer(){
 
         if (this._isStartingShooting) {
             this._currentAnim = this._animations["start_sand"];
+            ///this.sandEmetter.start();
         }
 
         else if (this._isEndingShooting) {
             this._currentAnim = this._animations["end_sand"];
+            this.sandEmetter.stop();
         }
 
         else if (this._isShooting) {
             this._currentAnim = this._animations["sand_idle"]
+            ///if (!this.sandEmetter.isStarted()){
+                this.sandEmetter.start();
+            //}
+
+
         }
 
         else if (this._isFalling){
@@ -295,27 +303,31 @@ private _animatePlayer(){
         if (this._gravity.y <= 0) {
             this._isJumping = false;
         }
-
         this._isFalling = (!this._isJumping) && this._falling > 0;
 
         if (this._inputs[this._currentInput].isShooting && !this._wasShootingLastFrame) { // Le joueur commence à shooter
             this._shootAnimationTimer = 0;
             this._wasShootingLastFrame = true;
             this._isStartingShooting = true
+            this._isShooting = false;
         }
 
-        else if (this._inputs[this._currentInput].isShooting && this._wasShootingLastFrame && !this._isShooting) { // Le joueur continue de shooter
+        else if ((this._inputs[this._currentInput].isShooting && this._wasShootingLastFrame && !this._isShooting) || this._isStartingShooting) { // Le joueur continue de shooter
             this._shootAnimationTimer += this._deltaTime;
             this._wasShootingLastFrame = true;
-
+            console.log("coucou je suis la 318 player");
             if (this._shootAnimationTimer > 1) {
+                console.log("coucou je suis la 320 player")
+
+                this._isStartingShooting = false;
                 this._isShooting = true;
             }
         }
 
-        else if (this._wasShootingLastFrame && (! this._inputs[this._currentInput].isShooting)) { // Le joueur s'arrête de shooter
+        else if (this._isShooting && (! this._inputs[this._currentInput].isShooting)) { // Le joueur s'arrête de shooter
             this._shootAnimationTimer = 0;
             this._isEndingShooting = true;
+            this._isShooting = false;
         }
 
         else if (this._isEndingShooting) { // En train de s'arrêter de shooter
@@ -329,6 +341,7 @@ private _animatePlayer(){
         if (! this._inputs[this._currentInput].isShooting) { // Arrête de shooter
             this._wasShootingLastFrame = false;
         }
+        console.log("shot anim timer =", this._shootAnimationTimer,"startShooting =", this._isStartingShooting, " shooting =", this._isShooting, "end shooting =", this._isEndingShooting, "was shooting last_frame", this._wasShootingLastFrame );
     }
 
     private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {
