@@ -21,7 +21,7 @@ export class AllMonolog {
         let isPlayed = [];
         for(let monolog in  this.getAllMonolog()){
             isPlayed.push(false);
-        };
+        }
         return isPlayed;
     }
 }
