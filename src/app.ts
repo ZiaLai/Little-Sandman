@@ -27,6 +27,7 @@ import {Game} from "./game";
 import {TestRunner} from "./Test/TestRunner";
 import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
+import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
@@ -75,7 +76,7 @@ class App {
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
         // todo change loading screen
-        //this._engine.loadingScreen = new CustomLoadingScreen("loading");
+        //this._engine.loadingScreen = new CustomLoadingScreen();
         this._scene = new Scene(this._engine);
 
         this._sceneOptimizer = new SceneOptimizer(this._scene);
