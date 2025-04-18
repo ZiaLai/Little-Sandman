@@ -17,6 +17,11 @@ export class AllMonolog {
     }
 
     static getIsPlayed() {
-        return [false];
+
+        let isPlayed = [];
+        for(let monolog in  this.getAllMonolog()){
+            isPlayed.push(false);
+        };
+        return isPlayed;
     }
 }
