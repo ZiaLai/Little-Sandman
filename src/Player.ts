@@ -508,17 +508,21 @@ export class Player extends TransformNode {
     }
 
     private updateSandEmetter(){
-        // -- POSITION
-        let copy = new Vector3().copyFrom(this.mesh.position);
-        let position = copy.addInPlace(new Vector3(0,1.25,-1));
-        this.sandEmetter.emitter = position;
-        //-- ANGLE
         let x = this._direction._x;
         let z = this._direction._z;
+        // -- POSITION
+        let copy = new Vector3().copyFrom(this.mesh.position);
+        let position = copy.addInPlace(new Vector3(x,1.25,z));// TODO  le add dépend de l'orientation ! (uniquement x et z ) c'est tout simplement direction ?
+        this.sandEmetter.emitter = position;
+        //-- ANGLE
+
         let orthogonal = new Vector3(-z,0.1,x).scale(1/3);
         let copyDirection = new Vector3().copyFrom(this._direction);
         let copyDirection2 = new Vector3().copyFrom(this._direction);
-        this.sandEmetter.createPointEmitter(copyDirection.subtract(orthogonal), copyDirection2.addInPlace(orthogonal)); // TODO modif que z et x...en fonction de _direction... mais comment ? on veut que le diamettre du cone soit toujours le meme...
+        let min  = copyDirection.subtract(orthogonal);
+        let max = copyDirection2.addInPlace(orthogonal);
+        this.sandEmetter.createPointEmitter(min,max); // TODO si min > max => prob ?
+        console.log ("direction :", this._direction, " direction sable :",min, ", ", max , " position sable : ", position);
     }
 
 }
