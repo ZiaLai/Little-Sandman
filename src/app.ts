@@ -52,9 +52,11 @@ class App {
     private _cutScene: Scene;
     private _lastFrameTime: number = 0;
     private _sceneOptimizer;
+
     // TIMER FRAUDE
     private fraudeTimer = 0;
-    private FRAUDE_DURATION = 10;
+    private FRAUDE_DURATION = 7;
+
     // Cinematic timer
     private cinematicTimer = 0;
     private CINEMATIC_DURATION = 88;
@@ -235,7 +237,6 @@ class App {
 
 
         // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)
-        // TODO : passer à l'écran "activez le son !
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -267,13 +268,21 @@ class App {
 
         guiMenu.addControl(imageRect);
         // TODO add logo casque ( un chat qui ecoute de la musique ?)
-        const text = new TextBlock("text", "Pour une meilleure expérience, pensez à activer le son !") // TODO : si on veut décentrer vers le bas, il faut changer text alignement et block alignement sur bottom
+        const logo = new Image("logo", "/textures/ls_headphones.png");
+        logo.width = "256px";
+        logo.height = "406px";
+        logo.paddingTop = 150;
+        logo.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        imageRect.addControl(logo);
+        const text = new TextBlock("text", "Pour une meilleure expérience,\npensez à activer le son !") // TODO : si on veut décentrer vers le bas, il faut changer text alignement et block alignement sur bottom
         text.color ="white";
         text.fontStyle= "bold";
         text.fontFamily = "Trebuchet MS";
         text.fontSize = 25;
+        text.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        text.paddingTop = "150px"
         imageRect.addControl(text);
-        const ok = Button.CreateSimpleButton("start", "OK"); // TODO lui donner vraiment l'allure d'un boutton (différencier du texte !)
+        const ok = Button.CreateSimpleButton("start", "OK");
         ok.fontFamily = "Trebuchet MS";
         ok.width = 0.05
         ok.height = "75px";
@@ -282,8 +291,7 @@ class App {
         ok.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         ok.paddingBottom = 25;
         ok.cornerRadius = 10;
-        ok.thickness = 2; // Épaisseur du cadre (0 = pas de cadre)
-        //ok.borderColor = "white"; // Couleur du cadre
+        ok.thickness = 2;
 
         imageRect.addControl(ok);
 
@@ -305,7 +313,7 @@ class App {
         this._scene.detachControl();
 
         let scene = new Scene(this._engine);
-        let camera = new ArcRotateCamera("arcR", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene); // TODO pas bouger camera...
+        let camera = new ArcRotateCamera("arcR", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene);
         //camera.setTarget(new Vector3(0, 0, 0.2));
 
         let planeOpts = {
@@ -392,14 +400,10 @@ class App {
         const startbg = new Image("startbg", "models/title_screen2.jpg");
         imageRect.addControl(startbg);
 
-        const startBtn = Button.CreateSimpleButton("start", "PLAY");
+        const startBtn = Button.CreateSimpleButton("start", "");
         startBtn.fontFamily = "Viga";
-        startBtn.width = 0.2
-        startBtn.height = "40px";
-        startBtn.color = "white";
-        startBtn.top = "-14px";
-        startBtn.thickness = 0;
-        startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        startBtn.width = 1
+        startBtn.height = 1;
         imageRect.addControl(startBtn);
 
         //this handles interactions with the start button attached to the scene
@@ -548,7 +552,7 @@ class App {
             advancedTexture.addControl(text1)
             await FadeText.fadeIn(text1);
 
-            const next = Button.CreateSimpleButton("next", ""); // TODO changer pour click souris ou tgimer
+            const next = Button.CreateSimpleButton("next", ""); // TODO changer pour timer ?
             next.width = 100;
             next.height = 100;
             advancedTexture.addControl(next);
