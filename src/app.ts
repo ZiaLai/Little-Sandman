@@ -29,7 +29,7 @@ import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC }
+enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON }
 
 class App {
     // General Entire Application
@@ -52,7 +52,9 @@ class App {
     private _cutScene: Scene;
     private _lastFrameTime: number = 0;
     private _sceneOptimizer;
-
+    // TIMER FRAUDE
+    private fraudeTimer = 0;
+    private FRAUDE_DURATION = 10;
     // Cinematic timer
     private cinematicTimer = 0;
     private CINEMATIC_DURATION = 88;
@@ -127,7 +129,7 @@ class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToCinematic();
+        await this._goToLesFraudes();
 
 
         // Register a render loop to repeatedly render the scene
@@ -155,6 +157,18 @@ class App {
                     else {
                         await this._goToStart();
                     }
+                    break;
+                case State.LES_FRAUDES:
+                    if(this.fraudeTimer < this.FRAUDE_DURATION){
+                        this.renderScene();
+                        this.fraudeTimer += this._scene.deltaTime/1000;
+                    }
+                    else{
+                        await this._goToActivateSound();
+                    }
+                    break;
+                case State.ACTIVEZ_SON:
+                    this.renderScene();
                     break;
                 default: break;
             }
@@ -192,13 +206,108 @@ class App {
             new Sound("violins", "./musics/sugarlessBakery/sugarless_bakery-Violons.ogg", this._scene, soundReady, {loop : true})
         ]
     }
+
+    private async _goToLesFraudes(){
+        this._engine.displayLoadingUI();
+        this._scene.detachControl();
+        let scene = new Scene(this._engine);
+        scene.clearColor = new Color4(0,0,0,1);
+
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+        camera.setTarget(Vector3.Zero());
+
+        //--------GUI---------
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        guiMenu.idealHeight = 720;
+
+        //LOGO
+        const imageRect = new Rectangle("titleContainer");
+        imageRect.width = 1;
+        imageRect.thickness = 0;
+        imageRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+
+        guiMenu.addControl(imageRect);
+
+        const logo = new Image("logo", "/textures/logo_titre_blanc.png");
+        logo.width = "256px";
+        logo.height = "256px";
+        imageRect.addControl(logo);
+
+
+        // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)
+        // TODO : passer à l'écran "activez le son !
+
+        //--SCENE FINISHED LOADING--
+        await scene.whenReadyAsync();
+        this._engine.hideLoadingUI();
+        //lastly set the current state to the start state and set the scene to the start scene
+        this._scene.dispose();
+        this._scene = scene;
+        this._state = State.LES_FRAUDES;
+    }
+
+    private async _goToActivateSound(){
+        this._engine.displayLoadingUI();
+        this._scene.detachControl();
+        let scene = new Scene(this._engine);
+        scene.clearColor = new Color4(0,0,0,1);
+
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+        camera.setTarget(Vector3.Zero());
+
+        //--------GUI---------
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        guiMenu.idealHeight = 720;
+
+        //
+        const imageRect = new Rectangle("container");
+        imageRect.width = 1;
+        imageRect.thickness = 0;
+        imageRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+
+        guiMenu.addControl(imageRect);
+        // TODO add logo casque ( un chat qui ecoute de la musique ?)
+        const text = new TextBlock("text", "Pour une meilleure expérience, pensez à activer le son !") // TODO : si on veut décentrer vers le bas, il faut changer text alignement et block alignement sur bottom
+        text.color ="white";
+        text.fontStyle= "bold";
+        text.fontFamily = "Trebuchet MS";
+        text.fontSize = 25;
+        imageRect.addControl(text);
+        const ok = Button.CreateSimpleButton("start", "OK"); // TODO lui donner vraiment l'allure d'un boutton (différencier du texte !)
+        ok.fontFamily = "Trebuchet MS";
+        ok.width = 0.05
+        ok.height = "75px";
+        ok.color = "white";
+        ok.thickness = 0;
+        ok.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        ok.paddingBottom = 25;
+        ok.cornerRadius = 10;
+        ok.thickness = 2; // Épaisseur du cadre (0 = pas de cadre)
+        //ok.borderColor = "white"; // Couleur du cadre
+
+        imageRect.addControl(ok);
+
+        ok.onPointerDownObservable.add(async() => {
+            await this._goToCinematic();
+            scene.detachControl(); //observables disabled
+        });
+        //--SCENE FINISHED LOADING--
+        await scene.whenReadyAsync();
+        this._engine.hideLoadingUI();
+        //lastly set the current state to the start state and set the scene to the start scene
+        this._scene.dispose();
+        this._scene = scene;
+        this._state = State.ACTIVEZ_SON;
+    }
+
     private async _goToCinematic() {
         this._engine.displayLoadingUI();
         this._scene.detachControl();
 
         let scene = new Scene(this._engine);
-
         let camera = new ArcRotateCamera("arcR", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene); // TODO pas bouger camera...
+        //camera.setTarget(new Vector3(0, 0, 0.2));
+
         let planeOpts = {
             height: 12,
             //width: 7.3967,
@@ -211,8 +320,6 @@ class App {
             width: 10000,
             sideOrientation: Mesh.DOUBLESIDE
         };
-        // TODO add a button "Passer"
-        // TODO passer à l'état ecran titre
         let ANote0Video = MeshBuilder.CreatePlane("plane", planeOpts, scene);
         let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
 
@@ -220,7 +327,7 @@ class App {
         ANote0Video.position = vidPos;
         background.position = new Vector3(0, 0, 0.2);
         let ANote0VideoMat = new StandardMaterial("m", scene);
-        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "/other/cinematic_finligrane.mp4", scene);
+        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "/textures/cinematic_finligrane.mp4", scene);
 
         ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
         ANote0VideoMat.roughness = 1;

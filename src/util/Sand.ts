@@ -20,7 +20,7 @@ export class Sand {
         let particleSystem = new ParticleSystem("particles", 2000, scene);
 
         //Texture of each particle
-        particleSystem.particleTexture = new Texture("/other/Flare.png", scene);
+        particleSystem.particleTexture = new Texture("/textures/Flare.png", scene);
         //particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
 
         // Where the particles come from
