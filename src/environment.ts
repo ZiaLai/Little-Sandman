@@ -15,12 +15,18 @@ export class Environment {
 
     }
 
-    public async changeAsset(assetName: string) {
+    public async changeAsset(assetName: string, newScene: Scene) {
         this._currentAssetName = assetName;
+
+        // Mettre à jour avec la nouvelle scène
+        this._scene = newScene;
+
         // Suppression des assets précédents
-        this._assets.allMeshes.forEach((m) => {
-            m.dispose();
-        })
+        // this._assets.allMeshes.forEach((m) => {
+        //     m.getScene()?.removeMesh(m);
+        //
+        //     m.dispose();
+        // })
         this._triggers = [];
         // Chargement des nouveaux assets
         await this.load();
@@ -38,8 +44,7 @@ export class Environment {
 
             if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                //m.isVisible = false;
-                m.isVisible = true;
+               // m.isVisible = false;
                 m.isPickable = true;
             }
             else if (m.name.includes("trigger")) {

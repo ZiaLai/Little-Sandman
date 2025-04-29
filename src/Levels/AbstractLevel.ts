@@ -1,4 +1,4 @@
-import {ActionManager, ExecuteCodeAction, Mesh, Scene, Vector3} from "@babylonjs/core";
+import {AbstractMesh, ActionManager, ExecuteCodeAction, Mesh, Scene, Vector3} from "@babylonjs/core";
 import {Environment} from "../environment";
 import {Game} from "../game";
 import {GameObject} from "../GameObjects/GameObject";
@@ -20,12 +20,16 @@ export abstract class AbstractLevel {
     }
 
     // Charge la ressource graphique du niveau
-    protected async load() {
+    protected async load(newScene: Scene) {
         this._loading = true;
         this._game.displayLoadingUI();
         // Désactivation de la scène
         this._game.getScene().detachControl();
-        await this._game.environment.changeAsset(this._ressourceName).then(()=> {
+        this._game.getScene().dispose();
+        this._game.setScene(newScene, this._ressourceName);
+
+
+        await this._game.environment.changeAsset(this._ressourceName, newScene).then(()=> {
             // On déplace le joueur à la position de départ
             const position = this._game.getStartPosition();
             this._game.getPlayer().setPosition(position);
@@ -43,13 +47,18 @@ export abstract class AbstractLevel {
     public abstract update(): void;
 
     // Rend le niveau actif
-    public async setActive() {
+    public async setActive(newScene: Scene) {
         console.log("AbstractLevel, In setActive");
-        await this.load();
+        await this.load(newScene);
     }
 
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
+
+        const root = this._game.getScene().getTransformNodeById("__root__"); // Todo : débugguer ce truc
+        console.log("root", root);
+        root?.dispose();
+
         for (let key in this._objects) {
             for (let object of this._objects[key]) {
                 object.destroy();

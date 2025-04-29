@@ -1,6 +1,6 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {ActionManager, Vector3} from "@babylonjs/core";
+import {ActionManager, Scene, Vector3} from "@babylonjs/core";
 
 export class BakersBedroom extends AbstractLevel {
     private _startPosition: Vector3;
@@ -13,8 +13,8 @@ export class BakersBedroom extends AbstractLevel {
 
     }
 
-    protected async load(startPosition?: Vector3) {
-        await super.load();
+    protected async load(newScene: Scene, startPosition?: Vector3) {
+        await super.load(newScene);
 
         this._addTriggers();
 

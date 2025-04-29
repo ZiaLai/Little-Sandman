@@ -1,6 +1,6 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {Mesh, Vector3} from "@babylonjs/core";
+import {Mesh, Scene, Vector3} from "@babylonjs/core";
 import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 import {GameObject} from "../GameObjects/GameObject";
 import {Knife} from "../GameObjects/Knife";
@@ -27,8 +27,8 @@ export class Breach1 extends AbstractLevel {
 
     }
 
-    protected async load(startPosition?: Vector3) {
-        await super.load();
+    protected async load(newScene: Scene, startPosition?: Vector3) {
+        await super.load(newScene);
 
         let breadMesh: Mesh;
 

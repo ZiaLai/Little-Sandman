@@ -171,13 +171,13 @@ export class Player extends TransformNode {
     public getFloorRay(): Ray {
         let offsetX = 0;
         let offsetZ = 0;
-        let raycastLen = 1
+        let raycastLen = 0.6
         let raycastFloorPos = new Vector3(this.mesh.position.x + offsetX, this.mesh.position.y + 0.5,
             this.mesh.position.z + offsetZ);
 
         let ray: Ray = new Ray(raycastFloorPos, Vector3.Up().scale(-1), raycastLen);
-
-        RayHelper.CreateAndShow(ray, this._scene, Color3.Red());
+        //
+        // RayHelper.CreateAndShow(ray, this._scene, Color3.Red());
 
 
         return ray;

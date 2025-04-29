@@ -7,9 +7,11 @@ import {CityLevel} from "./Levels/CityLevel";
 import {BakersBedroom} from "./Levels/BakersBedroom";
 import {Breach1} from "./Levels/Breach1";
 import {SpriteLoader} from "./SpriteLoader";
+import {App} from "./app";
 
 export class Game {
 
+    private _app: App;
     public environment: Environment;
     private _scene: Scene;
     private _player: Player;
@@ -21,7 +23,9 @@ export class Game {
     private _engine: Engine;
     private frameCount: number;
 
-    constructor(engine: Engine, scene: Scene, player: Player, environment: Environment) {
+    constructor(app: App, engine: Engine, scene: Scene, player: Player, environment: Environment) {
+        this._app = app;
+
         let levels: AbstractLevel[] = [
             new CityLevel(this, 0),
             new BakersBedroom(this, 1),
@@ -58,21 +62,23 @@ export class Game {
 
     public async setActiveLevel(name: string, playerPosition?: Vector3): Promise<void> {
 
-        this._levels[this._currentLevel].destroy();
+        console.assert(Object.keys(this._levels).includes(name), `The level name "${name}" does not exist`);
 
-        if (Object.keys(this._levels).includes(name)) {
-            this._currentLevel = name;
-            await this._levels[this._currentLevel].setActive();
-            this._player.reset();
-            if (playerPosition !== undefined) {
-                this._player.setPosition(playerPosition);
-            }
+        let newScene = new Scene(this._engine);
+        // this._scene.dispose();
+
+        // this._levels[this._currentLevel].destroy();
+
+        this._currentLevel = name;
+
+        await this._levels[this._currentLevel].setActive(newScene);
+
+        this._player.reset();
+        if (playerPosition !== undefined) {
+            this._player.setPosition(playerPosition);
+        }
 
         }
-        else {
-            throw new Error(`The level name "${name}" does not exist`);
-        }
-    }
 
 
     public getPlayer(): Player {
@@ -102,6 +108,15 @@ export class Game {
 
     public getScene() {
         return this._scene;
+    }
+
+    public setScene(scene: Scene, ressourceName: string) {
+        this._scene = scene;
+        this._app.changeGameScene(scene, ressourceName);
+    }
+
+    public setPlayer(player: Player) {
+        this._player = player;
     }
 
     getEnvironment() {

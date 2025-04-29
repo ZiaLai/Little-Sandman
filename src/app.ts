@@ -28,7 +28,7 @@ import {TestRunner} from "./Test/TestRunner";
 
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3}
 
-class App {
+export class App {
     // General Entire Application
     private _scene: Scene;
     private _canvas: HTMLCanvasElement;
@@ -51,7 +51,7 @@ class App {
     private _sceneOptimizer;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "breach_1";
+    private START_LEVEL = "city";
 
     constructor() {
         if (this.EXECUTE_TEST) {
@@ -241,18 +241,18 @@ class App {
 
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
         var finishedLoading = false;
-        await this._setUpGame().then(res =>{
+        await this._setUpGame("bakery_level_proto").then(res =>{
             finishedLoading = true;
             this._goToGame();
         });
     }
 
-    private async _setUpGame() {
+    private async _setUpGame(levelName: string) {
         let scene = new Scene(this._engine);
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene, "city_v8");
+        const environment = new Environment(scene, levelName);
         this._environment = environment;
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene);
@@ -269,7 +269,14 @@ class App {
             outer.isPickable = false;
             outer.checkCollisions = true;
 
-            //move origin of box collider to the bottom of the mesh (to match player mesh)
+            const debugMaterial = new StandardMaterial("debugMaterial", scene);
+            debugMaterial.wireframe = true;
+            debugMaterial.emissiveColor = new Color3(1, 0, 0); // rouge pour bien voir
+            outer.material = debugMaterial;
+            outer.isVisible = true;
+
+
+            //move origin of box collider to the bottom of the mesh (to     match player mesh)
             outer.bakeTransformIntoVertices(Matrix.Translation(0, 0.95, 0.33))
 
             //for collisions
@@ -387,11 +394,11 @@ class App {
         //get rid of start scene, switch to gamescene and change states
 
         // Instanciation de la classe game
-        this._game = new Game(this._engine, scene, this._player, this._environment);
+        this._game = new Game(this, this._engine, scene, this._player, this._environment);
 
-        await this._game.setActiveLevel(this.START_LEVEL);
+        //await this._game.setActiveLevel(this.START_LEVEL);
         console.log("finished Loading?");
-        this._game.initializeLevel();
+        //this._game.initializeLevel();
 
         this._scene.dispose();
         this._state = State.GAME;
@@ -432,6 +439,30 @@ class App {
         this._scene.dispose();
         this._scene = scene;
         this._state = State.LOSE;
+    }
+
+    public async changeGameScene(scene: Scene, levelName: string) {
+        console.log("In changeGameScene");
+
+        await this._setUpGame(levelName).then(res => {
+            this._goToGame();
+        });
+
+        // this._scene = scene;
+        //
+        // this._gamescene = scene;
+        //
+        // await this._initializeGameAsync(scene);
+        // await scene.whenReadyAsync();
+        //
+        // this._game.setPlayer(this._player);
+        //
+        // const environment = new Environment(scene, levelName);
+        // this._environment = environment;
+        // await this._environment.load();
+        // await this._loadCharacterAssets(scene)
+
+
     }
 }
 new App();

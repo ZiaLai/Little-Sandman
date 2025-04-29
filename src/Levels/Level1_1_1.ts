@@ -1,6 +1,7 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Environment} from "../environment";
 import {Game} from "../game";
+import {Scene} from "@babylonjs/core";
 
 
 export class Level1_1_1 extends AbstractLevel{
@@ -11,8 +12,8 @@ export class Level1_1_1 extends AbstractLevel{
         this._ressourceName = "bakery_indoors_with_textures";
     }
 
-    protected async load() {
-        super.load();
+    protected async load(newScene: Scene) {
+        super.load(newScene);
         // todo : charger la musique
     }
 

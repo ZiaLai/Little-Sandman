@@ -3,6 +3,42 @@ Planning :
 https://docs.google.com/spreadsheets/d/1wY1d4xigQfcB7zREt-sLo0T2_EJqLwas95yTEHs8QYk/edit?gid=0#gid=0
 ===================================
 
+RUSH LIST
+==========
+
+[] Débugguer la transition entre deux scènes
+
+    
+
+[] Débugguer direction
+
+[] Faire le niveau sur blender
+
+[] Jouer la musique
+    [] Ville
+    [] Bakery
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================================================================================
 [x] Revoir la camera car si la camera est bugguée, alors les déplacements dont buggés
     [x] Faire en sorte qu'on puisse obtenir l'orientation de la camera
     En fait il faut juste utiliser l'alpha et de la trigo
@@ -225,6 +261,12 @@ En fait il faudrait peut-être penser à destruct les modèles dont on n'a plus 
 Ou alors utiliser des scènes pour faciliter la gestion des ressources
 En fait ça pose pas trop de problème qu'on doive recharger le Player, car ses ressources graphiques
 sont chargées globalement
+
+>>>
+[] Créer une nouvelle scène lorsqu'on change d'univers, transition entre les deux scènes.
+    Dans la méthode setActiveLevel de Game
+
+    [] Méthode destroy, détruire tous les meshs sauf celui du joueur
 
 
 
