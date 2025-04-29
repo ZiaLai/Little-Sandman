@@ -1,12 +1,13 @@
 import {
+    Axis,
     Color3,
-    Mesh,
+    Mesh, MeshBuilder,
     Quaternion,
     Ray,
     RayHelper,
     Scalar,
     Scene,
-    ShadowGenerator,
+    ShadowGenerator, StandardMaterial,
     TransformNode,
     Vector3
 } from "@babylonjs/core";
@@ -162,10 +163,56 @@ export class Player extends TransformNode {
 
     beforeRenderUpdate(): void {
         //console.log("deltaTime : " + this._deltaTime);
+        console.log("Player direction", this._direction);
+        this._debug();
         this._updateFromControls();
         this._updateGroundDetection();
         //console.log("Player pos", this.mesh.position);
         //console.log(this._inputs[0]);
+    }
+
+    private _debug() {
+        // Fonction utilitaire pour créer une flèche orientée sur l'axe Z
+        function createArrow(scene: Scene, color: Color3): Mesh {
+            const body = MeshBuilder.CreateCylinder("arrowBody", {
+                height: 1.5,
+                diameter: 0.05
+            }, scene);
+            body.rotation.x = Math.PI / 2;
+
+            const head = MeshBuilder.CreateCylinder("arrowHead", {
+                height: 0.3,
+                diameterTop: 0,
+                diameterBottom: 0.15
+            }, scene);
+            head.rotation.x = Math.PI / 2;
+            head.position.z = 0.9;
+
+            const arrow = Mesh.MergeMeshes([body, head], true, false, undefined, false, true);
+            arrow.isPickable = false;
+
+            const mat = new StandardMaterial("arrowMat", scene);
+            mat.diffuseColor = color;
+            arrow.material = mat;
+
+            return arrow;
+        }
+
+// Créer les deux flèches
+        const directionArrow = createArrow(this._scene, Color3.Red());
+        const meshDirectionArrow = createArrow(this._scene, Color3.Blue());
+
+// Suivre la position et orientation du joueur
+        this._scene.onBeforeRenderObservable.add(() => {
+            // Rouge — this._direction
+            directionArrow.position.copyFrom(this.mesh.position);
+            directionArrow.lookAt(this.mesh.position.add(this._direction));
+
+            // Bleu — this.mesh.forward (ou une méthode équivalente)
+            const forward = this.mesh.getDirection(Axis.Z); // Z est "avant" local
+            meshDirectionArrow.position.copyFrom(this.mesh.position);
+            meshDirectionArrow.lookAt(this.mesh.position.add(forward));
+        });
     }
 
     public getFloorRay(): Ray {
@@ -340,6 +387,11 @@ export class Player extends TransformNode {
 
     public reset() {
         this._inputs[this._currentInput].reset();
+    }
+
+    private getMeshDirection(): Vector3 {
+        // TODO : Utiliser cette direction pour débugguer le lancer de sable
+        return this.mesh.getDirection(Axis.Z);
     }
 
 }
