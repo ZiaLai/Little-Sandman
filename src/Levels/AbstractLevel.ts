@@ -19,23 +19,28 @@ export abstract class AbstractLevel {
         this._id = id;
     }
 
+    public getRessourceName(): string {
+        return this._ressourceName;
+    }
+
     // Charge la ressource graphique du niveau
-    protected async load(newScene: Scene) {
+    protected async load() {
+        console.log("in AstractLevel load");
         this._loading = true;
         this._game.displayLoadingUI();
         // Désactivation de la scène
         this._game.getScene().detachControl();
-        this._game.getScene().dispose();
-        this._game.setScene(newScene, this._ressourceName);
+        // this._game.getScene().dispose();
+        // this._game.setScene(newScene, this._ressourceName);
 
 
-        await this._game.environment.changeAsset(this._ressourceName, newScene).then(()=> {
-            // On déplace le joueur à la position de départ
-            const position = this._game.getStartPosition();
-            this._game.getPlayer().setPosition(position);
-            this._loading = false;
-
-        });
+        // await this._game.environment.changeAsset(this._ressourceName, newScene).then(()=> {
+        //     // On déplace le joueur à la position de départ
+        //     const position = this._game.getStartPosition();
+        //     this._game.getPlayer().setPosition(position);
+        //     this._loading = false;
+        //
+        // });
 
 
     }
@@ -47,9 +52,9 @@ export abstract class AbstractLevel {
     public abstract update(): void;
 
     // Rend le niveau actif
-    public async setActive(newScene: Scene) {
+    public async setActive() {
         console.log("AbstractLevel, In setActive");
-        await this.load(newScene);
+        await this.load();
     }
 
     // Détruit la ressource du niveau, et ses objets
@@ -74,22 +79,30 @@ export abstract class AbstractLevel {
     protected _finishedLoading() {
         this._game.hideLoadingUI();
         this._game.getScene().attachControl();
+        console.log("level " + this._name + " loaded");
     }
 
     protected abstract _addTriggers(): void;
 
     protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, playerPosition?: Vector3) {
+        const outerMesh = this._game.getGameScene().getMeshByName("outer");
+
+        console.log("outerMesh", outerMesh);
+        console.assert(outerMesh instanceof AbstractMesh);
+
         m.actionManager.registerAction(
             new ExecuteCodeAction(
                 {
                     trigger: ActionManager.OnIntersectionEnterTrigger,
-                    parameter: this._game.getScene().getMeshByName("outer")
+                    parameter: outerMesh
                 },
                 () => {
-                        this._game.setActiveLevel(destination, playerPosition);
+                        //this._game.setActiveLevel(destination, playerPosition);
+
+                        // Changer le niveau
+                        this._game.getApp().changeGameScene(destination);
                 },
             ),
         );
     }
-
 }

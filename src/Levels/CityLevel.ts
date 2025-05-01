@@ -11,12 +11,12 @@ export class CityLevel extends AbstractLevel{
 
     }
 
-    protected async load(newScene: Scene) {
-        await super.load(newScene);
+    protected async load() {
+        await super.load();
         console.log("In city load");
         console.log(this._game.getEnvironment().getTriggers());
         this._addTriggers();
-
+        console.log("after adding triggers");
 
         this._finishedLoading();
     }

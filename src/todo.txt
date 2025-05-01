@@ -6,18 +6,42 @@ https://docs.google.com/spreadsheets/d/1wY1d4xigQfcB7zREt-sLo0T2_EJqLwas95yTEHs8
 RUSH LIST
 ==========
 
-[] Débugguer la transition entre deux scènes
+[x] Débugguer la transition entre deux scènes
 
     
 
-[] Débugguer direction
+[x] Débugguer direction
 
-[] Faire le niveau sur blender
+[x] Faire le niveau sur blender
+
+[x] Les triggers ne marchent plus. (Depuis le nouveau système de chargement de scène)
+========================================================================================================================
+    Le problème vient du fait qu'on n'a pas load le level avec sa classe.
+    On a juste mis les meshs dans une scène.
+
+    Il faut juste appeler la méthode load sur le level. Mais on doit modifier celle-ci, pour pas qu'elle recharge la scène.
+
+    Level ne gère plus le changement de scène. (Changement de scène dans app)
+
+    Quand on essaye de récupérer l'outer dans setMeshAsChangeLevelTrigger, on obtient undefined, il faudrait stocker le mesh quelque part
+========================================================================================================================
+
+[x] Ajouter écran de chargement entre deux scène (ou au moins un fadein/fadeout)
+
+[] Gérer correctement la position de spawn du joueur
+
 
 [] Jouer la musique
     [] Ville
     [] Bakery
 
+[] Evenements du niveau
+    [] Spawner bread slice
+
+    [] Lancer sable sur gateau
+        [] Cacher gateau moche
+        [] Montrer gateau joli
+        [] Upgrade la musique
 
 
 

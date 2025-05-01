@@ -12,8 +12,8 @@ export class Level1_1_1 extends AbstractLevel{
         this._ressourceName = "bakery_indoors_with_textures";
     }
 
-    protected async load(newScene: Scene) {
-        super.load(newScene);
+    protected async load() {
+        super.load();
         // todo : charger la musique
     }
 

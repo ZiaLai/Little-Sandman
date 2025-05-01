@@ -80,6 +80,9 @@ export class App {
         });
 
         // run the main render loop
+        // Instanciation de la classe game
+        this._game = new Game(this);
+
         this._main();
     }
 
@@ -241,10 +244,12 @@ export class App {
 
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
         var finishedLoading = false;
-        await this._setUpGame("bakery_level_proto").then(res =>{
-            finishedLoading = true;
-            this._goToGame();
-        });
+
+
+
+        await this._setUpGame(this.START_LEVEL);
+        finishedLoading = true;
+        await this._goToGame();
     }
 
     private async _setUpGame(levelName: string) {
@@ -252,10 +257,19 @@ export class App {
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene, levelName);
+        let levelRessource = this._game.getLevelRessourceNameByLevelName(levelName);
+
+
+
+
+        const environment = new Environment(scene, levelRessource);
         this._environment = environment;
         await this._environment.load(); //environment
+
         await this._loadCharacterAssets(scene);
+
+        // Todo : on aimerait écrire cette ligne, mais elle fait planter le programme
+        await this._game.setActiveLevel(levelName);
 
 
     }
@@ -269,11 +283,11 @@ export class App {
             outer.isPickable = false;
             outer.checkCollisions = true;
 
-            const debugMaterial = new StandardMaterial("debugMaterial", scene);
-            debugMaterial.wireframe = true;
-            debugMaterial.emissiveColor = new Color3(1, 0, 0); // rouge pour bien voir
-            outer.material = debugMaterial;
-            outer.isVisible = true;
+            // const debugMaterial = new StandardMaterial("debugMaterial", scene);
+            // debugMaterial.wireframe = true;
+            // debugMaterial.emissiveColor = new Color3(1, 0, 0); // rouge pour bien voir
+            // outer.material = debugMaterial;
+            // outer.isVisible = true;
 
 
             //move origin of box collider to the bottom of the mesh (to     match player mesh)
@@ -375,7 +389,9 @@ export class App {
 
         changeButton.onPointerDownObservable.add(() => {
             //this._environment.changeAsset("bakery_indoors_with_textures");
-            this._game.setActiveLevel("breach_1");
+            // this._game.setActiveLevel("breach_1");
+
+            this.changeGameScene("bakers_bedroom");
         })
 
 
@@ -393,8 +409,7 @@ export class App {
         //scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition() // move the player to the start position;
         //get rid of start scene, switch to gamescene and change states
 
-        // Instanciation de la classe game
-        this._game = new Game(this, this._engine, scene, this._player, this._environment);
+
 
         //await this._game.setActiveLevel(this.START_LEVEL);
         console.log("finished Loading?");
@@ -407,6 +422,8 @@ export class App {
         //the game is ready, attach control back
         //this._startMusic();
         this._scene.attachControl();
+
+        console.log("after goToGame");
 
     }
 
@@ -441,12 +458,15 @@ export class App {
         this._state = State.LOSE;
     }
 
-    public async changeGameScene(scene: Scene, levelName: string) {
+    public async changeGameScene(levelName: string) {
         console.log("In changeGameScene");
+        this._game.displayLoadingUI();
 
-        await this._setUpGame(levelName).then(res => {
-            this._goToGame();
-        });
+        await this._setUpGame(levelName);
+        await this._goToGame();
+
+        this._game.hideLoadingUI();
+
 
         // this._scene = scene;
         //
@@ -463,6 +483,26 @@ export class App {
         // await this._loadCharacterAssets(scene)
 
 
+    }
+
+    getEnvironment() {
+        return this._environment;
+    }
+
+    getScene() {
+        return this._scene;
+    }
+
+    getEngine() {
+        return this._engine;
+    }
+
+    getGameScene() {
+        return this._gamescene;
+    }
+
+    getPlayer() {
+        return this._player;
     }
 }
 new App();

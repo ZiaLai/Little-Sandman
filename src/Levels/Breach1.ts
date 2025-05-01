@@ -27,8 +27,8 @@ export class Breach1 extends AbstractLevel {
 
     }
 
-    protected async load(newScene: Scene, startPosition?: Vector3) {
-        await super.load(newScene);
+    protected async load() {
+        await super.load();
 
         let breadMesh: Mesh;
 
