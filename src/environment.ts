@@ -21,12 +21,6 @@ export class Environment {
         // Mettre à jour avec la nouvelle scène
         this._scene = newScene;
 
-        // Suppression des assets précédents
-        // this._assets.allMeshes.forEach((m) => {
-        //     m.getScene()?.removeMesh(m);
-        //
-        //     m.dispose();
-        // })
         this._triggers = [];
         // Chargement des nouveaux assets
         await this.load();
@@ -44,11 +38,11 @@ export class Environment {
 
             if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-               // m.isVisible = false;
+                m.isVisible = false;
                 m.isPickable = true;
             }
             else if (m.name.includes("trigger")) {
-                // m.visible = false;
+                m.visible = true;
                 m.isPickable = false;
                 m.checkCollisions = false;
                 this._triggers.push(m);

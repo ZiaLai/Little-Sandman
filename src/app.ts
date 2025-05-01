@@ -54,9 +54,7 @@ export class App {
     private START_LEVEL = "city";
 
     constructor() {
-        if (this.EXECUTE_TEST) {
-            new TestRunner().main();
-        }
+        if (this.EXECUTE_TEST) new TestRunner().main();
 
 
         this._canvas = this._createCanvas();
@@ -143,7 +141,6 @@ export class App {
 
     private renderScene() {
         this._scene.render();
-        //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
 
     private _startMusic() {
@@ -231,9 +228,9 @@ export class App {
         next.left = "-12%";
         cutScene.addControl(next);
 
-        next.onPointerUpObservable.add(() => {
-            //this._goToGame();
-        })
+        // next.onPointerUpObservable.add(() => {
+        //     //this._goToGame();
+        // })
 
         //--WHEN SCENE IS FINISHED LOADING--
         await this._cutScene.whenReadyAsync();
@@ -243,12 +240,7 @@ export class App {
         this._scene = this._cutScene;
 
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
-        var finishedLoading = false;
-
-
-
         await this._setUpGame(this.START_LEVEL);
-        finishedLoading = true;
         await this._goToGame();
     }
 
@@ -259,16 +251,12 @@ export class App {
         //--CREATE ENVIRONMENT--
         let levelRessource = this._game.getLevelRessourceNameByLevelName(levelName);
 
-
-
-
         const environment = new Environment(scene, levelRessource);
         this._environment = environment;
         await this._environment.load(); //environment
 
         await this._loadCharacterAssets(scene);
 
-        // Todo : on aimerait écrire cette ligne, mais elle fait planter le programme
         await this._game.setActiveLevel(levelName);
 
 
@@ -299,20 +287,6 @@ export class App {
 
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
-            // var box = MeshBuilder.CreateBox("Small1", { width: 0.5, depth: 0.5, height: 0.25, faceColors: [new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1),new Color4(0,0,0,1), new Color4(0,0,0,1)] }, scene);
-            // box.position.y = 1.5;
-            // box.position.z = 1;
-            //
-            // var body = Mesh.CreateCylinder("body", 3, 2,2,0,0,scene);
-            // var bodymtl = new StandardMaterial("red",scene);
-            // bodymtl.diffuseColor = new Color3(.8,.5,.5);
-            // body.material = bodymtl;
-            // body.isPickable = false;
-            // body.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0)); // simulates the imported mesh's origin
-            //
-            // //parent the meshes
-            // box.parent = body;
-            // body.parent = outer;
             return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_static2.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
@@ -335,7 +309,7 @@ export class App {
 
     }
 
-    private async _initializeGameAsync(scene): Promise<void> {
+    private async _initializeGameAsync(scene: Scene): Promise<void> {
         //temporary light to light the entire scene
         var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
 
@@ -358,9 +332,6 @@ export class App {
         this._scene.detachControl();
         let scene = this._gamescene;
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098); // a color that fit the overall color scheme better
-
-        //--INPUT--
-       // this._input = new PlayerInput(scene);
 
         //--GUI--
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -388,12 +359,8 @@ export class App {
         playerUI.addControl(changeButton);
 
         changeButton.onPointerDownObservable.add(() => {
-            //this._environment.changeAsset("bakery_indoors_with_textures");
-            // this._game.setActiveLevel("breach_1");
-
             this.changeGameScene("bakers_bedroom");
         })
-
 
         //this handles interactions with the start button attached to the scene
         loseBtn.onPointerDownObservable.add(() => {
@@ -407,18 +374,13 @@ export class App {
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         //scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition() // move the player to the start position;
+
         //get rid of start scene, switch to gamescene and change states
-
-
-
-        //await this._game.setActiveLevel(this.START_LEVEL);
-        console.log("finished Loading?");
-        //this._game.initializeLevel();
-
         this._scene.dispose();
         this._state = State.GAME;
         this._scene = scene;
         this._engine.hideLoadingUI();
+
         //the game is ready, attach control back
         //this._startMusic();
         this._scene.attachControl();
@@ -458,31 +420,18 @@ export class App {
         this._state = State.LOSE;
     }
 
-    public async changeGameScene(levelName: string) {
+    public async changeGameScene(levelName: string, playerPosition?: Vector3) {
         console.log("In changeGameScene");
         this._game.displayLoadingUI();
 
         await this._setUpGame(levelName);
         await this._goToGame();
 
+        this._player.reset();
+        if (playerPosition !== undefined) {
+            this._player.setPosition(playerPosition);
+        }
         this._game.hideLoadingUI();
-
-
-        // this._scene = scene;
-        //
-        // this._gamescene = scene;
-        //
-        // await this._initializeGameAsync(scene);
-        // await scene.whenReadyAsync();
-        //
-        // this._game.setPlayer(this._player);
-        //
-        // const environment = new Environment(scene, levelName);
-        // this._environment = environment;
-        // await this._environment.load();
-        // await this._loadCharacterAssets(scene)
-
-
     }
 
     getEnvironment() {

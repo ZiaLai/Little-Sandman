@@ -100,7 +100,7 @@ export abstract class AbstractLevel {
                         //this._game.setActiveLevel(destination, playerPosition);
 
                         // Changer le niveau
-                        this._game.getApp().changeGameScene(destination);
+                        this._game.getApp().changeGameScene(destination, playerPosition);
                 },
             ),
         );
