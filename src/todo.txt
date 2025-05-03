@@ -28,12 +28,28 @@ RUSH LIST
 
 [x] Ajouter écran de chargement entre deux scène (ou au moins un fadein/fadeout)
 
-[] Gérer correctement la position de spawn du joueur
+[x] Gérer correctement la position de spawn du joueur
 
+===
+
+[x] Effet de camera bizarre quand on spawn
+    Oui, c'est parce que la camera spawnait sous le sol. Maintenant elle spawne sur le joueur, mais comme le joueur spawne dans le ciel, c'est toujours buggué.
+
+[/] Corriger y du spawn du joueur
+
+===
+[] Camera détection mur ?
+
+======================
+[] MERGE LES BRANCHES
+======================
 
 [] Jouer la musique
     [] Ville
     [] Bakery
+
+[] Entrer dans le niveau
+    [] Lancer sable sur boulangère
 
 [] Evenements du niveau
     [] Spawner bread slice
@@ -42,6 +58,9 @@ RUSH LIST
         [] Cacher gateau moche
         [] Montrer gateau joli
         [] Upgrade la musique
+        [] Si tous les gâteaux sont trouvés, écran de fin
+
+    [] Plateformes tombantes
 
 
 

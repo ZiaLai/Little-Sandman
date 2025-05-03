@@ -428,9 +428,8 @@ export class App {
         await this._goToGame();
 
         this._player.reset();
-        if (playerPosition !== undefined) {
-            this._player.setPosition(playerPosition);
-        }
+        if (playerPosition !== undefined) this._player.setPosition(playerPosition);
+
         this._game.hideLoadingUI();
     }
 

@@ -68,7 +68,7 @@ export class Player extends TransformNode {
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
 
-        this.mesh.position.y = 30 // Temporairement, en attendant qu'il y ait une startPos dans la ville
+        this.mesh.position.y = 3.5   // Temporairement, en attendant qu'il y ait une startPos dans la ville
         //this.mesh.position = new Vector3(51, 18, 11);
 
         this.mesh.parent = this;
@@ -163,7 +163,7 @@ export class Player extends TransformNode {
 
     beforeRenderUpdate(): void {
         //console.log("deltaTime : " + this._deltaTime);
-        console.log("Player direction", this._direction);
+       // console.log("Player direction", this._direction);
         this._debug();
         this._updateFromControls();
         this._updateGroundDetection();

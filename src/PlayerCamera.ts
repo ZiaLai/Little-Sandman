@@ -1,4 +1,4 @@
-import {ArcRotateCamera, Ray, RayHelper, Scene, TransformNode, UniversalCamera, Vector3} from "@babylonjs/core";
+import {ArcRotateCamera, Ray, Scene, TransformNode, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
@@ -31,6 +31,7 @@ export class PlayerCamera {
         console.log("set up camera")
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0);
+        this._setPosition(this._player.mesh.position);
         // To face the player from behind (180 degrees)
         this._camRoot.rotation = new Vector3(0, Math.PI, 0);
 
@@ -74,7 +75,11 @@ export class PlayerCamera {
 
     }
 
-    // Misa à jour de la camera
+    private _setPosition(position: Vector3): void {
+        this._camRoot.position = new Vector3(position.x, position.y + 2, position.z);
+    }
+
+    // Mise à jour de la camera
     private _updatePosition(): void {
         let x = this._player.mesh.position.x;
         let y = this._player.lastGroundPos.y; // Dernière position sur le sol en y, car la caméra reste fixe si on saute
@@ -124,8 +129,8 @@ export class PlayerCamera {
 
     }
 
-    //  Permet de vérifier s'il y a un mur derrière la camera
-    // Et de rapprocher la camera du player pour éviter qu'elle passe au travers du mur
+    /*  Permet de vérifier s'il y a un mur derrière la camera
+     Et de rapprocher la camera du player pour éviter qu'elle passe au travers du mur */
     private _raycast() {
 
         // Raycast vers l'arrière
