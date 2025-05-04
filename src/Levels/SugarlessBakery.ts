@@ -4,12 +4,12 @@ import {Game} from "../game";
 import {Scene} from "@babylonjs/core";
 
 
-export class Level1_1_1 extends AbstractLevel{
+export class SugarlessBakery extends AbstractLevel{
 
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "sugarless_bakery";
-        this._ressourceName = "bakery_indoors_with_textures";
+        this._ressourceName = "bakery_level_1";
     }
 
     protected async load() {

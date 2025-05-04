@@ -97,8 +97,6 @@ export abstract class AbstractLevel {
                     parameter: outerMesh
                 },
                 () => {
-                        //this._game.setActiveLevel(destination, playerPosition);
-
                         // Changer le niveau
                         this._game.getApp().changeGameScene(destination, playerPosition);
                 },

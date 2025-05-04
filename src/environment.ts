@@ -15,6 +15,7 @@ export class Environment {
 
     }
 
+    // Apparaît comme unused, mais la méthode est bien utilisée
     public async changeAsset(assetName: string, newScene: Scene) {
         this._currentAssetName = assetName;
 

@@ -21,8 +21,9 @@ def cut_audio(input_file, output_file, start_time, end_time):
     cut_audio.export(output_file, format="ogg")
 
 
-FOLDER = "sugarlessBakery"
-DURATION = 208800
+FOLDER = "city"
+# Durée en millisecondes
+DURATION = 76000
 
 def folder_cut():
     for filename in os.listdir(FOLDER):
@@ -34,3 +35,5 @@ def folder_cut():
 
 
 # folder_cut()
+
+# cut_audio("city/city_loop.ogg", "city/city_loop.ogg", 0, 152000)

@@ -1,5 +1,5 @@
 import {AbstractLevel} from "./Levels/AbstractLevel";
-import {Level1_1_1} from "./Levels/Level1_1_1";
+import {SugarlessBakery} from "./Levels/SugarlessBakery";
 import {Environment} from "./environment";
 import {Engine, Scene, TransformNode, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
@@ -28,7 +28,7 @@ export class Game {
         let levels: AbstractLevel[] = [
             new CityLevel(this, 0),
             new BakersBedroom(this, 1),
-            new Level1_1_1(this, 2),
+            new SugarlessBakery(this, 2),
             new Breach1(this, 3)
 
         ];
