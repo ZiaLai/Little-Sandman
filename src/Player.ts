@@ -1,7 +1,7 @@
 import {
     Axis,
     Color3,
-    Mesh, MeshBuilder,
+    MeshBuilder,
     Quaternion,
     Ray,
     RayHelper,
@@ -10,9 +10,8 @@ import {
     Mesh,
     UniversalCamera,
     ArcRotateCamera,
-    Vector3,
-    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput, RayHelper,
-    AbstractMesh
+    ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput,
+    AbstractMesh,
     ShadowGenerator, StandardMaterial,
     TransformNode,
     Vector3
