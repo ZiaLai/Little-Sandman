@@ -17,7 +17,7 @@ import {
     ShadowGenerator,
     Quaternion,
     Matrix,
-    SceneLoader, SceneOptimizer, Sound, VideoTexture, PointerEventTypes,
+    SceneLoader, SceneOptimizer, Sound, VideoTexture, PointerEventTypes, Texture,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -131,8 +131,8 @@ class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToLesFraudes();
-
+        //await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
+        await this._goToStart(); // TODO enlever quand on  aura fini dev
 
         // Register a render loop to repeatedly render the scene
 
@@ -335,7 +335,7 @@ class App {
         ANote0Video.position = vidPos;
         background.position = new Vector3(0, 0, 0.2);
         let ANote0VideoMat = new StandardMaterial("m", scene);
-        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "/textures/cinematic_finligrane.mp4", scene);
+        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "/textures/cinematic_intro_ls_ss.mp4", scene);
 
         ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
         ANote0VideoMat.roughness = 1;
@@ -402,8 +402,8 @@ class App {
 
         const startBtn = Button.CreateSimpleButton("start", "");
         startBtn.fontFamily = "Viga";
-        startBtn.width = 1
-        startBtn.height = 1;
+        startBtn.width = 1.5,
+        startBtn.height = 1.5;
         imageRect.addControl(startBtn);
 
         //this handles interactions with the start button attached to the scene
@@ -428,7 +428,7 @@ class App {
         this._gamescene = scene;
 
         //--CREATE ENVIRONMENT--
-        const environment = new Environment(scene, "city_v8");
+        const environment = new Environment(scene, "city_v16");
         this._environment = environment;
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene);
@@ -454,21 +454,9 @@ class App {
 
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
-            // var box = MeshBuilder.CreateBox("Small1", { width: 0.5, depth: 0.5, height: 0.25, faceColors: [new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1), new Color4(0,0,0,1),new Color4(0,0,0,1), new Color4(0,0,0,1)] }, scene);
-            // box.position.y = 1.5;
-            // box.position.z = 1;
-            //
-            // var body = Mesh.CreateCylinder("body", 3, 2,2,0,0,scene);
-            // var bodymtl = new StandardMaterial("red",scene);
-            // bodymtl.diffuseColor = new Color3(.8,.5,.5);
-            // body.material = bodymtl;
-            // body.isPickable = false;
-            // body.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0)); // simulates the imported mesh's origin
-            //
-            // //parent the meshes
-            // box.parent = body;
-            // body.parent = outer;
-            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_anim8.glb", scene).then((result) => {
+
+            // TRUC QUI MARCEH MAIS ON COMMENTE POUR FAIRE UN TEST
+            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_22.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -481,7 +469,44 @@ class App {
                     mesh: outer as Mesh,
                     animationGroups : result.animationGroups
                 }
-            })
+            });
+            // return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_22.glb", scene).then((result) => {
+            //     const root = result.meshes[0];
+            //     const body = root;
+            //     body.parent = outer;
+            //     body.isPickable = false;
+            //
+            //     body.getChildMeshes().forEach(m => {
+            //         m.isPickable = false;
+            //     });
+            //
+            //     // 1. Récupérer le squelette
+            //     const skeleton = result.skeletons[0];
+            //     console.log(skeleton.bones.map(b => b.name));
+            //
+            //     // 2. Trouver l'os du cou
+            //     const neckBone = skeleton.bones[4];
+            //
+            //     // 3. Trouver le mesh de l'écharpe parmi les enfants
+            //     const scarf = body.getChildMeshes().find(m => m.name.includes("Plan"));
+            //
+            //     console.log("scarf", scarf);
+            //
+            //     // 4. Lier l'écharpe à l'os du cou
+            //     if (scarf && neckBone) {
+            //         scarf.attachToBone(neckBone, body);
+            //         scarf.position.set(0, 0, 0); // ajuste si nécessaire
+            //         //scarf.rotation.set(0, 0, 0);
+            //     } else {
+            //         console.warn("Écharpe ou os du cou introuvable.");
+            //     }
+            //
+            //     return {
+            //         mesh: outer as Mesh,
+            //         animationGroups: result.animationGroups
+            //     };
+            // });
+
 
 
         }
@@ -494,6 +519,8 @@ class App {
     private async _initializeGameAsync(scene): Promise<void> {
         //temporary light to light the entire scene
         var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+
+        light0.diffuse = new Color3(1, 1, 1);
 
         const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
         //light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
@@ -522,6 +549,24 @@ class App {
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         //dont detect any inputs from this ui while the game is loading
         scene.detachControl();
+        //SKYDOME (BUG)
+        /*const skydome = MeshBuilder.CreateSphere('skydome', {
+            segments: 32,
+            diameter: 1000,
+            sideOrientation: Mesh.BACKSIDE, // Important pour voir depuis l'intérieur
+            slice: 0.5,
+        }, scene);
+        skydome.infiniteDistance = true;  // Cela permet de garder l'illusion de l'infinité
+
+        // Textures pour le Skydome (par exemple une texture d'un ciel)
+        const skyMaterial = new StandardMaterial('skyMaterial', scene);
+        skyMaterial.diffuseTexture = new Texture(
+            '/textures/skydome.png',
+            scene
+        );
+        skyMaterial.diffuseTexture.coordinatesMode = Texture.SPHERICAL_MODE;
+        skyMaterial.backFaceCulling = false; // Important pour afficher les deux faces
+        skydome.material = skyMaterial;*/
 
         //create a simple button
         /*const loseBtn = Button.CreateSimpleButton("lose", "LOSE");
@@ -545,10 +590,6 @@ class App {
             text1.fontWeight = "bold";
             text1.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
             text1.paddingBottom = 100;
-            /*for (let i = 0; i < 1500; i++){ // TODO comment varier alpha ?
-                text1.alpha = 0.5;
-                advancedTexture.addControl(text1);
-            }*/
             advancedTexture.addControl(text1)
             await FadeText.fadeIn(text1);
 

@@ -88,11 +88,11 @@ export class Player extends TransformNode {
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
 
-        this.mesh.subMeshes.forEach(m=>{
-            console.log(m);
-
-        })
-        console.log("mesh", this.mesh);
+        // this.mesh.subMeshes.forEach(m=>{
+        //     console.log(m);
+        //
+        // })
+        // console.log("mesh", this.mesh);
 
         this.mesh.position.y = 30 // Temporairement, en attendant qu'il y ait une startPos dans la ville
         //this.mesh.position = new Vector3(51, 18, 11);
@@ -113,17 +113,15 @@ export class Player extends TransformNode {
         this._animations = { "end_sand" : assets.animationGroups[0],
             "fall_loop" : assets.animationGroups[1],
             "idle": assets.animationGroups[2],
-            "jump": assets.animationGroups[4],
-            "land" : assets.animationGroups[5],
-            "sand_back": assets.animationGroups[6],
-            "sand_forward": assets.animationGroups[7],
-            "sand_idle": assets.animationGroups[8],
-            "sand_left": assets.animationGroups[9],
-            "sand_right": assets.animationGroups[10],
-            "start_sand": assets.animationGroups[11],
-            "walk": assets.animationGroups[13],
-            "tiptoes": assets.animationGroups[14],
-            "scarf": assets.animationGroups[15]};
+            "jump": assets.animationGroups[3],
+            "land" : assets.animationGroups[4],
+            "sand_idle": assets.animationGroups[5],
+            "sand_forward": assets.animationGroups[6],
+            "start_sand": assets.animationGroups[7],
+            "walk": assets.animationGroups[8],
+            "scarf_left": assets.animationGroups[9],
+            "scarf_right": assets.animationGroups[10]};
+
         this._setUpAnimations();
         this.sandEmetter = Sand.getParticleSystem(this.scene);
     }
@@ -132,20 +130,16 @@ export class Player extends TransformNode {
         // indique quelles anim bouclent // utile dans anim player
         this._animations["idle"].loopAnimation = true;
         this._animations["walk"].loopAnimation = true;
-        this._animations["tiptoes"].loopAnimation = true;
-        this._animations["scarf"].loopAnimation = true;
+        this._animations["scarf_left"].loopAnimation = true;
+        this._animations["scarf_right"].loopAnimation = true;
         this._animations["fall_loop"].loopAnimation = true;
-
-        /*this._animations["sand_forward"].loopAnimation = true;
-        this._animations["sand_idle"].loopAnimation = true;
-        this._animations["sand_left"].loopAnimation = true;
-        this.animations["sand_right"].loopAnimation = true;
-        this.animations["sand_back"].loopAnimation = true;*/
+        this._animations["sand_forward"].loopAnimation = true;
 
         //init anim
         this._currentAnim = this._animations["idle"];
         this._prevAnim = this._animations["walk"];
-        this._animations["scarf"].play(true);
+        this._animations["scarf_right"].play(true);
+        this._animations["scarf_left"].play(true);
         this._animations["idle"].play(false);
 }
     private _animatePlayer(){
@@ -162,7 +156,12 @@ export class Player extends TransformNode {
         }
 
         else if (this._isShooting) {
-            this._currentAnim = this._animations["sand_idle"]
+            if (this._isWalking){
+                this._currentAnim = this._animations["sand_forward"];
+            }
+            else {
+                this._currentAnim = this._animations["sand_idle"];
+            }
             ///if (!this.sandEmetter.isStarted()){
                 this.sandEmetter.start();
             //}
@@ -316,9 +315,8 @@ export class Player extends TransformNode {
         else if ((this._inputs[this._currentInput].isShooting && this._wasShootingLastFrame && !this._isShooting) || this._isStartingShooting) { // Le joueur continue de shooter
             this._shootAnimationTimer += this._deltaTime;
             this._wasShootingLastFrame = true;
-            console.log("coucou je suis la 318 player");
+
             if (this._shootAnimationTimer > 1) {
-                console.log("coucou je suis la 320 player")
 
                 this._isStartingShooting = false;
                 this._isShooting = true;
@@ -342,7 +340,7 @@ export class Player extends TransformNode {
         if (! this._inputs[this._currentInput].isShooting) { // Arrête de shooter
             this._wasShootingLastFrame = false;
         }
-        console.log("shot anim timer =", this._shootAnimationTimer,"startShooting =", this._isStartingShooting, " shooting =", this._isShooting, "end shooting =", this._isEndingShooting, "was shooting last_frame", this._wasShootingLastFrame );
+       // console.log("shot anim timer =", this._shootAnimationTimer,"startShooting =", this._isStartingShooting, " shooting =", this._isShooting, "end shooting =", this._isEndingShooting, "was shooting last_frame", this._wasShootingLastFrame );
     }
 
     private _floorRaycast(offsetx: number, offsetz: number, raycastlen: number): Vector3 {

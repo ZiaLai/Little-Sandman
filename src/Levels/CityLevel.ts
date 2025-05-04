@@ -7,7 +7,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v8";
+        this._ressourceName = "city_v16";
     }
 
     protected async load() {
