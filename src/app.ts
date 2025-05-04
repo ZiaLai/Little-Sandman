@@ -131,8 +131,8 @@ class App {
     }
 
     private async _main(): Promise<void> {
-        //await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
-        await this._goToStart(); // TODO enlever quand on  aura fini dev
+        await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
+        //await this._goToStart(); // TODO enlever quand on  aura fini dev
 
         // Register a render loop to repeatedly render the scene
 
@@ -335,7 +335,7 @@ class App {
         ANote0Video.position = vidPos;
         background.position = new Vector3(0, 0, 0.2);
         let ANote0VideoMat = new StandardMaterial("m", scene);
-        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "/textures/cinematic_intro_ls_ss.mp4", scene);
+        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "https://dl.dropbox.com/scl/fi/i7ltk5bf40pv8kbmj4gen/cinematic_intro_ls_ss.mp4?rlkey=40fph0epvxqs3m2slpy2c64yr&st=w0dwxn5u&dl=0", scene);
 
         ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
         ANote0VideoMat.roughness = 1;
