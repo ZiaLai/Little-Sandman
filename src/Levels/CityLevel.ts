@@ -7,8 +7,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v8";
-
+        this._ressourceName = "city_v16";
     }
 
     protected async load() {
@@ -29,7 +28,6 @@ export class CityLevel extends AbstractLevel{
     }
 
     protected _addTriggers() {
-        console.log("City level, In addTriggers")
         this._game.getEnvironment().getTriggers().forEach(m => {
             if (m.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", m.name);

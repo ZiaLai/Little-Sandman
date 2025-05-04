@@ -7,6 +7,12 @@ import {
     RayHelper,
     Scalar,
     Scene,
+    Mesh,
+    UniversalCamera,
+    ArcRotateCamera,
+    Vector3,
+    Quaternion, Ray, Scalar, ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput, RayHelper,
+    AbstractMesh
     ShadowGenerator, StandardMaterial,
     TransformNode,
     Vector3
@@ -15,6 +21,7 @@ import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {PlayerCamera} from "./PlayerCamera";
+import {Sand} from "./util/Sand";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -46,7 +53,7 @@ export class Player extends TransformNode {
     private _gravity: Vector3 = new Vector3();
     private _grounded: boolean;
     lastGroundPos: Vector3 = Vector3.Zero();
-    private _maxJumpCount : number = 1;
+    private _maxJumpCount: number = 1;
     private _jumpCount: number = 1;
     private _canHover: boolean = false;
     private _hoverTimer: number = 0;
@@ -61,6 +68,25 @@ export class Player extends TransformNode {
     private _acceleration: number = 1 / 7 * Player.PLAYER_SPEED;
     private _moveVector: Vector3;
 
+    private _isJumping: boolean;
+    private _isWalking: boolean;
+    private _isLanding: boolean;
+    private _isHovering: boolean;
+    private _isFalling: boolean;
+
+    private _isShooting: boolean = false;
+    private _isStartingShooting: boolean;
+    private _isEndingShooting: boolean = false;
+    private _wasShootingLastFrame: boolean = false;
+    private _shootAnimationTimer: number;
+
+
+
+    private _animations: {};
+    private _currentAnim;
+    private _prevAnim;
+    private sandEmetter;
+    private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
         super("player", scene);
@@ -83,8 +109,108 @@ export class Player extends TransformNode {
         this._inputs = [new KeyboardInput(this.scene, this._canvas), new GamepadInput(this.scene)];
         this._inputs[this._currentInput].isActive = true;
         this._inputs[1 - this._currentInput].isActive = false;
-    }
 
+        this._animations = { "end_sand" : assets.animationGroups[0],
+            "fall_loop" : assets.animationGroups[1],
+            "idle": assets.animationGroups[2],
+            "jump": assets.animationGroups[3],
+            "land" : assets.animationGroups[4],
+            "sand_idle": assets.animationGroups[5],
+            "sand_forward": assets.animationGroups[6],
+            "start_sand": assets.animationGroups[7],
+            "walk": assets.animationGroups[8],
+            "scarf_left": assets.animationGroups[9],
+            "scarf_right": assets.animationGroups[10]};
+
+        this._setUpAnimations();
+        this.sandEmetter = Sand.getParticleSystem(this.scene);
+    }
+    private _setUpAnimations(){
+        this.scene.stopAllAnimations();
+        // indique quelles anim bouclent // utile dans anim player
+        this._animations["idle"].loopAnimation = true;
+        this._animations["walk"].loopAnimation = true;
+        this._animations["scarf_left"].loopAnimation = true;
+        this._animations["scarf_right"].loopAnimation = true;
+        this._animations["fall_loop"].loopAnimation = true;
+        this._animations["sand_forward"].loopAnimation = true;
+
+        //init anim
+        this._currentAnim = this._animations["idle"];
+        this._prevAnim = this._animations["walk"];
+        this._animations["scarf_right"].play(true);
+        this._animations["scarf_left"].play(true);
+        this._animations["idle"].play(false);
+}
+    private _animatePlayer(){
+
+
+        if (this._isStartingShooting) {
+            this._currentAnim = this._animations["start_sand"];
+            ///this.sandEmetter.start();
+        }
+
+        else if (this._isEndingShooting) {
+            this._currentAnim = this._animations["end_sand"];
+            this.sandEmetter.stop();
+        }
+
+        else if (this._isShooting) {
+            if (this._isWalking){
+                this._currentAnim = this._animations["sand_forward"];
+            }
+            else {
+                this._currentAnim = this._animations["sand_idle"];
+            }
+            ///if (!this.sandEmetter.isStarted()){
+                this.sandEmetter.start();
+            //}
+
+
+        }
+
+        else if (this._isFalling){
+             this._currentAnim = this._animations["fall_loop"];
+         }
+        else if (this._isJumping){
+            this._currentAnim = this._animations["jump"];
+        }
+        else if (this._hovering ){
+            this._currentAnim = this._animations["fall_loop"];
+        }
+
+         else if (this._isWalking){
+             this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
+             this._currentAnim = this._animations["walk"];
+         }
+
+        else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {// TODO marche pas
+            this._currentAnim = this._animations["land"];
+        }
+
+
+        else {
+            this._currentAnim = this._animations["idle"];
+        }
+
+
+        if (this._currentAnim === this._animations["land"]) {
+            this._landAnimationTimer += this._deltaTime;
+        }
+
+        if ((! this._isGrounded()) && (this._prevAnim == this._animations["fall_loop"])) {
+            this._landAnimationTimer = 0;
+        }
+
+        if (this._currentAnim != null && this._prevAnim !== this._currentAnim){
+
+            this._prevAnim.stop();
+            this._currentAnim.play(this._currentAnim.loopAnimation);
+            this._prevAnim = this._currentAnim
+        }
+
+
+}
     public setPosition(position: Vector3): void {
         console.log("set position", position);
         this.mesh.position = position;
@@ -143,11 +269,12 @@ export class Player extends TransformNode {
             this._speed = 0;
         }
 
-
+        this._isWalking = true;
         // Rotations
         // On vérifie s'il y a un mouvement pour déterminer si on a besoin de faire une rotation
         let input = new Vector3(this._inputs[this._currentInput].horizontalAxis, this._inputs[this._currentInput].verticalAxis);
         if (input.length() == 0) {
+            this._isWalking = false;
             return;
         }
         // rotation en fonction de l'input et de l'angle de la caméra
@@ -163,11 +290,56 @@ export class Player extends TransformNode {
 
     beforeRenderUpdate(): void {
         //console.log("deltaTime : " + this._deltaTime);
-       // console.log("Player direction", this._direction);
-        this._debug();
         this._updateFromControls();
         this._updateGroundDetection();
+        this._animatePlayer();
         //console.log("Player pos", this.mesh.position);
+        this.updateStates();
+        this.updateSandEmetter();
+    }
+
+    private updateStates() {
+        if (this._gravity.y <= 0) {
+            this._isJumping = false;
+        }
+        this._isFalling = (!this._isJumping) && this._falling > 0;
+
+        if (this._inputs[this._currentInput].isShooting && !this._wasShootingLastFrame) { // Le joueur commence à shooter
+            this._shootAnimationTimer = 0;
+            this._wasShootingLastFrame = true;
+            this._isStartingShooting = true
+            this._isShooting = false;
+        }
+
+        else if ((this._inputs[this._currentInput].isShooting && this._wasShootingLastFrame && !this._isShooting) || this._isStartingShooting) { // Le joueur continue de shooter
+            this._shootAnimationTimer += this._deltaTime;
+            this._wasShootingLastFrame = true;
+
+            if (this._shootAnimationTimer > 1) {
+
+                this._isStartingShooting = false;
+                this._isShooting = true;
+            }
+        }
+
+        else if (this._isShooting && (! this._inputs[this._currentInput].isShooting)) { // Le joueur s'arrête de shooter
+            this._shootAnimationTimer = 0;
+            this._isEndingShooting = true;
+            this._isShooting = false;
+        }
+
+        else if (this._isEndingShooting) { // En train de s'arrêter de shooter
+            this._shootAnimationTimer += this._deltaTime;
+            if (this._shootAnimationTimer > 1) {
+                this._isEndingShooting = false;
+            }
+        }
+
+
+        if (! this._inputs[this._currentInput].isShooting) { // Arrête de shooter
+            this._wasShootingLastFrame = false;
+        }
+       // console.log("shot anim timer =", this._shootAnimationTimer,"startShooting =", this._isStartingShooting, " shooting =", this._isShooting, "end shooting =", this._isEndingShooting, "was shooting last_frame", this._wasShootingLastFrame );
         //console.log(this._inputs[0]);
     }
 
@@ -304,7 +476,7 @@ export class Player extends TransformNode {
 
     private _updateGroundDetection(): void {
         if (!this._isGrounded()) {
-            // Vérifie si on est sur une pente
+            // Vérifie si on est sur une pente => isoler fonction pour plus de clarté ?
             if (this._checkSlope() && this._gravity.y <= 0) {
                 this._gravity.y = 0;
                 this._jumpCount = 1;
@@ -319,10 +491,13 @@ export class Player extends TransformNode {
                 }
                 else {
                     // Gravité augmentée si on lâche la touche
-                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));                }
-
+                    this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY * 2));
+                    this._isJumping = false;
+                    this._isFalling = true;
+                }
                 this._grounded = false;
-            } else {
+            }
+            else {
                 // Hovering
                 // On annule la gravité
                 this._gravity.y = Scalar.Lerp(this._gravity.y, 0, 0.2);
@@ -344,6 +519,8 @@ export class Player extends TransformNode {
         this._falling += 1;
         // Contact avec le sol
         if (this._isGrounded()) {
+            this._isJumping = false;
+            this._isFalling = false;
             this._gravity.y = 0;
             this._grounded = true;
             this.lastGroundPos.copyFrom(this.mesh.position);
@@ -356,12 +533,13 @@ export class Player extends TransformNode {
         // Détection de saut
         if (this._inputs[this._currentInput].jumpKeyDown) {
             if (!this._jumpKey && this._falling < 3 && this._jumpCount > 0) {
+                this._isJumping = true;
                 this._gravity.y = Player.JUMP_FORCE;
                 this._jumpCount--;
                 this._jumpKey = true;
             }
         } else {
-            this._jumpKey = false;
+            this._jumpKey = false; //jumpkey evite de sauter en boucke en mainteant le bouton appyer
         }
 
 
@@ -384,6 +562,25 @@ export class Player extends TransformNode {
     getDeltaTime() {
         return this._deltaTime;
     }
+
+    private updateSandEmetter(){
+        let x = this._direction._x;
+        let z = this._direction._z;
+        // -- POSITION
+        let copy = new Vector3().copyFrom(this.mesh.position);
+        let position = copy.addInPlace(new Vector3(x,1.25,z));// TODO  le add dépend de l'orientation ! (uniquement x et z ) c'est tout simplement direction ?
+        this.sandEmetter.emitter = position;
+        //-- ANGLE
+
+        let orthogonal = new Vector3(-z,0.1,x).scale(1/3);
+        let copyDirection = new Vector3().copyFrom(this._direction);
+        let copyDirection2 = new Vector3().copyFrom(this._direction);
+        let min  = copyDirection.subtract(orthogonal);
+        let max = copyDirection2.addInPlace(orthogonal);
+        this.sandEmetter.createPointEmitter(min,max); // TODO si min > max => prob ?
+        console.log ("direction :", this._direction, " direction sable :",min, ", ", max , " position sable : ", position);
+    }
+
 
     public reset() {
         this._inputs[this._currentInput].reset();
