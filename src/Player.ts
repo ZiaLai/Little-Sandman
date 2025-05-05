@@ -7,7 +7,7 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3
+    Vector3, Matrix, Tools
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -559,16 +559,29 @@ export class Player extends TransformNode {
         let x = this.getMeshDirection()._x;
         let z = this.getMeshDirection()._z;
         // -- POSITION
-        const d = Math.hypot(-0.12, 0.05); // valeurs trouvées par dicotomie
         let center = new Vector3().copyFrom(this.mesh.position);
-        // const R = Math.hypot(x, z);             // Rayon
-        // const theta0 = Math.atan2(z - center.x, z - center.z);        // Angle initial
-        // const deltaTheta = d / R;                           // Angle à parcourir
-        // const theta = theta0 + deltaTheta;                  // Nouvel angle
-        // const x1 = center.x +  Math.cos(theta);                 // Nouvelle coordonnée x
-        // const z1 = center.z + Math.sin(theta);
-        let position = center.addInPlace(new Vector3(x,1.23,z));// TODO comment caler parfaitment ? x-0.12, z+0.05 pour l'orientation originelle(mais pas les autres...)faut une équation de cercle ? on en a déja une mais le point n'est pas aligné....
-        this.sandEmetter.emitter = position;
+
+        let position = center.addInPlace(new Vector3(x,1.23,z));
+
+        function rotateAroundY(vector, center, angle) {
+            // Translation vers l'origine
+            angle = Tools.ToRadians(angle);
+            const translated = vector.subtract(center);
+
+            // Rotation autour de l'axe Y (plan XZ)
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+
+            const rotatedX = translated.x * cos - translated.z * sin;
+            const rotatedZ = translated.x * sin + translated.z * cos;
+
+            const rotated = new Vector3(rotatedX, translated.y, rotatedZ);
+
+            // Retour à la position d'origine
+            return rotated.add(center);
+        }
+
+        this.sandEmetter.emitter = rotateAroundY(position,new Vector3().copyFrom(this.mesh.position), -7);
         //-- ANGLE
 
         let orthogonal = new Vector3(-z,0.1,x).scale(1/3);
@@ -576,7 +589,7 @@ export class Player extends TransformNode {
         let copyDirection2 = new Vector3().copyFrom(this.getMeshDirection());
         let min  = copyDirection.subtract(orthogonal);
         let max = copyDirection2.addInPlace(orthogonal);
-        this.sandEmetter.createPointEmitter(min,max); // TODO si min > max => prob ?
+        this.sandEmetter.createPointEmitter(min,max);
         //console.log ("direction :", this._direction, " direction sable :",min, ", ", max , " position sable : ", position);
     }
 
