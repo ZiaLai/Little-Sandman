@@ -39,4 +39,12 @@ export class BakersBedroom extends AbstractLevel {
             }
         })
     }
+
+    protected setUpLights(): void {
+        // TODO implement (sun et point de lumiere sur la lampe de chevet)
+    }
+
+    protected setUpSkydome(): void {
+        // TODO implement
+    }
 }

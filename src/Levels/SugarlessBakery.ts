@@ -31,4 +31,12 @@ export class SugarlessBakery extends AbstractLevel{
 
     protected _addTriggers(): void {
     }
+
+    protected setUpLights(): void {
+        // TODO add lights sur les gateaux + lumiere rouge dans le four
+    }
+
+    protected setUpSkydome(): void {
+        // TODO implement (esce qu'on peut changer de texture losqu'on corrige un element ? )
+    }
 }

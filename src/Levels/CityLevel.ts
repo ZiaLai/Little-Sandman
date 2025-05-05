@@ -7,7 +7,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v16";
+        this._ressourceName = "city_v20";
     }
 
     protected async load() {
@@ -35,6 +35,14 @@ export class CityLevel extends AbstractLevel{
                 this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom");
             }
         })
+    }
+
+    protected setUpLights(): void {
+        // TODO sun et reverberes
+    }
+
+    protected setUpSkydome(): void {
+        // TODO add night sky
     }
 
 

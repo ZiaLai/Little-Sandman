@@ -5,6 +5,8 @@ import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 import {GameObject} from "../GameObjects/GameObject";
 import {Knife} from "../GameObjects/Knife";
 
+
+
 export class Breach1 extends AbstractLevel {
     private _startPosition: Vector3;
 
@@ -107,5 +109,11 @@ export class Breach1 extends AbstractLevel {
     }
 
     protected _addTriggers(): void {
+    }
+
+    protected setUpLights(): void {
+    }
+
+    protected setUpSkydome(): void {
     }
 }

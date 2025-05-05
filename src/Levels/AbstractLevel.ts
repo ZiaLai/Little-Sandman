@@ -41,7 +41,8 @@ export abstract class AbstractLevel {
         //     this._loading = false;
         //
         // });
-
+        this.setUpLights();
+        this.setUpSkydome();
 
     }
 
@@ -57,6 +58,8 @@ export abstract class AbstractLevel {
         await this.load();
     }
 
+    protected abstract setUpLights():void;
+    protected abstract setUpSkydome():void;
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
 
