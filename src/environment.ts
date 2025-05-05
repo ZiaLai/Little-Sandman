@@ -75,8 +75,16 @@ export class Environment {
     }
 
     public async _loadAsset() {
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",
-            this._scene);
+
+        let result;
+        if (this._currentAssetName === "city") { // Import de la ville sur dropbox car fichier lourd
+            result = await SceneLoader.ImportMeshAsync(null, "", "https://www.dropbox.com/scl/fi/oge4a6288q6uupxnzhvp0/city_v20.glb?rlkey=t2vzo43aok9cc96kwndhxfgz2&st=55it1s67&dl=0");
+        }
+        else {
+            result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",
+                this._scene);
+        }
+
         let env = result.meshes[0];
         // env.position.x = 5;
         // env.position.y = -15;
