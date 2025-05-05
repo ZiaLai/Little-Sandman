@@ -1,18 +1,11 @@
 import {
     Axis,
-    Color3,
-    MeshBuilder,
     Quaternion,
     Ray,
-    RayHelper,
     Scalar,
     Scene,
     Mesh,
-    UniversalCamera,
-    ArcRotateCamera,
-    ArcFollowCamera, FollowCamera, ArcRotateCameraGamepadInput,
-    AbstractMesh,
-    ShadowGenerator, StandardMaterial,
+    ShadowGenerator,
     TransformNode,
     Vector3
 } from "@babylonjs/core";
@@ -563,21 +556,28 @@ export class Player extends TransformNode {
     }
 
     private updateSandEmetter(){
-        let x = this._direction._x;
-        let z = this._direction._z;
+        let x = this.getMeshDirection()._x;
+        let z = this.getMeshDirection()._z;
         // -- POSITION
-        let copy = new Vector3().copyFrom(this.mesh.position);
-        let position = copy.addInPlace(new Vector3(x,1.25,z));// TODO  le add dépend de l'orientation ! (uniquement x et z ) c'est tout simplement direction ?
+        const d = Math.hypot(-0.12, 0.05); // valeurs trouvées par dicotomie
+        let center = new Vector3().copyFrom(this.mesh.position);
+        // const R = Math.hypot(x, z);             // Rayon
+        // const theta0 = Math.atan2(z - center.x, z - center.z);        // Angle initial
+        // const deltaTheta = d / R;                           // Angle à parcourir
+        // const theta = theta0 + deltaTheta;                  // Nouvel angle
+        // const x1 = center.x +  Math.cos(theta);                 // Nouvelle coordonnée x
+        // const z1 = center.z + Math.sin(theta);
+        let position = center.addInPlace(new Vector3(x,1.23,z));// TODO comment caler parfaitment ? x-0.12, z+0.05 pour l'orientation originelle(mais pas les autres...)faut une équation de cercle ? on en a déja une mais le point n'est pas aligné....
         this.sandEmetter.emitter = position;
         //-- ANGLE
 
         let orthogonal = new Vector3(-z,0.1,x).scale(1/3);
-        let copyDirection = new Vector3().copyFrom(this._direction);
-        let copyDirection2 = new Vector3().copyFrom(this._direction);
+        let copyDirection = new Vector3().copyFrom(this.getMeshDirection());
+        let copyDirection2 = new Vector3().copyFrom(this.getMeshDirection());
         let min  = copyDirection.subtract(orthogonal);
         let max = copyDirection2.addInPlace(orthogonal);
         this.sandEmetter.createPointEmitter(min,max); // TODO si min > max => prob ?
-        console.log ("direction :", this._direction, " direction sable :",min, ", ", max , " position sable : ", position);
+        //console.log ("direction :", this._direction, " direction sable :",min, ", ", max , " position sable : ", position);
     }
 
 
@@ -586,7 +586,6 @@ export class Player extends TransformNode {
     }
 
     private getMeshDirection(): Vector3 {
-        // TODO : Utiliser cette direction pour débugguer le lancer de sable
         return this.mesh.getDirection(Axis.Z);
     }
 
