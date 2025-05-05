@@ -454,6 +454,28 @@ export class App {
                 body.getChildMeshes().forEach(m => {
                     m.isPickable = false;
                 })
+                const skeleton = result.skeletons[0];
+                const bone = skeleton.bones[4];
+                console.log(bone.name)
+                // The player has 2 scarfs
+                // The name of the first scarf is "Plane.001"
+                const scarf1 = body.getChildMeshes().find(m => m.name.includes("Plane.001")) as Mesh;
+
+                // The name of the second scarf is "Plane.003"
+                const scarf2 = body.getChildMeshes().find(m => m.name.includes("Plane.003")) as Mesh;
+
+                const tshirt = scene.getMeshByName("t shirt sans simul.001");
+
+                if (scarf1 && scarf2 && bone) {
+                    scarf1.scaling.setAll(100);
+                    scarf1.position.y = -113;
+                    scarf2.scaling.setAll(100);
+                    scarf2.position.y = -117;
+                    scarf2.position.z = 8;
+                    scarf1.attachToBone(bone, tshirt);
+                    scarf2.attachToBone(bone, tshirt);
+                }
+
                 return {
                     mesh: outer as Mesh,
                     animationGroups : result.animationGroups
@@ -471,7 +493,7 @@ export class App {
     private async _initializeGameAsync(scene: Scene): Promise<void> {
         //temporary light to light the entire scene
         var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
-
+        light0.diffuse = new Color3(35/255,67/255,131/255);
         const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
         //light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
         light.intensity = 0;
