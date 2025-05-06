@@ -7,7 +7,7 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3, Matrix, Tools
+    Vector3, Matrix, Tools, RayHelper, PickWithRay
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -72,7 +72,7 @@ export class Player extends TransformNode {
     private _wasShootingLastFrame: boolean = false;
     private _shootAnimationTimer: number;
 
-
+    private _shootingRayHelper: RayHelper;
 
     private _animations: {};
     private _currentAnim;
@@ -281,13 +281,34 @@ export class Player extends TransformNode {
 
 
     beforeRenderUpdate(): void {
-        //console.log("deltaTime : " + this._deltaTime);
+        /* console.log("current input : ", this._currentInput);
+        console.log("player inputs : ", this._inputs); */
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
-        //console.log("Player pos", this.mesh.position);
         this.updateStates();
+        this.getMeshFromShooting();
         this.updateSandEmetter();
+    }
+
+    private getMeshFromShooting(): void {
+        if (this._inputs[this._currentInput].isShooting) {
+            if (this._shootingRayHelper != null) {
+                this._shootingRayHelper.hide();
+            }
+            let shootingRay = new Ray(this.mesh.position, this._moveDirection, 5);
+            this._shootingRayHelper = new RayHelper(shootingRay);
+            this._shootingRayHelper.show(this.scene);
+            let pickingInfo = PickWithRay(this.scene, shootingRay);
+            if (pickingInfo != null) {
+                console.log(pickingInfo.pickedMesh);
+                if (pickingInfo.pickedMesh != null) {
+                    console.log("null2");
+                    console.log(pickingInfo.pickedMesh);
+                }
+            }
+
+        }
     }
 
     private updateStates() {
