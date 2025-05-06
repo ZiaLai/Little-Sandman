@@ -84,7 +84,7 @@ export class App {
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
         // todo change loading screen (op)
-        //this._engine.loadingScreen = new CustomLoadingScreen();
+        this._engine.loadingScreen = new CustomLoadingScreen();
         this._scene = new Scene(this._engine);
         this._sceneOptimizer = new SceneOptimizer(this._scene);
 

@@ -17,11 +17,36 @@ export class CustomLoadingScreen implements ILoadingScreen {
         this._loadingDiv.style.height = "100%";
         this._loadingDiv.style.backgroundColor = this.loadingUIBackgroundColor;
         this._loadingDiv.style.display = "flex";
+        //this._loadingDiv.style.flexDirection = "column";
         this._loadingDiv.style.justifyContent = "center";
         this._loadingDiv.style.alignItems = "center";
-        let path = LoadingScreen64.getData();
-        this._loadingDiv.innerHTML = `<img src="${path}" style="width: auto; height: auto;"  alt=""/>`; // TODO comment fit au screen ?
-        //TODO c'est moche 
+        //this._loadingDiv.style.zIndex = "1000";
+        //let path = LoadingScreen64.getData();
+        //this._loadingDiv.innerHTML = `<img src="${path}" style="width: auto; height: auto;"  alt=""/>`;
+        const style = document.createElement("style");
+        style.innerHTML = `
+        @keyframes spritePlay {
+            from { background-position: 0 0; }
+            to { background-position: -700vw 0; } /* 7 frames × 1920px */
+        }
+        #spriteLoader {
+            width: 100vw;
+            height: 100vh;
+            background-image: url("/textures/loading_screen_sprite_sheet.png");
+            background-repeat: no-repeat;
+            background-size: 700vw 100vh;
+            animation: spritePlay 1s steps(7) infinite;  
+            
+        }
+        `;
+        document.head.appendChild(style);
+
+        // Contenu du loading screen
+        this._loadingDiv.innerHTML = `
+            <div id="spriteLoader"></div>
+        `;
+
+
     }
 
     displayLoadingUI() {
