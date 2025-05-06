@@ -393,6 +393,7 @@ export class App {
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(async() => {
+            this._engine.displayLoadingUI();
             await this._setUpGame(this.START_LEVEL).then(res =>{
                 this._goToGame();
             });
