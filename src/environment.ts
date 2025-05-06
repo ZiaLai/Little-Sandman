@@ -36,7 +36,6 @@ export class Environment {
             m.receiveShadows = true;
             m.checkCollisions = true;
 
-
             if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
                 m.isVisible = false;
@@ -62,7 +61,7 @@ export class Environment {
                // m.isPickable = false;
                 m.isVisible = true;
                 m.checkCollisions = false;
-                m.isPickable = false;
+                m.isPickable = true;
             }
 
             // if (m.name.includes("immaterial")) {
