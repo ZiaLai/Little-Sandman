@@ -18,6 +18,7 @@ import {
     Quaternion,
     Matrix,
     SceneLoader, SceneOptimizer, Sound, VideoTexture, PointerEventTypes, Texture,
+    Effect,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -85,7 +86,6 @@ export class App {
         // todo change loading screen (op)
         //this._engine.loadingScreen = new CustomLoadingScreen();
         this._scene = new Scene(this._engine);
-
         this._sceneOptimizer = new SceneOptimizer(this._scene);
 
         // hide/show the Inspector
@@ -384,15 +384,30 @@ export class App {
         // await this._goToGame();
         const startbg = new Image("startbg", "models/title_screen2.jpg");
         imageRect.addControl(startbg);
+        //--text---
+        let text = new TextBlock();
+        text.text = "Cliquez pour commencer"
+        text.color = "white";
+        text.fontSize = 20;
+        text.fontFamily = "Trebuchet MS";
+        text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        text.paddingBottom = 75;
+        text.shadowOffsetX = 1;
+        text.shadowBlur= 15;
+        imageRect.addControl(text);
 
+        //--START BUTTON ---
         const startBtn = Button.CreateSimpleButton("start", "");
         startBtn.fontFamily = "Viga";
-        startBtn.width = 1.5,
+        startBtn.width = 1.5;
         startBtn.height = 1.5;
         imageRect.addControl(startBtn);
 
+
+
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(async() => {
+            this._engine.displayLoadingUI();
             await this._setUpGame(this.START_LEVEL).then(res =>{
                 this._goToGame();
             });
@@ -418,6 +433,8 @@ export class App {
         const environment = new Environment(scene, levelRessource);
         this._environment = environment;
         await this._environment.load(); //environment
+
+
         await this._loadCharacterAssets(scene);
 
         await this._game.setActiveLevel(levelName);
@@ -492,8 +509,8 @@ export class App {
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
         //temporary light to light the entire scene
-        var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
-        light0.diffuse = new Color3(35/255,67/255,131/255);
+        //var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        //light0.diffuse = new Color3(35/255,67/255,131/255);
         const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
         //light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
         light.intensity = 0;
@@ -535,7 +552,7 @@ export class App {
             const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("cutscene")
             let text1 = new TextBlock();
             text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-            text1.color = "#FFFDB6FF";
+            text1.color = "#FDF1bf";
             text1.fontSize = 34;
             text1.fontFamily = "Trebuchet MS";
             text1.shadowOffsetX = 1;
