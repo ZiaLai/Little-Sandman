@@ -114,8 +114,10 @@ export class KeyboardInput extends PlayerInput {
             } else {
                 this.hoverKeyDown = false;
             }
-            console.log("is shooting", this.isShooting)
+
         }
+
+
 
         // if (this.inputMap["a"]) {
         //     this._pointerLocked = false;
@@ -130,17 +132,17 @@ export class KeyboardInput extends PlayerInput {
     }
 
     private _updateFromMouse(scene : Scene): void {
-        let left = 0
-        let right = 2
+        let left = 0;
+        let right = 2;
         scene.onPointerDown = (e) => {
 
             if (e.button === left) {
-                this.isShooting = true
-                console.log("left click")
+                this.isShooting = true;
+                console.log("left click");
             }
 
             if (e.button === right) {
-                console.log("right click")
+                console.log("right click");
             }
         }
 
@@ -149,7 +151,7 @@ export class KeyboardInput extends PlayerInput {
                 this.isShooting = false;
             }
             if (e.button === right) {
-                
+
             }
         }
     }

@@ -1,13 +1,13 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {ActionManager, ExecuteCodeAction, Mesh, SetValueAction} from "@babylonjs/core";
+import {ActionManager, ExecuteCodeAction, Mesh, Scene, SetValueAction} from "@babylonjs/core";
 
 export class CityLevel extends AbstractLevel{
 
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v8";
+        this._ressourceName = "city_v20";
     }
 
     protected async load() {
@@ -15,7 +15,7 @@ export class CityLevel extends AbstractLevel{
         console.log("In city load");
         console.log(this._game.getEnvironment().getTriggers());
         this._addTriggers();
-
+        console.log("after adding triggers");
 
         this._finishedLoading();
     }
@@ -35,6 +35,14 @@ export class CityLevel extends AbstractLevel{
                 this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom");
             }
         })
+    }
+
+    protected setUpLights(): void {
+        // TODO sun et reverberes
+    }
+
+    protected setUpSkydome(): void {
+        // TODO add night sky
     }
 
 

@@ -1,5 +1,5 @@
 import {GameObject} from "./GameObject";
-import {Constructor, Mesh, Quaternion, Tools, Vector3} from "@babylonjs/core";
+import {Color3, Constructor, Mesh, Quaternion, StandardMaterial, Tools, Vector3} from "@babylonjs/core";
 import {Game} from "../game";
 
 export class BreadSlicePlatform extends GameObject {
@@ -18,21 +18,47 @@ export class BreadSlicePlatform extends GameObject {
         // for (let child of this._mesh.getChildMeshes()) {
         //     child.checkCollisions = true;
         // }
+        this.getMesh().isPickable = true;
+
+
+
+        const dummyMaterial = new StandardMaterial("dummy", this._game.getScene());
+        dummyMaterial.diffuseColor = new Color3(1, 1, 1); // white
+        this._mesh.material = dummyMaterial;
+
+        console.log("Mesh visibility:", this._mesh.visibility);
+        console.log("Mesh isEnabled:", this._mesh.isEnabled());
+        console.log("Mesh isVisible:", this._mesh.isVisible);
+        console.log("Mesh has material:", this._mesh.material);
+
+        console.log("Mesh bounding box:", this._mesh.getBoundingInfo().boundingBox);
+
+
     }
-
-
-
 
     update(): void {
         //console.log("breadSlice update, position", this._mesh.position);
         switch(this._currentState) {
             case "moving":
                 this._move();
+                if (this._detectPlayerFeet()) {
+                    console.log("touching player", this._game.getPlayer().getDeltaTime());
+                }
                 break;
             case "rotating":
                 this._rotate();
                 break;
         }
+
+    }
+
+    private _detectPlayerFeet(): boolean {
+        let ray = this._game.getPlayer().getFloorRay();
+
+        let result = this._game.getScene().pickWithRay(ray, (mesh) => mesh === this._mesh);
+        //let result = ray.intersectsMesh(this._mesh)
+        console.log("pick result", result);
+        return ray.intersectsMesh(this._mesh).hit;
 
     }
 
@@ -43,6 +69,9 @@ export class BreadSlicePlatform extends GameObject {
     private _rotate() {
         // let rotation = Quaternion.FromEulerAngles(this._mesh.rotationQuaternion.toEulerAngles().x + this._rotationSpeed * this._game.getPlayer().getDeltaTime(), 0, 0);
         // this._mesh.rotationQuaternion = rotation;
+        this._mesh.position.addInPlace(this._speed.scale(this._game.getPlayer().getDeltaTime()));
+        this._mesh.position.addInPlace(new Vector3(0, -1 * this._game.getPlayer().getDeltaTime(), 0));
+
         this._mesh.rotate(new Vector3(-1, 0, 0), this._rotationSpeed * this._game.getPlayer().getDeltaTime());
 
         // La rotation en x descend jusqu'à -90, puis elle remonte. Elle ne dépasse jamais 90

@@ -1,6 +1,6 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {ActionManager, Vector3} from "@babylonjs/core";
+import {ActionManager, Scene, Vector3} from "@babylonjs/core";
 
 export class BakersBedroom extends AbstractLevel {
     private _startPosition: Vector3;
@@ -13,7 +13,7 @@ export class BakersBedroom extends AbstractLevel {
 
     }
 
-    protected async load(startPosition?: Vector3) {
+    protected async load() {
         await super.load();
 
         this._addTriggers();
@@ -38,5 +38,13 @@ export class BakersBedroom extends AbstractLevel {
                 this.setMeshAsChangeLevelTrigger(m, "city", new Vector3(52, 3, 13));
             }
         })
+    }
+
+    protected setUpLights(): void {
+        // TODO implement (sun et point de lumiere sur la lampe de chevet)
+    }
+
+    protected setUpSkydome(): void {
+        // TODO implement
     }
 }

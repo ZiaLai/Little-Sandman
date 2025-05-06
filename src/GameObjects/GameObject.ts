@@ -15,12 +15,15 @@ export abstract class GameObject {
     protected _blenderId: string;
     private _startPosition: Vector3;
     protected _child: TransformNode;
+    protected _hitbox;
 
     constructor(game: Game, mesh: Mesh, startPosition: Vector3, blenderId: string) {
         console.log("Creating GameObject");
 
         this._game = game;
-        this._mesh = mesh.clone(blenderId);
+        this._mesh = mesh.clone(blenderId); // On crée une copie du mesh passé en paramètre
+        this._mesh.checkCollisions = false;
+        this._mesh.isPickable = true;
 
         //this._child = this._mesh.getChildTransformNodes()[0];
 

@@ -11,6 +11,7 @@ export abstract class PlayerInput {
     public isShooting: boolean = false;
     public jumpKeyDown: boolean;
     public hoverKeyDown: boolean;
+    public isShooting: boolean = false;
 
 
     // Camera values

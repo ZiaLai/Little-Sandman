@@ -15,12 +15,13 @@ export class Environment {
 
     }
 
-    public async changeAsset(assetName: string) {
+    // Apparaît comme unused, mais la méthode est bien utilisée
+    public async changeAsset(assetName: string, newScene: Scene) {
         this._currentAssetName = assetName;
-        // Suppression des assets précédents
-        this._assets.allMeshes.forEach((m) => {
-            m.dispose();
-        })
+
+        // Mettre à jour avec la nouvelle scène
+        this._scene = newScene;
+
         this._triggers = [];
         // Chargement des nouveaux assets
         await this.load();
@@ -38,12 +39,11 @@ export class Environment {
 
             if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                //m.isVisible = false;
-                m.isVisible = true;
+                m.isVisible = false;
                 m.isPickable = true;
             }
             else if (m.name.includes("trigger")) {
-                // m.visible = false;
+                m.visible = true;
                 m.isPickable = false;
                 m.checkCollisions = false;
                 this._triggers.push(m);
@@ -75,8 +75,16 @@ export class Environment {
     }
 
     public async _loadAsset() {
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",
-            this._scene);
+
+        let result;
+        if (this._currentAssetName === "city") { // Import de la ville sur dropbox car fichier lourd
+            result = await SceneLoader.ImportMeshAsync(null, "", "https://www.dropbox.com/scl/fi/oge4a6288q6uupxnzhvp0/city_v20.glb?rlkey=t2vzo43aok9cc96kwndhxfgz2&st=55it1s67&dl=0");
+        }
+        else {
+            result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",
+                this._scene);
+        }
+
         let env = result.meshes[0];
         // env.position.x = 5;
         // env.position.y = -15;

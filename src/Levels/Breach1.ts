@@ -1,8 +1,11 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {Mesh, Vector3} from "@babylonjs/core";
+import {Mesh, Scene, Vector3} from "@babylonjs/core";
 import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 import {GameObject} from "../GameObjects/GameObject";
+import {Knife} from "../GameObjects/Knife";
+
+
 
 export class Breach1 extends AbstractLevel {
     private _startPosition: Vector3;
@@ -11,7 +14,8 @@ export class Breach1 extends AbstractLevel {
     // todo : Pourquoi on fait pas ça ailleurs ? Si on fait ça là on va devoir tout réecrire à chaque niveau
     // Pourtant le modèle de tranche de pain ne change pas d'un niveau à l'autre. Le mettre dans game ?
     private _modelRessourcesByNames: {} = {
-        "breadSlice": "bread_slice.glb"
+        "breadSlice": "bread_slice_v2.glb",
+        "knife": "knife.glb"
     }
 
 
@@ -25,7 +29,7 @@ export class Breach1 extends AbstractLevel {
 
     }
 
-    protected async load(startPosition?: Vector3) {
+    protected async load() {
         await super.load();
 
         let breadMesh: Mesh;
@@ -97,10 +101,19 @@ export class Breach1 extends AbstractLevel {
         return {
             "breadSlice" : [
                 new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"], new Vector3(7, 6, -15), "bread_slice")
+            ],
+            "knife" : [
+                new Knife(this._game, this._objectsMeshes["knife"], new Vector3(0, 0, 0), "knife")
             ]
             };
     }
 
     protected _addTriggers(): void {
+    }
+
+    protected setUpLights(): void {
+    }
+
+    protected setUpSkydome(): void {
     }
 }
