@@ -15,7 +15,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v20";
+        this._ressourceName = "city_v22";
     }
 
     protected async load() {
@@ -49,7 +49,7 @@ export class CityLevel extends AbstractLevel{
 
         var light0 = new HemisphericLight("nightLight", new Vector3(0, 1, 0), this._game.getGameScene());
         light0.diffuse = new Color3(35/255,67/255,131/255);
-        light0.intensity = 0.5;
+        light0.intensity = 0.9;
         // REVERBERES
         // function createPointLight(name: string, position: Vector3, scene: Scene): PointLight {
         //     const light = new PointLight(name, position, scene);
@@ -91,25 +91,23 @@ export class CityLevel extends AbstractLevel{
     }
 
     protected setUpSkydome(): void {
-        // TODO POURQUOI CE *** DE SKYDOME EST BLANC !!!!!!??????
-        const skydome = MeshBuilder.CreateSphere('skydome', {
-            segments: 32,
-            diameter: 1000,
-            sideOrientation: Mesh.BACKSIDE,
-            //slice: 0.5, // prendre seulement la moitié de la sphère
-        }, this._game.getGameScene());
-        skydome.infiniteDistance = true;
-
-        // Material pour le ciel
-        const skyMaterial = new StandardMaterial('skyMaterial', this._game.getGameScene());
-        skyMaterial.diffuseTexture = new Texture("textures/skydome_chat_stars.png", this._game.getGameScene());
-        //skyMaterial.diffuseTexture.scale(4);
-
-        //skyMaterial.diffuseTexture.wrapU = Texture.WRAP_ADDRESSMODE;
-        //skyMaterial.diffuseTexture.wrapV = Texture.WRAP_ADDRESSMODE;
-        skyMaterial.diffuseTexture.coordinatesMode = Texture.SPHERICAL_MODE;
-        skyMaterial.backFaceCulling = false;
-        skydome.material = skyMaterial;
+        // const skydome = MeshBuilder.CreateSphere('skydome', {
+        //     segments: 32,
+        //     diameter: 1000,
+        //     //slice: 0.5, // prendre seulement la moitié de la sphère
+        // }, this._game.getGameScene());
+        // skydome.infiniteDistance = true;
+        //
+        // // Material pour le ciel
+        // const skyMaterial = new StandardMaterial('skyMaterial', this._game.getGameScene());
+        // skyMaterial.diffuseTexture = new Texture("models/skydome_2.jpeg", this._game.getGameScene());
+        // //skyMaterial.diffuseTexture.scale(8);
+        //
+        // //skyMaterial.diffuseTexture.wrapU = Texture.WRAP_ADDRESSMODE;
+        // //skyMaterial.diffuseTexture.wrapV = Texture.WRAP_ADDRESSMODE;
+        // skyMaterial.diffuseTexture.coordinatesMode = Texture.SPHERICAL_MODE;
+        // skyMaterial.backFaceCulling = false;
+        // skydome.material = skyMaterial;
     }
 
 
