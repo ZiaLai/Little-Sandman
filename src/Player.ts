@@ -78,6 +78,7 @@ export class Player extends TransformNode {
     private _currentAnim;
     private _prevAnim;
     private sandEmetter;
+    private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
@@ -116,6 +117,9 @@ export class Player extends TransformNode {
 
         this._setUpAnimations();
         this.sandEmetter = Sand.getParticleSystem(this.scene);
+        this.hoveringSandEmetter = Sand.getParticleSystem(this.scene);
+        this.hoveringSandEmetter.createPointEmitter(new Vector3(-0.2,-1,0.2), new Vector3(0.2,-1,-0.2));
+
     }
     private _setUpAnimations(){
         this.scene.stopAllAnimations();
@@ -160,29 +164,38 @@ export class Player extends TransformNode {
 
 
         }
-
+        else if (this._hovering ){
+            this._currentAnim = this._animations["fall_loop"];
+            this.hoveringSandEmetter.start();
+            console.log("is hovering est true mdr")
+        }
         else if (this._isFalling){
              this._currentAnim = this._animations["fall_loop"];
+             console.log("is falling")
          }
         else if (this._isJumping){
             this._currentAnim = this._animations["jump"];
+            this.hoveringSandEmetter.stop();
+
         }
-        else if (this._hovering ){
-            this._currentAnim = this._animations["fall_loop"];
-        }
+
 
          else if (this._isWalking){
              this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
              this._currentAnim = this._animations["walk"];
+                    this.sandEmetter.stop();
          }
 
-        else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {// TODO marche pas
+        else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {
             this._currentAnim = this._animations["land"];
+            this.hoveringSandEmetter.stop();
         }
 
 
         else {
             this._currentAnim = this._animations["idle"];
+            this.hoveringSandEmetter.stop();
+
         }
 
 
@@ -556,6 +569,7 @@ export class Player extends TransformNode {
     }
 
     private updateSandEmetter(){
+        this.hoveringSandEmetter.emitter = new Vector3(0,1.23,0).addInPlace(new Vector3().copyFrom(this.mesh.position));
         let x = this.getMeshDirection()._x;
         let z = this.getMeshDirection()._z;
         // -- POSITION
