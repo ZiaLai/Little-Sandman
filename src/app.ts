@@ -29,6 +29,7 @@ import {TestRunner} from "./Test/TestRunner";
 import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
+import {Monolog} from "./util/Monolog";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON }
 
@@ -62,28 +63,16 @@ export class App {
     private cinematicTimer = 0;
     private CINEMATIC_DURATION = 88;
 
-    // -- Monolog
-
-    private readonly allMonolog : string[][];
-    private current_monolog_index = 0;
-    private current_sentence_index = 0;
-    private readonly monolog_played : boolean[];
-    private isPlayingMonolog: boolean = true;
-
     private EXECUTE_TEST = true;
     private START_LEVEL = "city";
 
     constructor() {
         if (this.EXECUTE_TEST) new TestRunner().main();
-        // -- Monolog data
-        this.monolog_played = AllMonolog.getIsPlayed();
-        this.allMonolog =  AllMonolog.getAllMonolog();
 
         this._canvas = this._createCanvas();
 
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
-        // todo change loading screen (op)
         this._engine.loadingScreen = new CustomLoadingScreen();
         this._scene = new Scene(this._engine);
         this._sceneOptimizer = new SceneOptimizer(this._scene);
@@ -462,7 +451,7 @@ export class App {
 
 
             // TRUC QUI MARCEH MAIS ON COMMENTE POUR FAIRE UN TEST
-            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_22.glb", scene).then((result) => {
+            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_23.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -548,52 +537,6 @@ export class App {
         loseBtn.thickness = 0;
         loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         playerUI.addControl(loseBtn);*/
-        if (this.isPlayingMonolog){
-            const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("cutscene")
-            let text1 = new TextBlock();
-            text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-            text1.color = "#FDF1bf";
-            text1.fontSize = 34;
-            text1.fontFamily = "Trebuchet MS";
-            text1.shadowOffsetX = 1;
-            text1.shadowBlur= 15;
-            text1.shadowColor= "#594000FF";
-            text1.fontWeight = "bold";
-            text1.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
-            text1.paddingBottom = 100;
-            advancedTexture.addControl(text1)
-            await FadeText.fadeIn(text1);
-
-            const next = Button.CreateSimpleButton("next", ""); // TODO changer pour timer ?
-            next.width = 100;
-            next.height = 100;
-            advancedTexture.addControl(next);
-
-            next.onPointerUpObservable.add(async () => {
-                this.current_sentence_index++;
-                advancedTexture.addControl(text1);
-                await FadeText.fadeOut(text1);
-                if (this.current_monolog_index <= this.allMonolog.length - 1) {
-
-                    if (this.current_sentence_index > this.allMonolog[this.current_monolog_index].length - 1) {
-                        this.monolog_played[this.current_monolog_index] = true;
-                        this.current_monolog_index += 1;
-                        this.current_sentence_index = 0;
-                        this.isPlayingMonolog = false;
-                        text1.text = "";
-                        advancedTexture.addControl(text1);
-                        next.isVisible = false;
-                        advancedTexture.addControl(next); // TODO travailler les variables pour pouvoir afficher un autre dialogue à un autre moment.
-                    }
-                    else {
-                        text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-                        advancedTexture.addControl(text1);
-                        await FadeText.fadeIn(text1);
-                    }
-                }
-            })
-
-        }
         // Bouton pour tester le changement d'environnement
         const changeButton = Button.CreateSimpleButton("change", "CHANGE");
         changeButton.width = 0.2

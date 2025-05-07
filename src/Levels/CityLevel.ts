@@ -9,13 +9,14 @@ import {
     SetValueAction, StandardMaterial, Texture,
     Vector3
 } from "@babylonjs/core";
+import {AllMonolog} from "../data/AllMonolog";
 
 export class CityLevel extends AbstractLevel{
 
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v22";
+        this._ressourceName = "city_v16";
     }
 
     protected async load() {
@@ -24,7 +25,7 @@ export class CityLevel extends AbstractLevel{
         console.log(this._game.getEnvironment().getTriggers());
         this._addTriggers();
         console.log("after adding triggers");
-
+        AllMonolog.play(0);
         this._finishedLoading();
     }
 
