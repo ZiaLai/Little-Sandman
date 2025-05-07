@@ -1,6 +1,7 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {ActionManager, Color3, HemisphericLight, PointLight, Scene, Vector3} from "@babylonjs/core";
+import {AllMonolog} from "../data/AllMonolog";
 
 export class BakersBedroom extends AbstractLevel {
     private _startPosition: Vector3;
@@ -21,7 +22,7 @@ export class BakersBedroom extends AbstractLevel {
 
         //startPosition === null ? this._game.getPlayer().setPosition(this._startPosition) : this._game.getPlayer().setPosition(startPosition);
         this._game.getPlayer().setPosition(this._startPosition);
-
+        AllMonolog.play(1);
         this._finishedLoading();
     }
 
@@ -32,6 +33,8 @@ export class BakersBedroom extends AbstractLevel {
     }
 
     protected _addTriggers() {
+        // TODO trigged boulangere (sand)
+        //TODO triger nuage (rentrer dans le reve)
         this._game.getEnvironment().getTriggers().forEach(m => {
             if (m.name.includes("exit")) {
                 m.actionManager = new ActionManager(this._game.getScene());
