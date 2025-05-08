@@ -2,12 +2,16 @@ import {AbstractMesh, ActionManager, ExecuteCodeAction, Mesh, Scene, Vector3} fr
 import {Environment} from "../environment";
 import {Game} from "../game";
 import {GameObject} from "../GameObjects/GameObject";
+import {MusicPlayer} from "../AudioControl/MusicPlayer";
+import {Music} from "../AudioControl/Music";
 
 
 export abstract class AbstractLevel {
     protected _name: string;
     protected _ressourceName: string;
     protected _game: Game;
+
+    protected _music: Music;
 
     protected _objectsMeshes: {};
     protected _objects: {} = {}; // Dictionnaire de string name vers une liste de GameObjects
@@ -63,16 +67,19 @@ export abstract class AbstractLevel {
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
 
-        const root = this._game.getScene().getTransformNodeById("__root__"); // Todo : débugguer ce truc
-        console.log("root", root);
-        root?.dispose();
+        console.log('in destroy');
+
+        // const root = this._game.getScene().getTransformNodeById("__root__"); // Todo : débugguer ce truc
+        // console.log("root", root);
+        // root?.dispose();
 
         for (let key in this._objects) {
             for (let object of this._objects[key]) {
                 object.destroy();
             }
-
         }
+
+        if (this._music) this._music.stop();
     }
 
     getName() {
