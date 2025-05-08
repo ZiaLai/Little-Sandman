@@ -13,4 +13,7 @@ export class IntroLoopMusic implements Music {
     play(): void {
     }
 
+    stop(): void {
+    }
+
 }
