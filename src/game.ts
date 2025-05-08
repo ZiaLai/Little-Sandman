@@ -64,7 +64,7 @@ export class Game {
         //let newScene = new Scene(this._engine);
         // this._scene.dispose();
 
-        // this._levels[this._currentLevel].destroy();
+        this._levels[this._currentLevel].destroy();
 
         this._currentLevel = name;
 
