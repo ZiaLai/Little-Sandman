@@ -9,7 +9,7 @@ export class SugarlessBakery extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "sugarless_bakery";
-        this._ressourceName = "bakery_level_1";
+        this._ressourceName = "bakery_level_02_01";
     }
 
     protected async load() {
