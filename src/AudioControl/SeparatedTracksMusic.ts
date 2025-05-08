@@ -58,9 +58,10 @@ export class SeparatedTracksMusic implements Music {
         this._nbOfTracksPlaying++;
     }
 
-    stop(): void {
+    destroy(): void {
         for (const track of this._tracks) {
             track.stop();
+            track.dispose()
         }
     }
 

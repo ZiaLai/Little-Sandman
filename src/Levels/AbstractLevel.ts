@@ -79,7 +79,7 @@ export abstract class AbstractLevel {
             }
         }
 
-        if (this._music) this._music.stop();
+        if (this._music) this._music.destroy();
     }
 
     getName() {
