@@ -1,6 +1,7 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {ActionManager, ExecuteCodeAction, Mesh, Scene, SetValueAction} from "@babylonjs/core";
+import {IntroLoopMusic} from "../AudioControl/IntroLoopMusic";
 
 export class CityLevel extends AbstractLevel{
 
@@ -8,6 +9,9 @@ export class CityLevel extends AbstractLevel{
         super(game, id);
         this._name = "city";
         this._ressourceName = "city_v20";
+
+        this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', './musics/city/city_intro.ogg'],
+                                                                  ['loop', './musics/city/city_loop.ogg'  ] ]);
     }
 
     protected async load() {
@@ -16,6 +20,8 @@ export class CityLevel extends AbstractLevel{
         console.log(this._game.getEnvironment().getTriggers());
         this._addTriggers();
         console.log("after adding triggers");
+
+        this._music.play();
 
         this._finishedLoading();
     }
