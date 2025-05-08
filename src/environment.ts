@@ -36,10 +36,22 @@ export class Environment {
             m.receiveShadows = true;
             m.checkCollisions = true;
 
+            if (m.name.includes("debug")) {
+                const activateDebug = false;
 
-            if (m.name.includes("collider")) {
+                m.isVisible = activateDebug;
+                m.isPickable = activateDebug;
+                m.checkCollisions = activateDebug;
+
+            }
+
+            else if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
                 m.isVisible = false;
+                m.isPickable = true;
+            }
+
+            else if (m.name.includes("regularSolid")) {
                 m.isPickable = true;
             }
             else if (m.name.includes("trigger")) {
