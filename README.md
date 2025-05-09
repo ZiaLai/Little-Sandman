@@ -7,6 +7,7 @@ Games on web 2025 DreamLand
   Le monde des rêves est en péril. Incarnez un aprenti du Marchand de sable et sauvez le rêve. 
 Plongez dans un univers onirique où les cauchemars rôdent. Trouvez les cauchemars et rammenez le rêve.
 
+Dans le cadre du concours, nous n'avons eu le temps de créer que le premier niveau. D'autres sont en cours de developpement... (donner concepts ? )
 
 # **Pour commencer (comment jouer)**
 Lien du jeu ?? 
