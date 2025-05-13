@@ -31,7 +31,7 @@ import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 import {Monolog} from "./util/Monolog";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON }
+enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON, THANKS }
 
 export class App {
     // General Entire Application
@@ -46,7 +46,6 @@ export class App {
     private _environment;
     private _player: Player;
     private _game: Game;
-
 
     //Scene - related
     private _state: number = 0;
@@ -156,11 +155,14 @@ export class App {
                         this.renderScene();
                         this.fraudeTimer += this._scene.deltaTime/1000;
                     }
-                    else{
+                    else {
                         await this._goToActivateSound();
                     }
                     break;
                 case State.ACTIVEZ_SON:
+                    this.renderScene();
+                    break;
+                case State.THANKS:
                     this.renderScene();
                     break;
                 default: break;
@@ -207,7 +209,7 @@ export class App {
         imageRect.addControl(logo);
 
 
-        // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)
+        // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)(op)
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -392,15 +394,13 @@ export class App {
         startBtn.height = 1.5;
         imageRect.addControl(startBtn);
 
-
-
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(async() => {
             this._engine.displayLoadingUI();
+            scene.detachControl(); //observables disabled
             await this._setUpGame(this.START_LEVEL).then(res =>{
                 this._goToGame();
             });
-            scene.detachControl(); //observables disabled
         });
 
         //--SCENE FINISHED LOADING--
@@ -516,6 +516,7 @@ export class App {
 
     private async _goToGame(){
         //--SETUP SCENE--
+        this._engine.displayLoadingUI();
         this._scene.detachControl();
         let scene = this._gamescene;
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098); // a color that fit the overall color scheme better
@@ -606,6 +607,39 @@ export class App {
         this._scene.dispose();
         this._scene = scene;
         this._state = State.LOSE;
+    }
+    private async _goToThanks(): Promise<void> {
+        this._scene.detachControl();
+        let scene = new Scene(this._engine);
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+        camera.setTarget(Vector3.Zero());
+
+        //--------GUI---------
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        guiMenu.idealHeight = 720;
+
+        //background image
+        const imageRect = new Rectangle("titleContainer");
+        imageRect.width = 1;
+        imageRect.thickness = 0;
+        guiMenu.addControl(imageRect);
+
+        //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
+        // await this._setUpGame(this.START_LEVEL);
+        // await this._goToGame();
+        const bg = new Image("bg", "/textures/thanks_for_playing (2).png");
+        imageRect.addControl(bg);
+        const draw = new Image("draw", "/textures/thanks_for_playing (1).png");
+        draw.height = "100%";
+        draw.stretch = Image.STRETCH_UNIFORM;
+        imageRect.addControl(draw);
+        //--SCENE FINISHED LOADING--
+        await scene.whenReadyAsync();
+        this._engine.hideLoadingUI();
+        //lastly set the current state to the start state and set the scene to the start scene
+        this._scene.dispose();
+        this._scene = scene;
+        this._state = State.START;
     }
 
     public async changeGameScene(levelName: string, playerPosition?: Vector3) {
