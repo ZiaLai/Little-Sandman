@@ -14,6 +14,7 @@ import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {PlayerCamera} from "./PlayerCamera";
 import {Sand} from "./util/Sand";
+import {StaminaBar} from "./util/StaminaBar";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -80,6 +81,7 @@ export class Player extends TransformNode {
     private sandEmetter;
     private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
+    private _staminaBar;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
         super("player", scene);
@@ -116,9 +118,13 @@ export class Player extends TransformNode {
             "scarf_right": assets.animationGroups[10]};
 
         this._setUpAnimations();
+
+        // -- SAND EMMETTER
         this.sandEmetter = Sand.getParticleSystem(this.scene);
         this.hoveringSandEmetter = Sand.getParticleSystem(this.scene);
         this.hoveringSandEmetter.createPointEmitter(new Vector3(-0.2,-1,0.2), new Vector3(0.2,-1,-0.2));
+        // -- STAMINA BAR
+        this._staminaBar = new StaminaBar(this.mesh, this.scene);
 
     }
     private _setUpAnimations(){
@@ -140,10 +146,8 @@ export class Player extends TransformNode {
 }
     private _animatePlayer(){
 
-
         if (this._isStartingShooting) {
             this._currentAnim = this._animations["start_sand"];
-            ///this.sandEmetter.start();
         }
 
         else if (this._isEndingShooting) {
@@ -158,16 +162,13 @@ export class Player extends TransformNode {
             else {
                 this._currentAnim = this._animations["sand_idle"];
             }
-            ///if (!this.sandEmetter.isStarted()){
-                this.sandEmetter.start();
-            //}
-
-
+            this.sandEmetter.start();
         }
+
         else if (this._hovering ){
             this._currentAnim = this._animations["fall_loop"];
             this.hoveringSandEmetter.start();
-            console.log("is hovering est true mdr")
+
         }
         else if (this._isFalling){
              this._currentAnim = this._animations["fall_loop"];
@@ -183,7 +184,7 @@ export class Player extends TransformNode {
          else if (this._isWalking){
              this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
              this._currentAnim = this._animations["walk"];
-                    this.sandEmetter.stop();
+                    this.hoveringSandEmetter.stop();
          }
 
         else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {
@@ -301,6 +302,8 @@ export class Player extends TransformNode {
         //console.log("Player pos", this.mesh.position);
         this.updateStates();
         this.updateSandEmetter();
+        this.updateStaminaBar();
+
     }
 
     private updateStates() {
@@ -614,6 +617,40 @@ export class Player extends TransformNode {
 
     private getMeshDirection(): Vector3 {
         return this.mesh.getDirection(Axis.Z);
+    }
+
+    private updateStaminaBar(){
+        this._staminaBar.updateStaminaBarAnimated(this._hoverTimer- this._deltaTime, this._hoverTimer);
+        let x = this.getMeshDirection()._x;
+
+        let z = this.getMeshDirection()._z;
+
+        // -- POSITION
+        const forward = this.camera.getCamera().getForwardRay().direction;
+        const up = Vector3.Up();
+        const right = Vector3.Cross(forward, up).normalize();
+
+        const offsetRight = right.scale(0.5);
+        const offsetUp = new Vector3(0, 1.5, 0);
+        const position =  new Vector3().copyFrom(this.position.add(offsetRight).add(offsetUp));
+
+        // La jauge regarde toujours la caméra
+        this._staminaBar.updatePosition(position);
+
+        if (this._hovering) {
+            this._staminaBar.staminaPlane.visibility = 1;
+            this._staminaBar.staminaPlane.setEnabled(true);
+        }
+
+        else {
+            if (this._staminaBar.staminaPlane.visibility > 0){
+                this._staminaBar.staminaPlane.visibility -= 0.02;
+            }
+            else {
+                this._staminaBar.staminaPlane.setEnabled(false);
+            }
+
+        }
     }
 
 }
