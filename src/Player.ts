@@ -14,6 +14,7 @@ import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {PlayerCamera} from "./PlayerCamera";
 import {Sand} from "./util/Sand";
+import {ShootingSystem} from "./ShootingSystem";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -287,29 +288,15 @@ export class Player extends TransformNode {
         this._updateGroundDetection();
         this._animatePlayer();
         this.updateStates();
-        this.getMeshFromShooting();
+        if (this._inputs[this._currentInput].isShooting) {
+            let shootingSystem = new ShootingSystem();
+            let mesh = shootingSystem.getMeshFromShooting(this._scene, this.mesh.position, this._moveDirection);
+            console.log(mesh);
+        }
         this.updateSandEmetter();
     }
 
-    private getMeshFromShooting(): void {
-        if (this._inputs[this._currentInput].isShooting) {
-            if (this._shootingRayHelper != null) {
-                this._shootingRayHelper.hide();
-            }
-            let shootingRay = new Ray(this.mesh.position, this._moveDirection, 5);
-            this._shootingRayHelper = new RayHelper(shootingRay);
-            this._shootingRayHelper.show(this.scene);
-            let pickingInfo = PickWithRay(this.scene, shootingRay);
-            if (pickingInfo != null) {
-                console.log(pickingInfo.pickedMesh);
-                if (pickingInfo.pickedMesh != null) {
-                    console.log("null2");
-                    console.log(pickingInfo.pickedMesh);
-                }
-            }
 
-        }
-    }
 
     private updateStates() {
         if (this._gravity.y <= 0) {
