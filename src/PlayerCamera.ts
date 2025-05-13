@@ -2,6 +2,7 @@ import {ArcRotateCamera, Ray, Scene, TransformNode, Vector3} from "@babylonjs/co
 import {Player} from "./Player";
 import {Lerp} from "@babylonjs/core/Maths/math.scalar.functions";
 import {CameraRadiusFunction} from "./Functions/CameraRadiusFunction";
+import {ShootingSystem} from "./ShootingSystem";
 
 export class PlayerCamera {
     private _camRoot: TransformNode;
@@ -173,11 +174,11 @@ export class PlayerCamera {
         //console.log("beta", this._camera.beta, "radius", this._camera.radius);
     }
 
-    public activate(): ArcRotateCamera {
+    public activate(shootingSystem: ShootingSystem): ArcRotateCamera {
         console.log("activating camera")
         this._scene.registerBeforeRender(() => {
             //console.log(this._player.mesh.position);
-            this._player.beforeRenderUpdate();
+            this._player.beforeRenderUpdate(shootingSystem);
             this.update();
 
         })

@@ -28,6 +28,7 @@ import {TestRunner} from "./Test/TestRunner";
 import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
+import {ShootingSystem} from "./ShootingSystem";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON }
 
@@ -505,8 +506,9 @@ export class App {
 
         //Create the player
         this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
-
-        const camera = this._player.camera.activate();
+        let shootingSystem = new ShootingSystem();
+        shootingSystem.registerPointerEvent(scene);
+        const camera = this._player.camera.activate(shootingSystem);
     }
 
     private async _goToGame(){

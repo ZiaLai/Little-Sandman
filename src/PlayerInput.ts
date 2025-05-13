@@ -8,7 +8,6 @@ export abstract class PlayerInput {
     public horizontalAxis: number;
     public inputMap: {};
     public dashing: boolean;
-    public isShooting: boolean = false;
     public jumpKeyDown: boolean;
     public hoverKeyDown: boolean;
 
