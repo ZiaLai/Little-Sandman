@@ -9,7 +9,7 @@ export class BakersBedroom extends AbstractLevel {
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "bakers_bedroom";
-        this._ressourceName = "baker_bedroom v4";
+        this._ressourceName = "baker_bedroom v5 ";
         this._startPosition = new Vector3(3.74, 0.91, -3.28);
 
     }
@@ -48,9 +48,14 @@ export class BakersBedroom extends AbstractLevel {
         light0.diffuse = new Color3(35/255,67/255,131/255);
         light0.intensity = 0.3;
         // LOUPIote
-        const light = new PointLight("loupiote", new Vector3(4, 2.8, 1), this._game.getGameScene());
-        light.diffuse = new Color3(222/255,193/255,223/255);
-        light.intensity =10;    }
+        const loupiote = new PointLight("loupiote", new Vector3(10, 3, 3), this._game.getGameScene());
+        loupiote.diffuse = new Color3(222/255,193/255,223/255);
+        loupiote.intensity =10;
+
+        const aura = new PointLight("aura_cauchemar", new Vector3(7.4, 4.5, 2), this._game.getGameScene());
+        aura.diffuse = new Color3(0.559,0.359,1);
+        aura.intensity =10;
+    }
 
     protected setUpSkydome(): void {
 
