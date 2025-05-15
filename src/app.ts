@@ -506,6 +506,10 @@ export class App {
         this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
 
         const camera = this._player.camera.activate();
+
+        this._game.initializeLevel();
+
+
     }
 
     private async _goToGame(){
