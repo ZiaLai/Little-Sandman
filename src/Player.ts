@@ -602,4 +602,7 @@ export class Player extends TransformNode {
         return this.mesh.getDirection(Axis.Z);
     }
 
+    public disableCamera(): void {
+        this.camera.disable();
+    }
 }

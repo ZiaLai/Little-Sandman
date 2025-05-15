@@ -16,6 +16,8 @@ export class PlayerCamera {
     private _raycastCollision: boolean = false;
     private _groundDetectionRadius: number;
     private _raycastRadius: number;
+    private _isActive: boolean = true;
+
 
 
 
@@ -166,6 +168,8 @@ export class PlayerCamera {
     }
 
     public update(): void {
+        if (! this._isActive) return;
+
         this._updatePosition();
         this._raycast();
         this._camera.radius = Math.min(this._raycastRadius, this._groundDetectionRadius);
@@ -188,5 +192,15 @@ export class PlayerCamera {
 
     getAlpha() {
         return this._camera.alpha;
+    }
+
+    public disable(): void {
+        console.log("disabling player camera");
+        this._camera.detachControl();
+        this._isActive = false;
+    }
+
+    getIsActive(): boolean {
+        return this._isActive;
     }
 }

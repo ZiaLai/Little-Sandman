@@ -121,4 +121,8 @@ export abstract class AbstractLevel {
             this._music.upgrade();
         }
     }
+
+    protected _disablePlayerCamera(): void {
+        this._game.getPlayer().disableCamera();
+    }
 }
