@@ -26,14 +26,7 @@ export class SugarlessBakery extends AbstractLevel{
         await super.load();
         // todo : charger la musique
         this._music.play();
-        if (this._music instanceof SeparatedTracksMusic) {
-            this._music.upgrade();
-            this._music.upgrade();
-            this._music.upgrade();
-            this._music.upgrade();
-        }
-
-
+        // this._upgradeMusic();
     }
 
     update(): void {

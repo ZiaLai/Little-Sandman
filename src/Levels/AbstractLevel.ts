@@ -4,6 +4,7 @@ import {Game} from "../game";
 import {GameObject} from "../GameObjects/GameObject";
 import {MusicPlayer} from "../AudioControl/MusicPlayer";
 import {Music} from "../AudioControl/Music";
+import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 
 
 export abstract class AbstractLevel {
@@ -112,5 +113,12 @@ export abstract class AbstractLevel {
                 },
             ),
         );
+    }
+
+
+    protected _upgradeMusic(): void {
+        if (this._music instanceof SeparatedTracksMusic) {
+            this._music.upgrade();
+        }
     }
 }
