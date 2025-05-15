@@ -8,6 +8,8 @@ export class SeparatedTracksMusic implements Music {
     private _trackData: any  // Liste de [nom, path] des instruments
     private _nbOfTracks: number;
 
+    private _upgradeSound;
+
     private _nbOfTracksPlaying: number;
     private _nbOfTracksPlayingAtStart: number;
 
@@ -44,6 +46,8 @@ export class SeparatedTracksMusic implements Music {
         for (let i = this._nbOfTracksPlayingAtStart; i < this._nbOfTracks; i++) {
             this._tracks[i].setVolume(0);
         }
+
+        this._upgradeSound = new Sound('upgrade', './musics/sfx/upgrade.ogg', this._scene);
     }
 
     play(): void {
@@ -56,6 +60,8 @@ export class SeparatedTracksMusic implements Music {
 
         this._tracks[this._nbOfTracksPlaying].setVolume(1);
         this._nbOfTracksPlaying++;
+
+        this._upgradeSound.play();
     }
 
     destroy(): void {
