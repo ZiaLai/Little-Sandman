@@ -132,7 +132,7 @@ export class Player extends TransformNode {
         this._prevAnim = this._animations["walk"];
         this._animations["scarf_right"].play(true);
         this._animations["scarf_left"].play(true);
-        this._animations["idle"].play(false);
+        this._animations["idle"].play(true);
 }
     private _animatePlayer(){
 
