@@ -3,13 +3,12 @@ import {Game} from "../game";
 import {ActionManager, FreeCamera, Scene, Tools, Vector3} from "@babylonjs/core";
 
 export class BakersBedroom extends AbstractLevel {
-    private _startPosition: Vector3;
+    public static START_POSITION: Vector3 = new Vector3(3.89, 2.45, -7.52);
 
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "bakers_bedroom";
-        this._ressourceName = "baker_bedroom_v5";
-        this._startPosition = new Vector3(3.74, 0.91, -3.28);
+        this._ressourceName = "chambre_boulangere_resize";
 
     }
 
@@ -18,11 +17,7 @@ export class BakersBedroom extends AbstractLevel {
 
         this._addTriggers();
 
-
-        //startPosition === null ? this._game.getPlayer().setPosition(this._startPosition) : this._game.getPlayer().setPosition(startPosition);
-        this._game.getPlayer().setPosition(this._startPosition);
-
-
+        //startPosition === null ? this._game.getPlayer().setPosition(this._startPosition) : this._game.getPlayer().setPosition(startPosition)
 
         this._finishedLoading();
     }
@@ -35,6 +30,15 @@ export class BakersBedroom extends AbstractLevel {
         camera.rotation.y = Tools.ToRadians(180);
 
         this._game.getGameScene().activeCamera = camera;
+
+
+        this._game.getPlayer().setMeshDirection(new Vector3( 0 , 0 , Tools.ToRadians(90) ));
+
+        // const bakersSkeleton = this._game.getGameScene().getSkeletonById("skeleton0");
+        //
+        // console.assert(bakersSkeleton !== undefined);
+        //
+        // this._game.getScene().beginAnimation(bakersSkeleton, 0, 60, true);
     }
 
     update(): void {

@@ -205,7 +205,7 @@ export class Player extends TransformNode {
 }
     public setPosition(position: Vector3): void {
         console.log("set position", position);
-        this.mesh.position = position;
+        this.mesh.position.copyFrom(position);
     }
 
     // Calculs en fonction des inputs
@@ -604,5 +604,9 @@ export class Player extends TransformNode {
 
     public disableCamera(): void {
         this.camera.disable();
+    }
+
+    public setMeshDirection(direction: Vector3): void {
+        this.mesh.setDirection(direction);
     }
 }

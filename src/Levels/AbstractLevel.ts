@@ -32,7 +32,7 @@ export abstract class AbstractLevel {
     protected async load() {
         console.log("in AstractLevel load");
         this._loading = true;
-        this._game.displayLoadingUI();
+        //this._game.displayLoadingUI();
         // Désactivation de la scène
         this._game.getScene().detachControl();
         // this._game.getScene().dispose();
@@ -88,7 +88,7 @@ export abstract class AbstractLevel {
     }
 
     protected _finishedLoading() {
-        this._game.hideLoadingUI();
+        //this._game.hideLoadingUI();
         this._game.getScene().attachControl();
         console.log("level " + this._name + " loaded");
     }

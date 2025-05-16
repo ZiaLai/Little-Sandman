@@ -2,6 +2,7 @@ import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {ActionManager, ExecuteCodeAction, Mesh, Scene, SetValueAction} from "@babylonjs/core";
 import {IntroLoopMusic} from "../AudioControl/IntroLoopMusic";
+import {BakersBedroom} from "./BakersBedroom";
 
 export class CityLevel extends AbstractLevel{
 
@@ -38,7 +39,7 @@ export class CityLevel extends AbstractLevel{
             if (m.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", m.name);
                 m.actionManager = new ActionManager(this._game.getScene());
-                this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom");
+                this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom", BakersBedroom.START_POSITION);
             }
         })
     }
