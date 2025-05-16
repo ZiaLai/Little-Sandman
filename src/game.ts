@@ -137,4 +137,8 @@ export class Game {
         return null;
     }
 
+    public getPlayerPosition(): Vector3 {
+        return this.getPlayer().mesh.position;
+    }
+
 }
