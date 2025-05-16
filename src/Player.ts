@@ -288,10 +288,7 @@ export class Player extends TransformNode {
         this._updateGroundDetection();
         this._animatePlayer();
         this.updateStates(shootingSystem);
-        if (shootingSystem.isShooting()) {
-            let mesh = shootingSystem.getMeshFromShooting(this._scene, this.mesh.position, this.getMeshDirection());
-            console.log(mesh);
-        }
+        shootingSystem.getMeshFromShooting(this._scene, this.mesh.position, this.getMeshDirection());
         this.updateSandEmetter();
     }
 
