@@ -8,7 +8,7 @@ export class BakersBedroom extends AbstractLevel {
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "bakers_bedroom";
-        this._ressourceName = "chambre_boulangere_resize";
+        this._ressourceName = "baker_bedroom_v5";
 
     }
 
