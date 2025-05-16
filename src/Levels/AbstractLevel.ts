@@ -87,13 +87,13 @@ export abstract class AbstractLevel {
 
     protected abstract _addTriggers(): void;
 
-    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, playerPosition?: Vector3) {
+    protected setMeshAsChangeLevelTrigger(mesh: Mesh, destination: string, playerPosition?: Vector3) {
         const outerMesh = this._game.getGameScene().getMeshByName("outer");
 
         console.log("outerMesh", outerMesh);
         console.assert(outerMesh instanceof AbstractMesh);
 
-        m.actionManager.registerAction(
+        mesh.actionManager.registerAction(
             new ExecuteCodeAction(
                 {
                     trigger: ActionManager.OnIntersectionEnterTrigger,
@@ -105,5 +105,25 @@ export abstract class AbstractLevel {
                 },
             ),
         );
+    }
+
+    protected setMeshAsSwapMeshTrigger(mesh: Mesh, destination: string, playerPosition?: Vector3) {
+        console.log("setMeshAsSwapMeshTrigger", mesh);
+        let shootingSystem = this._game.getApp().getShootingSystem()
+        mesh.registerBeforeRender(() => {
+            console.log("mesh", mesh);
+            let shootingRay = shootingSystem.getShootingRay();
+            console.log("ray", shootingRay)
+            if (shootingRay && !shootingSystem.isInteracting()) {
+                let hitResult = shootingRay.intersectsMesh(mesh);
+                console.log("hitResult", hitResult);
+                if (hitResult.hit) {
+                    shootingSystem.setIsInteracting(true);
+                    this._game.getApp().changeGameScene(destination, playerPosition);
+                    shootingSystem.setIsInteracting(false);
+                }
+            }
+
+        })
     }
 }
