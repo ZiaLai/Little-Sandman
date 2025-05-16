@@ -2,7 +2,8 @@ import {AbstractMesh, Nullable, PickWithRay, Ray, RayHelper, Scene, Vector3} fro
 
 export class ShootingSystem {
     private _isShooting: boolean;
-    private _shootingRayHelper: RayHelper;
+    private _shootingRay: Ray;
+    private _isInteracting = false;
 
     constructor() {
         this._isShooting = false;
@@ -30,25 +31,30 @@ export class ShootingSystem {
         }
     }
 
-    public getMeshFromShooting(scene: Scene, position: Vector3, direction: Vector3): Nullable<AbstractMesh> {
-        if (this._shootingRayHelper != null) {
-            this._shootingRayHelper.hide();
+    public getRayFromShooting(scene: Scene, position: Vector3, direction: Vector3): void {
+        if (this._isShooting) {
+            this._shootingRay = new Ray(position, direction, 2);
+            let rayHelper = new RayHelper(this._shootingRay);
+            rayHelper.show(scene);
         }
-        let shootingRay = new Ray(position, direction, 2);
-        this._shootingRayHelper = new RayHelper(shootingRay);
-        this._shootingRayHelper.show(scene);
-        let pickingInfo = PickWithRay(scene, shootingRay);
-        if (pickingInfo != null) {
-            console.log(pickingInfo.pickedMesh);
-            if (pickingInfo.pickedMesh != null) {
-                console.log(pickingInfo.pickedMesh);
-            }
-            return pickingInfo.pickedMesh;
+        else {
+            this._shootingRay = null;
         }
-        return null;
     }
 
     public isShooting(): boolean {
         return this._isShooting;
+    }
+
+    public getShootingRay(): Ray {
+        return this._shootingRay;
+    }
+
+    public isInteracting(): boolean {
+        return this._isInteracting;
+    }
+
+    public setIsInteracting(isInteracting: boolean): void {
+        this._isInteracting = isInteracting;
     }
 }
