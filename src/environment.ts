@@ -43,7 +43,7 @@ export class Environment {
             }
             else if (m.name.includes("trigger")) {
                 m.visible = true;
-                m.isPickable = false;
+                m.isPickable = true;
                 m.checkCollisions = false;
                 this._triggers.push(m);
             }
