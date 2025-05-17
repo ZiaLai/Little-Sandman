@@ -141,4 +141,8 @@ export class Game {
         return this.getPlayer().mesh.position;
     }
 
+    public getDeltaTime(): number {
+        return this.getPlayer().getDeltaTime();
+    }
+
 }
