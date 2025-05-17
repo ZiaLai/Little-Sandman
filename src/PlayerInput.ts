@@ -10,6 +10,7 @@ export abstract class PlayerInput {
     public dashing: boolean;
     public jumpKeyDown: boolean;
     public hoverKeyDown: boolean;
+    public actionKeyDown: boolean;
     public isShooting: boolean = false;
 
 
