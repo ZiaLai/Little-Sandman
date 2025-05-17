@@ -1,8 +1,8 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {
-    ActionManager, Color3,
-    ExecuteCodeAction,
+    ActionManager, Camera, Color3,
+    ExecuteCodeAction, FreeCamera,
     HemisphericLight,
     Mesh, MeshBuilder, PointLight,
     Scene,
@@ -16,7 +16,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v16";
+        this._ressourceName = "city_v23";
     }
 
     protected async load() {
@@ -25,7 +25,8 @@ export class CityLevel extends AbstractLevel{
         console.log(this._game.getEnvironment().getTriggers());
         this._addTriggers();
         console.log("after adding triggers");
-        AllMonolog.play(0);
+        this.introduction();
+        AllMonolog.play(0);// TODO jouer dialogue uniquement à la fin de l'introduction
         this._finishedLoading();
     }
 
@@ -110,6 +111,11 @@ export class CityLevel extends AbstractLevel{
         // skyMaterial.backFaceCulling = false;
         // skydome.material = skyMaterial;
     }
+    private introduction(): void {
+        // TODO trouver position de départ de la cam;
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._game.getGameScene());
+        this._game.getGameScene().activeCamera = camera;
 
+    }
 
 }

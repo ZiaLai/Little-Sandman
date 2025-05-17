@@ -37,26 +37,40 @@ export class Environment {
             m.checkCollisions = true;
 
 
-            if (m.name.includes("collider")) {
+            if (m.name.includes("debug")) {
+                const activateDebug = true;
+
+                m.isVisible = activateDebug;
+                m.isPickable = activateDebug;
+                m.checkCollisions = activateDebug;
+
+            }
+
+            else if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                m.isVisible = false;
+                //m.isVisible = false;
                 m.isPickable = true;
             }
+
+            else if (m.name.includes("regularSolid")) {
+                m.isPickable = true;
+            }
+
             else if (m.name.includes("trigger")) {
                 m.visible = true;
                 m.isPickable = false;
                 m.checkCollisions = false;
                 this._triggers.push(m);
             }
-            else if (m.name.includes("bread_slice")) { // todo : remplacer par game_object (quand Zia aura mis les flags)
-                // ça sert juste de repère pour placer les éléments manuellement
-                m.isVisible = false;
-                m.isPickable = false;
-                m.checkCollisions = false;
-                console.log("Adding game_object")
-                //this._gameObjectsMeshes[m.name] = m;
-                //this._gameObjectsPositions[m.name] = m.getAbsolutePosition();
-            }
+            // else if (m.name.includes("bread_slice")) { // todo : remplacer par game_object (quand Zia aura mis les flags)
+            //     // ça sert juste de repère pour placer les éléments manuellement
+            //     m.isVisible = false;
+            //     m.isPickable = false;
+            //     m.checkCollisions = false;
+            //     console.log("Adding game_object")
+            //     //this._gameObjectsMeshes[m.name] = m;
+            //     //this._gameObjectsPositions[m.name] = m.getAbsolutePosition();
+            // }
             else {
                 // Tous les autres mesh ne vérifient pas les collisions
                // m.isPickable = false;

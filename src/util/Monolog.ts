@@ -35,7 +35,7 @@ export class Monolog {
         next.onPointerUpObservable.add(async () => {
             this.current_sentence++;
             advancedTexture.addControl(text1);
-            await FadeText.fadeOut(text1);
+            await FadeText.fadeOut(text1); // TODO marche pas
             if (this.current_sentence > this.sentences.length - 1) {
                 this.isFinished = true;
                 text1.text = "";

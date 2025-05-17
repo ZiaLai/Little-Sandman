@@ -30,8 +30,10 @@ import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 import {Monolog} from "./util/Monolog";
+import {CinematicScene} from "./util/CInematicScene";
+import {State} from "./State";
+import {AllCinematicData} from "./data/AllCInematicData";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON, THANKS }
 
 export class App {
     // General Entire Application
@@ -56,11 +58,11 @@ export class App {
 
     // TIMER FRAUDE
     private fraudeTimer = 0;
-    private FRAUDE_DURATION = 7;
+    private FRAUDE_DURATION = 5;
 
     // Cinematic timer
+    private currentCinematic = AllCinematicData.getData(0);
     private cinematicTimer = 0;
-    private CINEMATIC_DURATION = 88;
 
     private EXECUTE_TEST = true;
     private START_LEVEL = "city";
@@ -142,7 +144,7 @@ export class App {
                     this.renderScene();
                     break;
                 case State.CINEMATIC:
-                    if (this.cinematicTimer< this.CINEMATIC_DURATION){
+                    if (this.cinematicTimer< this.currentCinematic.getDuration()){
                         this.renderScene();
                         this.cinematicTimer+= this._scene.deltaTime/1000;
                     }
@@ -180,8 +182,21 @@ export class App {
         //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
 
+    public async goToSomething(wantedSate): Promise<void> {
+        switch(wantedSate) {
+            //TODO ajouter en fonction des besoins
+            case State.START :
+                await this._goToStart();
+                break;
+            case State.THANKS :
+                await this._goToThanks();
+                break;
+            case State.GAME:
+                await this._goToGame();
+                break;
 
-
+        }
+    }
     private async _goToLesFraudes(){
         this._engine.displayLoadingUI();
         this._scene.detachControl();
@@ -268,7 +283,7 @@ export class App {
         imageRect.addControl(ok);
 
         ok.onPointerDownObservable.add(async() => {
-            await this._goToCinematic();
+            await this._goToCinematic(0);
             scene.detachControl(); //observables disabled
         });
 
@@ -280,68 +295,41 @@ export class App {
         this._scene = scene;
         this._state = State.ACTIVEZ_SON;
     }
-
-    private async _goToCinematic() {
+/* index cinematic est l'index de la cinématique voulue dans AllCinematicData
+* */
+    private async _goToCinematic(indexCinematic: number) {
         this._engine.displayLoadingUI();
         this._scene.detachControl();
-
+        this.currentCinematic = AllCinematicData.getData(indexCinematic);
         let scene = new Scene(this._engine);
-        let camera = new ArcRotateCamera("arcR", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene);
-        //camera.setTarget(new Vector3(0, 0, 0.2));
+        new CinematicScene(scene, this.currentCinematic);
+        if (this.currentCinematic.isSkippable()) {
+            // -- GUI button skip
+            const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+            guiMenu.idealHeight = 720;
+            const imageRect = new Rectangle("titleContainer");
+            imageRect.width = 1;
+            imageRect.thickness = 0;
+            guiMenu.addControl(imageRect);
+            const skipbtn = Button.CreateSimpleButton("start", "Passer");
+            skipbtn.fontFamily = "Trebuchet MS";
+            skipbtn.width = 0.2
+            skipbtn.height = "50px";
+            skipbtn.color = "white";
+            skipbtn.top = "-14px";
+            skipbtn.thickness = 0;
+            skipbtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            skipbtn.horizontalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            skipbtn.paddingRight = 20;
+            skipbtn.paddingBottom = 20;
 
-        let planeOpts = {
-            height: 12,
-            //width: 7.3967,
-            width: 22,
-            sideOrientation: Mesh.DOUBLESIDE
-        };
-        let backgroudopt = {
-            height: 1000,
-            //width: 7.3967,
-            width: 10000,
-            sideOrientation: Mesh.DOUBLESIDE
-        };
-        let ANote0Video = MeshBuilder.CreatePlane("plane", planeOpts, scene);
-        let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
+            imageRect.addControl(skipbtn);
 
-        let vidPos = (new Vector3(0, 0, 0.1))
-        ANote0Video.position = vidPos;
-        background.position = new Vector3(0, 0, 0.2);
-        let ANote0VideoMat = new StandardMaterial("m", scene);
-        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "https://dl.dropbox.com/scl/fi/i7ltk5bf40pv8kbmj4gen/cinematic_intro_ls_ss.mp4?rlkey=40fph0epvxqs3m2slpy2c64yr&st=w0dwxn5u&dl=0", scene);
-
-        ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-        ANote0VideoMat.roughness = 1;
-        ANote0VideoMat.emissiveColor = Color3.White();
-        ANote0Video.material = ANote0VideoMat;
-
-        // -- GUI
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
-        const imageRect = new Rectangle("titleContainer");
-        imageRect.width = 1;
-        imageRect.thickness = 0;
-        guiMenu.addControl(imageRect);
-        const skipbtn = Button.CreateSimpleButton("start", "Passer");
-        skipbtn.fontFamily = "Trebuchet MS";
-        skipbtn.width = 0.2
-        skipbtn.height = "50px";
-        skipbtn.color = "white";
-        skipbtn.top = "-14px";
-        skipbtn.thickness = 0;
-        skipbtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        skipbtn.horizontalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        skipbtn.paddingRight = 20;
-        skipbtn.paddingBottom = 20;
-
-        imageRect.addControl(skipbtn);
-
-        skipbtn.onPointerDownObservable.add(async() => {
-            await this._goToStart();
-            scene.detachControl(); //observables disabled
-        });
-
-
+            skipbtn.onPointerDownObservable.add(async() => {
+                await this.goToSomething(this.currentCinematic.getWantedState());
+                scene.detachControl(); //observables disabled
+            });
+        }
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI();

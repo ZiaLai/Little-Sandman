@@ -19,8 +19,8 @@ export class AllMonolog {
     }
 
     static play(index: number) {
-        if (index < this.getAllMonolog().length) {
-            if (!this.getAllMonolog()[index].isPlayed()){
+        if (index < this.getAllMonolog().length){
+            if (!this.getAllMonolog()[index].isPlayed()) {
                 this.getAllMonolog()[index].play();
             }
             else{console.log("monolog" + index + " already played")}
