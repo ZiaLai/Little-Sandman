@@ -11,7 +11,7 @@ import {
 
 enum CameraState {ZOOMING_IN, ZOOMING_OUT, ZOOMED_IN, ZOOMED_OUT }
 
-enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, APPEARING_4, SHOWN}
+enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, SHOWN}
 
 export class BakersBedroom extends AbstractLevel {
     public static START_POSITION: Vector3 = new Vector3(3.89, 2.45, -7.52);
@@ -226,8 +226,12 @@ export class BakersBedroom extends AbstractLevel {
                 break;
 
             case CloudState.SHOWN:
-                //this._hideCloud()
-                //this._cloudState = CloudState.START_APPEARING;
+
+                if (this._game.getPlayer().getInput().actionKeyDown) {
+                    this._game.getApp().changeGameScene("sugarless_bakery");
+                    this._cloudState = null;
+                }
+
                 break;
         }
     }

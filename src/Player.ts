@@ -609,4 +609,8 @@ export class Player extends TransformNode {
     public setMeshDirection(direction: Vector3): void {
         this.mesh.setDirection(direction);
     }
+
+    public getInput(): PlayerInput {
+        return this._inputs[this._currentInput];
+    }
 }

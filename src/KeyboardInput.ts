@@ -7,6 +7,7 @@ export class KeyboardInput extends PlayerInput {
     private _canvas: HTMLCanvasElement;
 
 
+
     constructor(scene: Scene, canvas: HTMLCanvasElement) {
         super();
         this._canvas = canvas;
@@ -109,12 +110,9 @@ export class KeyboardInput extends PlayerInput {
                 this.horizontalAxis = 0;
             }
 
-            if (this.inputMap["Shift"]) {
-                this.hoverKeyDown = true;
-            } else {
-                this.hoverKeyDown = false;
-            }
+            this.hoverKeyDown = !!this.inputMap["Shift"];
 
+            this.actionKeyDown = !!this.inputMap["f"];
         }
 
 
