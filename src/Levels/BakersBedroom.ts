@@ -1,7 +1,13 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {AbstractMesh, ActionManager, FreeCamera, Scene, Tools, Vector3} from "@babylonjs/core";
-import {SpriteLoader} from "../SpriteLoader";
+import {
+    AbstractMesh,
+    ActionManager,
+    AnimationGroup,
+    FreeCamera,
+    Tools,
+    Vector3
+} from "@babylonjs/core";
 
 enum CameraState {ZOOMING_IN, ZOOMING_OUT, ZOOMED_IN, ZOOMED_OUT }
 
@@ -27,6 +33,7 @@ export class BakersBedroom extends AbstractLevel {
 
 
     private _cloudMeshes: AbstractMesh[];
+    private _baker: { animationGroups: AnimationGroup[]; mesh: AbstractMesh };
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -90,7 +97,6 @@ export class BakersBedroom extends AbstractLevel {
     }
 
     update(): void {
-
         this._updateCamera();
 
         this._updateCloud();
@@ -147,12 +153,22 @@ export class BakersBedroom extends AbstractLevel {
     }
 
     private async _initBaker() {
-        const baker = await this._game.spriteLoader.loadSprite("baker.glb");
+        const baker = await this._game.spriteLoader.loadSprite("BOULANGERE.glb");
+        
+        this._baker = baker;
+        //const bakerRoot = this._game.getGameScene().getTransformNodeByName("Armature");
+        const bakerRoot = baker.mesh;
+
+        bakerRoot.rotationQuaternion = null;
+
+        console.log("bakerRoot", bakerRoot );
+
+        bakerRoot.position = Vector3.Zero();
+        bakerRoot.rotation.y = Tools.ToRadians(180);
 
         //console.log("baker animationGroups : ", baker.animationGroups);
 
-        // Marche pas TODO : chercher pourquoi il n'y a pas l'anim (export blender ???)
-        // baker.animationGroups[0].play(true);
+        baker.animationGroups[0].play(true);
     }
 
     private _hideCloud() {
