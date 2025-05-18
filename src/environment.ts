@@ -60,15 +60,15 @@ export class Environment {
                 m.checkCollisions = false;
                 this._triggers.push(m);
             }
-            else if (m.name.includes("bread_slice")) { // todo : remplacer par game_object (quand Zia aura mis les flags)
-                // ça sert juste de repère pour placer les éléments manuellement
-                m.isVisible = false;
-                m.isPickable = false;
-                m.checkCollisions = false;
-                console.log("Adding game_object")
-                //this._gameObjectsMeshes[m.name] = m;
-                //this._gameObjectsPositions[m.name] = m.getAbsolutePosition();
-            }
+            // else if (m.name.includes("bread_slice")) { // todo : remplacer par game_object (quand Zia aura mis les flags)
+            //     // ça sert juste de repère pour placer les éléments manuellement
+            //     m.isVisible = false;
+            //     m.isPickable = false;
+            //     m.checkCollisions = false;
+            //     console.log("Adding game_object")
+            //     //this._gameObjectsMeshes[m.name] = m;
+            //     //this._gameObjectsPositions[m.name] = m.getAbsolutePosition();
+            // }
             else {
                 // Tous les autres mesh ne vérifient pas les collisions
                // m.isPickable = false;
