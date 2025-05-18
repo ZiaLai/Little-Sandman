@@ -119,11 +119,9 @@ export abstract class AbstractLevel {
                 console.log("hitResult", hitResult);
                 if (hitResult.hit) {
                     shootingSystem.setIsInteracting(true);
-                    this._game.getApp().changeGameScene(destination, playerPosition);
-                    shootingSystem.setIsInteracting(false);
+                    this._game.getApp().changeGameScene(destination, playerPosition).then(() => shootingSystem.setIsInteracting(false));
                 }
             }
-
         })
     }
 }
