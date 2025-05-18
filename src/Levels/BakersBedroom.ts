@@ -8,13 +8,18 @@ import {
     Tools,
     Vector3
 } from "@babylonjs/core";
+import {CityLevel} from "./CityLevel";
+import {SpawnData} from "../SpawnData";
+import {SugarlessBakery} from "./SugarlessBakery";
 
 enum CameraState {ZOOMING_IN, ZOOMING_OUT, ZOOMED_IN, ZOOMED_OUT }
 
 enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, SHOWN}
 
 export class BakersBedroom extends AbstractLevel {
-    public static START_POSITION: Vector3 = new Vector3(3.89, 2.45, -7.52);
+    public static START_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(3.89, 2.45, -7.52),
+                                                              new Vector3(0, 0, 0),
+                                                              null);
 
     private _CAMERA_ZOOM_IN_TARGET: Vector3 = new Vector3(7.2, 4.3, 4);
     private _CAMERA_ZOOM_OUT_TARGET: Vector3 = new Vector3(4, 3.8, 8);
@@ -60,7 +65,6 @@ export class BakersBedroom extends AbstractLevel {
         this._camera = camera;
         this._game.getGameScene().activeCamera = camera;
 
-        this._game.getPlayer().setMeshDirection(new Vector3( 0 , 0 , Tools.ToRadians(90) ));
 
         this._initCloudMeshes();
 
@@ -139,7 +143,7 @@ export class BakersBedroom extends AbstractLevel {
         this._game.getEnvironment().getTriggers().forEach(m => {
             if (m.name.includes("exit")) {
                 m.actionManager = new ActionManager(this._game.getScene());
-                this.setMeshAsChangeLevelTrigger(m, "city", new Vector3(52, 3, 13));
+                this.setMeshAsChangeLevelTrigger(m, "city", CityLevel.BAKERY_EXIT_SPAWN_DATA);
             }
         })
     }
@@ -227,8 +231,8 @@ export class BakersBedroom extends AbstractLevel {
 
             case CloudState.SHOWN:
 
-                if (this._game.getPlayer().getInput().actionKeyDown) {
-                    this._game.getApp().changeGameScene("sugarless_bakery");
+                if (this._game.getPlayer().getInput().actionKeyDown && this._cameraState === CameraState.ZOOMED_IN) {
+                    this._game.getApp().changeGameScene("sugarless_bakery", SugarlessBakery.ENTRANCE_SPAWN_DATA);
                     this._cloudState = null;
                 }
 

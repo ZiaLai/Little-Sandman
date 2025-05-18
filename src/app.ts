@@ -28,6 +28,7 @@ import {TestRunner} from "./Test/TestRunner";
 import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
+import {SpawnData} from "./SpawnData";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON }
 
@@ -70,7 +71,7 @@ export class App {
     private isPlayingMonolog: boolean = true;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "city";
+    private START_LEVEL = "bakers_bedroom";
 
     constructor() {
         if (this.EXECUTE_TEST) new TestRunner().main();
@@ -490,7 +491,7 @@ export class App {
 
     }
 
-    private async _initializeGameAsync(scene: Scene): Promise<void> {
+    private async _initializeGameAsync(scene: Scene, playerPosition: Vector3): Promise<void> {
         //temporary light to light the entire scene
         var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
         light0.diffuse = new Color3(35/255,67/255,131/255);
@@ -503,7 +504,7 @@ export class App {
         shadowGenerator.darkness = 0.4;
 
         //Create the player
-        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
+        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, playerPosition);
 
         const camera = this._player.camera.activate();
 
@@ -512,7 +513,7 @@ export class App {
 
     }
 
-    private async _goToGame(){
+    private async _goToGame(playerPosition?: Vector3){
         //--SETUP SCENE--
         this._scene.detachControl();
         let scene = this._gamescene;
@@ -603,7 +604,7 @@ export class App {
         });*/
 
         //primitive character and setting
-        await this._initializeGameAsync(scene);
+        await this._initializeGameAsync(scene, playerPosition);
 
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -652,7 +653,7 @@ export class App {
         this._state = State.LOSE;
     }
 
-    public async changeGameScene(levelName: string, playerPosition?: Vector3) {
+    public async changeGameScene(levelName: string, spawnData?: SpawnData) {
         console.log("In changeGameScene");
         this._game.displayLoadingUI();
 
@@ -661,7 +662,12 @@ export class App {
 
         this._player.reset();
 
-        if (playerPosition !== undefined) this._player.setPosition(playerPosition);
+        if (spawnData !== undefined) {
+            this._player.setPosition(spawnData.position);
+            this._player.setMeshDirection(spawnData.direction);
+
+            if (spawnData.alpha) this._player.camera.setAlpha(spawnData.alpha);
+        }
 
        this._game.hideLoadingUI();
     }

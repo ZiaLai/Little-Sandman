@@ -203,4 +203,8 @@ export class PlayerCamera {
     getIsActive(): boolean {
         return this._isActive;
     }
+
+    public setAlpha(alpha: number): void {
+        this._camera.alpha = alpha;
+    }
 }

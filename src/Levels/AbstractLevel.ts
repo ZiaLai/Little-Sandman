@@ -5,6 +5,7 @@ import {GameObject} from "../GameObjects/GameObject";
 import {MusicPlayer} from "../AudioControl/MusicPlayer";
 import {Music} from "../AudioControl/Music";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
+import {SpawnData} from "../SpawnData";
 
 
 export abstract class AbstractLevel {
@@ -81,6 +82,7 @@ export abstract class AbstractLevel {
         }
 
         if (this._music) this._music.destroy();
+
     }
 
     getName() {
@@ -95,7 +97,7 @@ export abstract class AbstractLevel {
 
     protected abstract _addTriggers(): void;
 
-    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, playerPosition?: Vector3) {
+    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, spawnData?: SpawnData) {
         const outerMesh = this._game.getGameScene().getMeshByName("outer");
 
         console.log("outerMesh", outerMesh);
@@ -109,7 +111,7 @@ export abstract class AbstractLevel {
                 },
                 () => {
                         // Changer le niveau
-                        this._game.getApp().changeGameScene(destination, playerPosition);
+                        this._game.getApp().changeGameScene(destination, spawnData);
                 },
             ),
         );
