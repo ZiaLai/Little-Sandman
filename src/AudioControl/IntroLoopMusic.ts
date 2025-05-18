@@ -36,7 +36,7 @@ export class IntroLoopMusic implements Music {
         const intro = new Sound(this._musicData[0][0], this._musicData[0][1], this._scene, soundReady);
         this._intro = intro;
 
-        const loop = new Sound(this._musicData[1][0], this._musicData[1][1], this._scene, soundReady, {loop: true});
+        const loop = new Sound(this._musicData[1][0], this._musicData[1][1], this._scene, soundReady, {loop: true, spatialSound: false});
         this._loop = loop;
     }
 
