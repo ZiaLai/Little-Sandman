@@ -562,7 +562,7 @@ export class App {
         this._scene.dispose();
         this._state = State.GAME;
         this._scene = scene;
-        //this._engine.hideLoadingUI();
+        this._engine.hideLoadingUI();
 
         //the game is ready, attach control back
         //this._startMusic();
@@ -636,7 +636,7 @@ export class App {
 
     public async changeGameScene(levelName: string, playerPosition?: Vector3) {
         console.log("In changeGameScene");
-        this._game.displayLoadingUI();
+        this._engine.displayLoadingUI();
 
         await this._setUpGame(levelName);
         await this._goToGame();
@@ -645,7 +645,7 @@ export class App {
 
         if (playerPosition !== undefined) this._player.setPosition(playerPosition);
 
-       this._game.hideLoadingUI();
+       this._engine.hideLoadingUI();
     }
 
     getEnvironment() {
