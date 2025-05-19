@@ -8,6 +8,8 @@ import {BakersBedroom} from "./Levels/BakersBedroom";
 import {Breach1} from "./Levels/Breach1";
 import {SpriteLoader} from "./SpriteLoader";
 import {App} from "./app";
+import {GameState} from "./GameState";
+import {AdvancedDynamicTexture, Button, Rectangle, StackPanel} from "@babylonjs/gui";
 
 export class Game {
 
@@ -21,9 +23,11 @@ export class Game {
     private _currentLevel : string;
 
     private frameCount: number;
+    private _state : GameState;
 
     constructor(app: App) {
         this._app = app;
+        this._state = GameState.PLAYING;
 
         let levels: AbstractLevel[] = [
             new CityLevel(this, 0),
@@ -49,8 +53,64 @@ export class Game {
     }
 
     public update(): void {
-        this._levels[this._currentLevel].update();
+        //TODO completer
+        switch (this._state){
+            case GameState.PLAYING:this._levels[this._currentLevel].update();
+                break;
 
+            case GameState.PAUSE: break; // TODO afficher menu pause;
+                // TODO capter l'event qui permet de passer en pause
+            case GameState.CINEMATIC: break; // TODO joue cinématique sans changer niveau
+
+        }
+
+
+    }
+    public pauseMenu():void{
+        const advancedTexture =AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+        const pauseMenu = new Rectangle();
+        // TODO mettre image
+        pauseMenu.width = "400px";
+        pauseMenu.height = "300px";
+        pauseMenu.thickness = 0;
+        pauseMenu.background = "#222";
+        pauseMenu.isVisible = false;
+        advancedTexture.addControl(pauseMenu);
+
+    // Créer un StackPanel pour les boutons
+        const buttonPanel = new StackPanel();
+        buttonPanel.width = "100%";
+        buttonPanel.isVertical = true;
+        pauseMenu.addControl(buttonPanel);
+
+        // Fonction pour créer des boutons cohérents
+        function createMenuButton(text, callback) {
+            const button = Button.CreateSimpleButton("btn_" + text, text);
+            button.width = "80%";
+            button.height = "50px";
+            button.color = "white";
+            button.cornerRadius = 10;
+            button.background = "#444";
+            button.paddingTop = "10px";
+            button.onPointerUpObservable.add(callback);
+            return button;
+        }
+
+    // Ajouter des boutons au panel
+        buttonPanel.addControl(createMenuButton("Reprendre", () => {
+            pauseMenu.isVisible = false;
+            console.log("Reprendre");
+        }));
+
+        buttonPanel.addControl(createMenuButton("Retourner au point de départ", () => {
+            console.log("Options cliquées");
+        }));
+
+        buttonPanel.addControl(createMenuButton("Quitter", () => {
+            console.log("Quitter cliqué");
+        }));
+        // TODO si pas dans un niveau, ajouter "recommencer" et " retour à la ville"
     }
 
     public initializeLevel(): void {
