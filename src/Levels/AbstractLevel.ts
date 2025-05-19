@@ -107,19 +107,27 @@ export abstract class AbstractLevel {
         );
     }
 
-    protected setMeshAsSwapMeshTrigger(mesh: Mesh, destination: string, playerPosition?: Vector3) {
-        console.log("setMeshAsSwapMeshTrigger", mesh);
+    protected setMeshAsSwapMeshTrigger(mesh: Mesh) {
         let shootingSystem = this._game.getApp().getShootingSystem()
         mesh.registerBeforeRender(() => {
-            console.log("mesh", mesh);
             let shootingRay = shootingSystem.getShootingRay();
-            console.log("ray", shootingRay)
             if (shootingRay && !shootingSystem.isInteracting()) {
                 let hitResult = shootingRay.intersectsMesh(mesh);
-                console.log("hitResult", hitResult);
                 if (hitResult.hit) {
                     shootingSystem.setIsInteracting(true);
-                    this._game.getApp().changeGameScene(destination, playerPosition).then(() => shootingSystem.setIsInteracting(false));
+                    //this._game.getApp().changeGameScene(destination, playerPosition).then(() => shootingSystem.setIsInteracting(false));
+                    let meshName = mesh.name.split("_");
+                    let index = meshName[1].charAt(meshName[1].length - 1);
+                    let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index)
+                    let elementDream = this._game.getScene().getTransformNodeByName(meshName[0] + "_" + meshName[1])
+                    elementNightMare.getChildMeshes().forEach(mesh => {
+                        mesh.isVisible = false;
+                    })
+                    elementDream.getChildMeshes().forEach(mesh => {
+                        mesh.isVisible = true;
+                    })
+                    shootingSystem.setIsInteracting(false);
+                    console.log("swap done");
                 }
             }
         })
