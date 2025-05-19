@@ -189,4 +189,7 @@ export class PlayerCamera {
     getAlpha() {
         return this._camera.alpha;
     }
+    public getCamera(){
+        return this._camera;
+    }
 }

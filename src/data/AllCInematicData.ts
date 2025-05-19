@@ -1,0 +1,20 @@
+import {CinematicData} from "./CinematicData";
+import {State} from "../State";
+
+export class AllCinematicData {
+    public static getAllCinematicData() {
+        return  [
+            new CinematicData("https://dl.dropbox.com/scl/fi/i7ltk5bf40pv8kbmj4gen/cinematic_intro_ls_ss.mp4?rlkey=40fph0epvxqs3m2slpy2c64yr&st=w0dwxn5u&dl=0",
+                88, true, State.START),
+            new CinematicData("/textures/Sugarless to Sugarfull.mov",7, false, State.THANKS)
+        ];
+
+    }
+    public static getData(index: number): CinematicData {
+        let data = this.getAllCinematicData();
+        if (index < 0 || index > data.length - 1) {
+            return null;
+        }
+        return data[index];
+    }
+}

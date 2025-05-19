@@ -14,6 +14,7 @@ import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {PlayerCamera} from "./PlayerCamera";
 import {Sand} from "./util/Sand";
+import {StaminaBar} from "./util/StaminaBar";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -78,7 +79,9 @@ export class Player extends TransformNode {
     private _currentAnim;
     private _prevAnim;
     private sandEmetter;
+    private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
+    private _staminaBar;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
         super("player", scene);
@@ -115,7 +118,14 @@ export class Player extends TransformNode {
             "scarf_right": assets.animationGroups[10]};
 
         this._setUpAnimations();
+
+        // -- SAND EMMETTER
         this.sandEmetter = Sand.getParticleSystem(this.scene);
+        this.hoveringSandEmetter = Sand.getParticleSystem(this.scene);
+        this.hoveringSandEmetter.createPointEmitter(new Vector3(-0.2,-1,0.2), new Vector3(0.2,-1,-0.2));
+        // -- STAMINA BAR
+        this._staminaBar = new StaminaBar(this.mesh, this.scene);
+
     }
     private _setUpAnimations(){
         this.scene.stopAllAnimations();
@@ -136,10 +146,8 @@ export class Player extends TransformNode {
 }
     private _animatePlayer(){
 
-
         if (this._isStartingShooting) {
             this._currentAnim = this._animations["start_sand"];
-            ///this.sandEmetter.start();
         }
 
         else if (this._isEndingShooting) {
@@ -154,35 +162,41 @@ export class Player extends TransformNode {
             else {
                 this._currentAnim = this._animations["sand_idle"];
             }
-            ///if (!this.sandEmetter.isStarted()){
-                this.sandEmetter.start();
-            //}
-
-
+            this.sandEmetter.start();
         }
 
+        else if (this._hovering ){
+            this._currentAnim = this._animations["fall_loop"];
+            this.hoveringSandEmetter.start();
+
+        }
         else if (this._isFalling){
              this._currentAnim = this._animations["fall_loop"];
+             console.log("is falling")
          }
         else if (this._isJumping){
             this._currentAnim = this._animations["jump"];
+            this.hoveringSandEmetter.stop();
+
         }
-        else if (this._hovering ){
-            this._currentAnim = this._animations["fall_loop"];
-        }
+
 
          else if (this._isWalking){
              this._landAnimationTimer = 10; // Valeur arbitrairement grande pour empêcher l'anim d'atterissage
              this._currentAnim = this._animations["walk"];
+                    this.hoveringSandEmetter.stop();
          }
 
-        else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {// TODO marche pas
+        else if (this._isGrounded() && (this._prevAnim == this._animations["fall_loop"] || this._landAnimationTimer < 0.88)) {
             this._currentAnim = this._animations["land"];
+            this.hoveringSandEmetter.stop();
         }
 
 
         else {
             this._currentAnim = this._animations["idle"];
+            this.hoveringSandEmetter.stop();
+
         }
 
 
@@ -288,6 +302,8 @@ export class Player extends TransformNode {
         //console.log("Player pos", this.mesh.position);
         this.updateStates();
         this.updateSandEmetter();
+        this.updateStaminaBar();
+
     }
 
     private updateStates() {
@@ -556,6 +572,7 @@ export class Player extends TransformNode {
     }
 
     private updateSandEmetter(){
+        this.hoveringSandEmetter.emitter = new Vector3(0,1.23,0).addInPlace(new Vector3().copyFrom(this.mesh.position));
         let x = this.getMeshDirection()._x;
         let z = this.getMeshDirection()._z;
         // -- POSITION
@@ -600,6 +617,40 @@ export class Player extends TransformNode {
 
     private getMeshDirection(): Vector3 {
         return this.mesh.getDirection(Axis.Z);
+    }
+
+    private updateStaminaBar(){
+        this._staminaBar.updateStaminaBarAnimated(this._hoverTimer- this._deltaTime, this._hoverTimer);
+        let x = this.getMeshDirection()._x;
+
+        let z = this.getMeshDirection()._z;
+
+        // -- POSITION
+        const forward = this.camera.getCamera().getForwardRay().direction;
+        const up = Vector3.Up();
+        const right = Vector3.Cross(forward, up).normalize();
+
+        const offsetRight = right.scale(0.5);
+        const offsetUp = new Vector3(0, 1.5, 0);
+        const position =  new Vector3().copyFrom(this.position.add(offsetRight).add(offsetUp));
+
+        // La jauge regarde toujours la caméra
+        this._staminaBar.updatePosition(position);
+
+        if (this._hovering) {
+            this._staminaBar.staminaPlane.visibility = 1;
+            this._staminaBar.staminaPlane.setEnabled(true);
+        }
+
+        else {
+            if (this._staminaBar.staminaPlane.visibility > 0){
+                this._staminaBar.staminaPlane.visibility -= 0.02;
+            }
+            else {
+                this._staminaBar.staminaPlane.setEnabled(false);
+            }
+
+        }
     }
 
 }
