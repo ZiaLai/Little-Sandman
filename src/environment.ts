@@ -36,10 +36,20 @@ export class Environment {
             m.receiveShadows = true;
             m.checkCollisions = true;
 
+            if (m.name.includes("debug")) {
+                const activateDebug = false;
 
-            if (m.name.includes("collider")) {
+                m.isVisible = activateDebug;
+                m.isPickable = activateDebug;
+                m.checkCollisions = activateDebug;
+            }
+            else if (m.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
                 m.isVisible = false;
+                m.isPickable = true;
+            }
+
+            else if (m.name.includes("regularSolid")) {
                 m.isPickable = true;
             }
             else if (m.name.includes("trigger")) {
@@ -48,15 +58,7 @@ export class Environment {
                 m.checkCollisions = false;
                 this._triggers.push(m);
             }
-            else if (m.name.includes("bread_slice")) { // todo : remplacer par game_object (quand Zia aura mis les flags)
-                // ça sert juste de repère pour placer les éléments manuellement
-                m.isVisible = false;
-                m.isPickable = false;
-                m.checkCollisions = false;
-                console.log("Adding game_object")
-                //this._gameObjectsMeshes[m.name] = m;
-                //this._gameObjectsPositions[m.name] = m.getAbsolutePosition();
-            }
+
             else {
                 // Tous les autres mesh ne vérifient pas les collisions
                // m.isPickable = false;
@@ -78,7 +80,7 @@ export class Environment {
 
         let result;
         if (this._currentAssetName === "city") { // Import de la ville sur dropbox car fichier lourd
-            result = await SceneLoader.ImportMeshAsync(null, "", "https://www.dropbox.com/scl/fi/oge4a6288q6uupxnzhvp0/city_v20.glb?rlkey=t2vzo43aok9cc96kwndhxfgz2&st=55it1s67&dl=0");
+            result = await SceneLoader.ImportMeshAsync(null, "", "https://dl.dropbox.com/scl/fi/qqhgx4nbvashye9ik5tgv/city_v24.glb?rlkey=4ph5ocelohxg5az8x0aznijur&st=atidxmss&dl=0");
         }
         else {
             result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",

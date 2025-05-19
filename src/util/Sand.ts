@@ -20,7 +20,7 @@ export class Sand {
         let particleSystem = new ParticleSystem("particles", 2000, scene);
 
         //Texture of each particle
-        particleSystem.particleTexture = new Texture("/textures/Flare.png", scene);
+        particleSystem.particleTexture = new Texture("/textures/grain_sable.png", scene);
         //particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
 
         // Where the particles come from
@@ -33,7 +33,7 @@ export class Sand {
 
         // Size of each particle (random between...
         particleSystem.minSize = 0.01;
-        particleSystem.maxSize = 0.05;
+        particleSystem.maxSize = 0.1;
 
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 0.3;
@@ -43,12 +43,12 @@ export class Sand {
         particleSystem.emitRate = 1000;
 
         /******* Emission Space ********/
-        particleSystem.createPointEmitter(new Vector3(-0.1,-0.1,-1), new Vector3(0.1,0.1,-1)); // TODO changer direction : changer uniquement z et x
+        particleSystem.createPointEmitter(new Vector3(-0.1,-0.1,-1), new Vector3(0.1,0.1,-1));
 
         // Speed
         particleSystem.minEmitPower = 2;
         particleSystem.maxEmitPower = 4;
-        particleSystem.updateSpeed = 0.005;
+        particleSystem.updateSpeed = 0.01;
 
         //
         particleSystem.gravity = new Vector3(-0.05, -0.5, 0);

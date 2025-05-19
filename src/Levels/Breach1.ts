@@ -1,9 +1,6 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {Mesh, Scene, Vector3} from "@babylonjs/core";
-import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
-import {GameObject} from "../GameObjects/GameObject";
-import {Knife} from "../GameObjects/Knife";
+import {Mesh, Vector3} from "@babylonjs/core";
 
 
 
@@ -57,7 +54,7 @@ export class Breach1 extends AbstractLevel {
 
         console.log("before loading asset");
         await this._loadObjects().then((result)=> {
-            this._objects = result;
+            //this._objects = result;
             // Réactivation de la scène quand le chargement est fini (évite au joueur de passer sous la map s'il charge avant)
             this._finishedLoading();
             console.log("after loading asset");
@@ -74,38 +71,38 @@ export class Breach1 extends AbstractLevel {
     }
 
     initialize(): void {
-        console.log(this._objects);
-
-        for (let key in this._objects) {
-            for (let object of this._objects[key]) {
-                console.log("INitializing object", object);
-                object.initialize();
-                console.log("Bread Slice Position", this._objects["breadSlice"][0]);
-            }
-        }
+        // console.log(this._objects);
+        //
+        // for (let key in this._objects) {
+        //     for (let object of this._objects[key]) {
+        //         console.log("INitializing object", object);
+        //         object.initialize();
+        //         console.log("Bread Slice Position", this._objects["breadSlice"][0]);
+        //     }
+        // }
         //this._objects["breadSlice"][0].getMesh().position = new Vector3(10, 0, -30);
     }
 
     update(): void {
-        for (let key in this._objects) {
-            for (let object of this._objects[key]) {
-                object.update();
-            }
-        }
+        // for (let key in this._objects) {
+        //     for (let object of this._objects[key]) {
+        //         object.update();
+        //     }
+        // }
     }
 
 
-    private async _loadObjects(): Promise<{}> {
-
-        // Dictionnaire des objets. nom de l'objet : [liste des objets de ce type]
-        return {
-            "breadSlice" : [
-                new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"], new Vector3(7, 6, -15), "bread_slice")
-            ],
-            "knife" : [
-                new Knife(this._game, this._objectsMeshes["knife"], new Vector3(0, 0, 0), "knife")
-            ]
-            };
+    private async _loadObjects(): Promise<void> {
+        //
+        // // Dictionnaire des objets. nom de l'objet : [liste des objets de ce type]
+        // return {
+        //     "breadSlice" : [
+        //         new BreadSlicePlatform(this._game, this._objectsMeshes["breadSlice"], new Vector3(7, 6, -15), "bread_slice")
+        //     ],
+        //     "knife" : [
+        //         new Knife(this._game, this._objectsMeshes["knife"], new Vector3(0, 0, 0), "knife")
+        //     ]
+        //     };
     }
 
     protected _addTriggers(): void {

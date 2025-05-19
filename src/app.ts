@@ -18,6 +18,7 @@ import {
     Quaternion,
     Matrix,
     SceneLoader, SceneOptimizer, Sound, VideoTexture, PointerEventTypes, Texture,
+    Effect,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -28,8 +29,12 @@ import {TestRunner} from "./Test/TestRunner";
 import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
+import {SpawnData} from "./SpawnData";
+import {Monolog} from "./util/Monolog";
+import {State} from "./State";
+import {CinematicScene} from "./util/CInematicScene";
+import {AllCinematicData} from "./data/AllCInematicData";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, CINEMATIC, LES_FRAUDES, ACTIVEZ_SON }
 
 export class App {
     // General Entire Application
@@ -45,7 +50,6 @@ export class App {
     private _player: Player;
     private _game: Game;
 
-
     //Scene - related
     private _state: number = 0;
     private _gamescene: Scene;
@@ -55,37 +59,24 @@ export class App {
 
     // TIMER FRAUDE
     private fraudeTimer = 0;
-    private FRAUDE_DURATION = 7;
+    private FRAUDE_DURATION = 5;
 
     // Cinematic timer
+    private currentCinematic = AllCinematicData.getData(0);
     private cinematicTimer = 0;
-    private CINEMATIC_DURATION = 88;
-
-    // -- Monolog
-
-    private readonly allMonolog : string[][];
-    private current_monolog_index = 0;
-    private current_sentence_index = 0;
-    private readonly monolog_played : boolean[];
-    private isPlayingMonolog: boolean = true;
 
     private EXECUTE_TEST = true;
     private START_LEVEL = "city";
 
     constructor() {
         if (this.EXECUTE_TEST) new TestRunner().main();
-        // -- Monolog data
-        this.monolog_played = AllMonolog.getIsPlayed();
-        this.allMonolog =  AllMonolog.getAllMonolog();
 
         this._canvas = this._createCanvas();
 
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
-        // todo change loading screen (op)
-        //this._engine.loadingScreen = new CustomLoadingScreen();
+        this._engine.loadingScreen = new CustomLoadingScreen();
         this._scene = new Scene(this._engine);
-
         this._sceneOptimizer = new SceneOptimizer(this._scene);
 
         // hide/show the Inspector
@@ -154,7 +145,7 @@ export class App {
                     this.renderScene();
                     break;
                 case State.CINEMATIC:
-                    if (this.cinematicTimer< this.CINEMATIC_DURATION){
+                    if (this.cinematicTimer< this.currentCinematic.getDuration()){
                         this.renderScene();
                         this.cinematicTimer+= this._scene.deltaTime/1000;
                     }
@@ -167,11 +158,14 @@ export class App {
                         this.renderScene();
                         this.fraudeTimer += this._scene.deltaTime/1000;
                     }
-                    else{
+                    else {
                         await this._goToActivateSound();
                     }
                     break;
                 case State.ACTIVEZ_SON:
+                    this.renderScene();
+                    break;
+                case State.THANKS:
                     this.renderScene();
                     break;
                 default: break;
@@ -189,8 +183,21 @@ export class App {
         //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
 
+    public async goToSomething(wantedState): Promise<void> {
+        switch(wantedState) {
+            //TODO ajouter en fonction des besoins
+            case State.START :
+                await this._goToStart();
+                break;
+            case State.THANKS :
+                await this._goToThanks();
+                break;
+            case State.GAME:
+                await this._goToGame();
+                break;
 
-
+        }
+    }
     private async _goToLesFraudes(){
         this._engine.displayLoadingUI();
         this._scene.detachControl();
@@ -218,7 +225,7 @@ export class App {
         imageRect.addControl(logo);
 
 
-        // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)
+        // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)(op)
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -277,7 +284,7 @@ export class App {
         imageRect.addControl(ok);
 
         ok.onPointerDownObservable.add(async() => {
-            await this._goToCinematic();
+            await this._goToCinematic(0);
             scene.detachControl(); //observables disabled
         });
 
@@ -289,68 +296,41 @@ export class App {
         this._scene = scene;
         this._state = State.ACTIVEZ_SON;
     }
-
-    private async _goToCinematic() {
+/* index cinematic est l'index de la cinématique voulue dans AllCinematicData
+* */
+    private async _goToCinematic(indexCinematic: number) {
         this._engine.displayLoadingUI();
         this._scene.detachControl();
-
+        this.currentCinematic = AllCinematicData.getData(indexCinematic);
         let scene = new Scene(this._engine);
-        let camera = new ArcRotateCamera("arcR", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene);
-        //camera.setTarget(new Vector3(0, 0, 0.2));
+        new CinematicScene(scene, this.currentCinematic);
+        if (this.currentCinematic.isSkippable()) {
+            // -- GUI button skip
+            const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+            guiMenu.idealHeight = 720;
+            const imageRect = new Rectangle("titleContainer");
+            imageRect.width = 1;
+            imageRect.thickness = 0;
+            guiMenu.addControl(imageRect);
+            const skipbtn = Button.CreateSimpleButton("start", "Passer");
+            skipbtn.fontFamily = "Trebuchet MS";
+            skipbtn.width = 0.2
+            skipbtn.height = "50px";
+            skipbtn.color = "white";
+            skipbtn.top = "-14px";
+            skipbtn.thickness = 0;
+            skipbtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            skipbtn.horizontalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            skipbtn.paddingRight = 20;
+            skipbtn.paddingBottom = 20;
 
-        let planeOpts = {
-            height: 12,
-            //width: 7.3967,
-            width: 22,
-            sideOrientation: Mesh.DOUBLESIDE
-        };
-        let backgroudopt = {
-            height: 1000,
-            //width: 7.3967,
-            width: 10000,
-            sideOrientation: Mesh.DOUBLESIDE
-        };
-        let ANote0Video = MeshBuilder.CreatePlane("plane", planeOpts, scene);
-        let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
+            imageRect.addControl(skipbtn);
 
-        let vidPos = (new Vector3(0, 0, 0.1))
-        ANote0Video.position = vidPos;
-        background.position = new Vector3(0, 0, 0.2);
-        let ANote0VideoMat = new StandardMaterial("m", scene);
-        let ANote0VideoVidTex = new VideoTexture("truc_mushe", "https://dl.dropbox.com/scl/fi/i7ltk5bf40pv8kbmj4gen/cinematic_intro_ls_ss.mp4?rlkey=40fph0epvxqs3m2slpy2c64yr&st=w0dwxn5u&dl=0", scene);
-
-        ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-        ANote0VideoMat.roughness = 1;
-        ANote0VideoMat.emissiveColor = Color3.White();
-        ANote0Video.material = ANote0VideoMat;
-
-        // -- GUI
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
-        const imageRect = new Rectangle("titleContainer");
-        imageRect.width = 1;
-        imageRect.thickness = 0;
-        guiMenu.addControl(imageRect);
-        const skipbtn = Button.CreateSimpleButton("start", "Passer");
-        skipbtn.fontFamily = "Trebuchet MS";
-        skipbtn.width = 0.2
-        skipbtn.height = "50px";
-        skipbtn.color = "white";
-        skipbtn.top = "-14px";
-        skipbtn.thickness = 0;
-        skipbtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        skipbtn.horizontalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        skipbtn.paddingRight = 20;
-        skipbtn.paddingBottom = 20;
-
-        imageRect.addControl(skipbtn);
-
-        skipbtn.onPointerDownObservable.add(async() => {
-            await this._goToStart();
-            scene.detachControl(); //observables disabled
-        });
-
-
+            skipbtn.onPointerDownObservable.add(async() => {
+                await this.goToSomething(this.currentCinematic.getWantedState());
+                scene.detachControl(); //observables disabled
+            });
+        }
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI();
@@ -384,19 +364,32 @@ export class App {
         // await this._goToGame();
         const startbg = new Image("startbg", "models/title_screen2.jpg");
         imageRect.addControl(startbg);
+        //--text---
+        let text = new TextBlock();
+        text.text = "Cliquez pour commencer"
+        text.color = "white";
+        text.fontSize = 20;
+        text.fontFamily = "Trebuchet MS";
+        text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        text.paddingBottom = 75;
+        text.shadowOffsetX = 1;
+        text.shadowBlur= 15;
+        imageRect.addControl(text);
 
+        //--START BUTTON ---
         const startBtn = Button.CreateSimpleButton("start", "");
         startBtn.fontFamily = "Viga";
-        startBtn.width = 1.5,
+        startBtn.width = 1.5;
         startBtn.height = 1.5;
         imageRect.addControl(startBtn);
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(async() => {
+            this._engine.displayLoadingUI();
+            scene.detachControl(); //observables disabled
             await this._setUpGame(this.START_LEVEL).then(res =>{
                 this._goToGame();
             });
-            scene.detachControl(); //observables disabled
         });
 
         //--SCENE FINISHED LOADING--
@@ -418,6 +411,8 @@ export class App {
         const environment = new Environment(scene, levelRessource);
         this._environment = environment;
         await this._environment.load(); //environment
+
+
         await this._loadCharacterAssets(scene);
 
         await this._game.setActiveLevel(levelName);
@@ -445,7 +440,7 @@ export class App {
 
 
             // TRUC QUI MARCEH MAIS ON COMMENTE POUR FAIRE UN TEST
-            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_22.glb", scene).then((result) => {
+            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_23.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -490,10 +485,10 @@ export class App {
 
     }
 
-    private async _initializeGameAsync(scene: Scene): Promise<void> {
+    private async _initializeGameAsync(scene: Scene, playerPosition: Vector3): Promise<void> {
         //temporary light to light the entire scene
-        var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
-        light0.diffuse = new Color3(35/255,67/255,131/255);
+        //var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        //light0.diffuse = new Color3(35/255,67/255,131/255);
         const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
         //light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
         light.intensity = 0;
@@ -503,13 +498,18 @@ export class App {
         shadowGenerator.darkness = 0.4;
 
         //Create the player
-        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
+        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, playerPosition);
 
         const camera = this._player.camera.activate();
+
+        this._game.initializeLevel();
+
+
     }
 
-    private async _goToGame(){
+    private async _goToGame(playerPosition?: Vector3){
         //--SETUP SCENE--
+        this._engine.displayLoadingUI();
         this._scene.detachControl();
         let scene = this._gamescene;
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098); // a color that fit the overall color scheme better
@@ -531,52 +531,6 @@ export class App {
         loseBtn.thickness = 0;
         loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         playerUI.addControl(loseBtn);*/
-        if (this.isPlayingMonolog){
-            const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("cutscene")
-            let text1 = new TextBlock();
-            text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-            text1.color = "#FFFDB6FF";
-            text1.fontSize = 34;
-            text1.fontFamily = "Trebuchet MS";
-            text1.shadowOffsetX = 1;
-            text1.shadowBlur= 15;
-            text1.shadowColor= "#594000FF";
-            text1.fontWeight = "bold";
-            text1.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
-            text1.paddingBottom = 100;
-            advancedTexture.addControl(text1)
-            await FadeText.fadeIn(text1);
-
-            const next = Button.CreateSimpleButton("next", ""); // TODO changer pour timer ?
-            next.width = 100;
-            next.height = 100;
-            advancedTexture.addControl(next);
-
-            next.onPointerUpObservable.add(async () => {
-                this.current_sentence_index++;
-                advancedTexture.addControl(text1);
-                await FadeText.fadeOut(text1);
-                if (this.current_monolog_index <= this.allMonolog.length - 1) {
-
-                    if (this.current_sentence_index > this.allMonolog[this.current_monolog_index].length - 1) {
-                        this.monolog_played[this.current_monolog_index] = true;
-                        this.current_monolog_index += 1;
-                        this.current_sentence_index = 0;
-                        this.isPlayingMonolog = false;
-                        text1.text = "";
-                        advancedTexture.addControl(text1);
-                        next.isVisible = false;
-                        advancedTexture.addControl(next); // TODO travailler les variables pour pouvoir afficher un autre dialogue à un autre moment.
-                    }
-                    else {
-                        text1.text = this.allMonolog[this.current_monolog_index][this.current_sentence_index];
-                        advancedTexture.addControl(text1);
-                        await FadeText.fadeIn(text1);
-                    }
-                }
-            })
-
-        }
         // Bouton pour tester le changement d'environnement
         const changeButton = Button.CreateSimpleButton("change", "CHANGE");
         changeButton.width = 0.2
@@ -599,7 +553,7 @@ export class App {
         });*/
 
         //primitive character and setting
-        await this._initializeGameAsync(scene);
+        await this._initializeGameAsync(scene, playerPosition);
 
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -647,18 +601,57 @@ export class App {
         this._scene = scene;
         this._state = State.LOSE;
     }
+    private async _goToThanks(): Promise<void> {
+        this._scene.detachControl();
+        let scene = new Scene(this._engine);
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+        camera.setTarget(Vector3.Zero());
 
-    public async changeGameScene(levelName: string, playerPosition?: Vector3) {
+        //--------GUI---------
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        guiMenu.idealHeight = 720;
+
+        //background image
+        const imageRect = new Rectangle("titleContainer");
+        imageRect.width = 1;
+        imageRect.thickness = 0;
+        guiMenu.addControl(imageRect);
+
+        //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
+        // await this._setUpGame(this.START_LEVEL);
+        // await this._goToGame();
+        const bg = new Image("bg", "/textures/thanks_for_playing (2).png");
+        imageRect.addControl(bg);
+        const draw = new Image("draw", "/textures/thanks_for_playing (1).png");
+        draw.height = "100%";
+        draw.stretch = Image.STRETCH_UNIFORM;
+        imageRect.addControl(draw);
+        //--SCENE FINISHED LOADING--
+        await scene.whenReadyAsync();
+        this._engine.hideLoadingUI();
+        //lastly set the current state to the start state and set the scene to the start scene
+        this._scene.dispose();
+        this._scene = scene;
+        this._state = State.START;
+    }
+
+    public async changeGameScene(levelName: string, spawnData?: SpawnData) {
         console.log("In changeGameScene");
-        this._game.displayLoadingUI();
+        this._engine.displayLoadingUI();
 
         await this._setUpGame(levelName);
         await this._goToGame();
 
         this._player.reset();
-        if (playerPosition !== undefined) this._player.setPosition(playerPosition);
 
-        this._game.hideLoadingUI();
+        if (spawnData !== undefined) {
+            this._player.setPosition(spawnData.position);
+            this._player.setMeshDirection(spawnData.direction);
+
+            if (spawnData.alpha) this._player.camera.setAlpha(spawnData.alpha);
+        }
+
+       this._engine.hideLoadingUI();
     }
 
     getEnvironment() {

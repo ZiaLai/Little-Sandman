@@ -16,6 +16,8 @@ export class PlayerCamera {
     private _raycastCollision: boolean = false;
     private _groundDetectionRadius: number;
     private _raycastRadius: number;
+    private _isActive: boolean = true;
+
 
 
 
@@ -166,6 +168,8 @@ export class PlayerCamera {
     }
 
     public update(): void {
+        if (! this._isActive) return;
+
         this._updatePosition();
         this._raycast();
         this._camera.radius = Math.min(this._raycastRadius, this._groundDetectionRadius);
@@ -174,7 +178,6 @@ export class PlayerCamera {
     }
 
     public activate(): ArcRotateCamera {
-        console.log("activating camera")
         this._scene.registerBeforeRender(() => {
             //console.log(this._player.mesh.position);
             this._player.beforeRenderUpdate();
@@ -188,5 +191,21 @@ export class PlayerCamera {
 
     getAlpha() {
         return this._camera.alpha;
+    }
+    public getCamera(){
+        return this._camera;
+    }
+
+    public disable(): void {
+        this._camera.detachControl();
+        this._isActive = false;
+    }
+
+    getIsActive(): boolean {
+        return this._isActive;
+    }
+
+    public setAlpha(alpha: number): void {
+        this._camera.alpha = alpha;
     }
 }
