@@ -3,6 +3,7 @@ import {Game} from "../game";
 import {Scalar, Tools, TransformNode, Vector3} from "@babylonjs/core";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 import {SpawnData} from "../SpawnData";
+import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 
 enum KnifeState {RISING, RISEN, FALLING, FALLEN}
 
@@ -22,6 +23,8 @@ export class SugarlessBakery extends AbstractLevel{
     private _knife: TransformNode;
     private _knifeState: KnifeState = KnifeState.RISING;
     private _knifeTimer: number = 0;
+    private _knifeCanCreateBreadSlicePlatform: boolean = true;
+    private _breadSlicePlatformTransformNode: TransformNode;
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -46,30 +49,41 @@ export class SugarlessBakery extends AbstractLevel{
     }
 
     update(): void {
-        for (let key in this._objects) {
-            for (let object of this._objects[key]) {
-                object.update();
-            }
+
+        for (const object of this._objects) {
+            object.update();
         }
 
         this._updateKnife();
 
-        console.log("player position :", this._game.getPlayerPosition());
+        // console.log("player position :", this._game.getPlayerPosition());
     }
 
     public initialize() {
+        const breadSlice: TransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
+        breadSlice.getChildMeshes().forEach(mesh => {
+            mesh.isVisible = false;
+        })
+
         this._initKnife();
+
+        this._breadSlicePlatformTransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
+        console.assert(this._breadSlicePlatformTransformNode);
+
+        //this._objects["bread_slice"] = [];
     }
 
     private _initKnife() {
         this._knife = this._game.getGameScene().getTransformNodeByName("knife");
         this._knife.rotationQuaternion = null;
         this._knife.position.y -= 5;
+
+        //console.log("GAME OBJECTS :", this._objects);
     }
 
     private _updateKnife() {
 
-        console.log("in update knife, state : ", this._knifeState);
+        //console.log("in update knife, state : ", this._knifeState);
         let x_rotation: number;
         switch (this._knifeState) {
             case KnifeState.RISING:
@@ -77,13 +91,20 @@ export class SugarlessBakery extends AbstractLevel{
 
                 this._knife.rotation = new Vector3(x_rotation, Tools.ToRadians(-180), Tools.ToRadians(-90));
                 if (this._knife.rotation.x > Tools.ToRadians(89)) {
-                    this._knifeState = KnifeState.FALLING;
+                    this._knifeState = KnifeState.RISEN;
                     this._knifeTimer = 0;
+                    this._knifeCanCreateBreadSlicePlatform = true;
                 }
                 break;
 
             case KnifeState.RISEN:
                 this._knifeTimer += this._game.getDeltaTime();
+                if (this._knifeTimer >= 1 && this._knifeCanCreateBreadSlicePlatform) {
+                    this._knifeCanCreateBreadSlicePlatform = false;
+
+
+                    this._objects.push(new BreadSlicePlatform(this._game, this._breadSlicePlatformTransformNode, new Vector3(21.2, 21.65, 26.81)))
+                }
                 if (this._knifeTimer >= 2) this._knifeState = KnifeState.FALLING;
                 break;
 
