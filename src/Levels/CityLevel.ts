@@ -28,12 +28,11 @@ export class CityLevel extends AbstractLevel{
     }
 
     protected _addTriggers() {
-        this._game.getEnvironment().getTriggers().forEach(m => {
-            if (m.name.includes("bakers_bedroom")) {
-                console.log("adding collide observable on : ", m.name);
-                m.actionManager = new ActionManager(this._game.getScene());
-                //this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom");
-                this.setMeshAsSwapMeshTrigger(m, "bakers_bedroom");
+        this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
+            if (mesh.name.includes("bakers_bedroom")) {
+                console.log("adding collide observable on : ", mesh.name);
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                this.setMeshAsChangeLevelTrigger(mesh, "bakers_bedroom");
             }
         })
     }
