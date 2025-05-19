@@ -29,9 +29,10 @@ import {TestRunner} from "./Test/TestRunner";
 import {AllMonolog} from "./data/AllMonolog";
 import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
+import {SpawnData} from "./SpawnData";
 import {Monolog} from "./util/Monolog";
-import {CinematicScene} from "./util/CInematicScene";
 import {State} from "./State";
+import {CinematicScene} from "./util/CInematicScene";
 import {AllCinematicData} from "./data/AllCInematicData";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 
@@ -182,8 +183,8 @@ export class App {
         //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
 
-    public async goToSomething(wantedSate): Promise<void> {
-        switch(wantedSate) {
+    public async goToSomething(wantedState): Promise<void> {
+        switch(wantedState) {
             //TODO ajouter en fonction des besoins
             case State.START :
                 await this._goToStart();
@@ -484,7 +485,7 @@ export class App {
 
     }
 
-    private async _initializeGameAsync(scene: Scene): Promise<void> {
+    private async _initializeGameAsync(scene: Scene, playerPosition: Vector3): Promise<void> {
         //temporary light to light the entire scene
         //var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
         //light0.diffuse = new Color3(35/255,67/255,131/255);
@@ -497,7 +498,7 @@ export class App {
         shadowGenerator.darkness = 0.4;
 
         //Create the player
-        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
+        this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, playerPosition);
 
         const camera = this._player.camera.activate();
 
@@ -506,7 +507,7 @@ export class App {
 
     }
 
-    private async _goToGame(){
+    private async _goToGame(playerPosition?: Vector3){
         //--SETUP SCENE--
         this._engine.displayLoadingUI();
         this._scene.detachControl();
@@ -552,7 +553,7 @@ export class App {
         });*/
 
         //primitive character and setting
-        await this._initializeGameAsync(scene);
+        await this._initializeGameAsync(scene, playerPosition);
 
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -634,7 +635,7 @@ export class App {
         this._state = State.START;
     }
 
-    public async changeGameScene(levelName: string, playerPosition?: Vector3) {
+    public async changeGameScene(levelName: string, spawnData?: SpawnData) {
         console.log("In changeGameScene");
         this._engine.displayLoadingUI();
 
@@ -643,7 +644,12 @@ export class App {
 
         this._player.reset();
 
-        if (playerPosition !== undefined) this._player.setPosition(playerPosition);
+        if (spawnData !== undefined) {
+            this._player.setPosition(spawnData.position);
+            this._player.setMeshDirection(spawnData.direction);
+
+            if (spawnData.alpha) this._player.camera.setAlpha(spawnData.alpha);
+        }
 
        this._engine.hideLoadingUI();
     }

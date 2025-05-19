@@ -1,7 +1,6 @@
 import {AbstractLevel} from "./Levels/AbstractLevel";
 import {SugarlessBakery} from "./Levels/SugarlessBakery";
-import {Environment} from "./environment";
-import {Engine, Scene, TransformNode, Vector3} from "@babylonjs/core";
+import {TransformNode, Vector3} from "@babylonjs/core";
 import {Player} from "./Player";
 import {CityLevel} from "./Levels/CityLevel";
 import {BakersBedroom} from "./Levels/BakersBedroom";
@@ -10,6 +9,7 @@ import {SpriteLoader} from "./SpriteLoader";
 import {App} from "./app";
 import {GameState} from "./GameState";
 import {AdvancedDynamicTexture, Button, Rectangle, StackPanel} from "@babylonjs/gui";
+import {GameObject} from "./GameObjects/GameObject";
 
 export class Game {
 
@@ -203,6 +203,18 @@ export class Game {
 
     public getDeltaTime(): number {
         return this.getPlayer().getDeltaTime();
+    }
+
+    public destroyGameObject(gameObject: GameObject) {
+        const index: number = this._levels[this._currentLevel].getObjects().indexOf(gameObject);
+        if (index !== -1) {
+            this._levels[this._currentLevel].getObjects().splice(index, 1);
+        }
+
+    }
+
+    public getCurrentLevel(): AbstractLevel {
+        return this._levels[this._currentLevel];
     }
 
 }

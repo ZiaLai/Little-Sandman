@@ -83,14 +83,16 @@ export class Player extends TransformNode {
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
     private _staminaBar;
 
-    constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator) {
+    constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
         super("player", scene);
         this.scene = scene;
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
 
-        this.mesh.position.y = 3.5   // Temporairement, en attendant qu'il y ait une startPos dans la ville
+        // this.mesh.position.y = 3.5   // Temporairement, en attendant qu'il y ait une startPos dans la ville
         //this.mesh.position = new Vector3(51, 18, 11);
+        if (playerPosition === undefined) playerPosition = new Vector3(0, 3.5, 0);
+        this.setPosition(playerPosition);
 
         this.mesh.parent = this;
 
@@ -661,10 +663,16 @@ export class Player extends TransformNode {
     }
 
     public setMeshDirection(direction: Vector3): void {
-        this.mesh.setDirection(direction);
+
+        this.mesh.rotationQuaternion = Quaternion.FromEulerAngles(direction.x, direction.y, direction.z);
+        //this.mesh.setDirection(direction);
     }
 
     public getInput(): PlayerInput {
         return this._inputs[this._currentInput];
     }
+
+    // public orientCamera(): void {
+    //     this.camera.setAlpha(this.getMeshDirection().z);
+    // }
 }

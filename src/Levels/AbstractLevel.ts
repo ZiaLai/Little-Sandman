@@ -1,10 +1,9 @@
-import {AbstractMesh, ActionManager, ExecuteCodeAction, Mesh, Scene, Vector3} from "@babylonjs/core";
-import {Environment} from "../environment";
+import {AbstractMesh, ActionManager, ExecuteCodeAction, Mesh} from "@babylonjs/core";
 import {Game} from "../game";
 import {GameObject} from "../GameObjects/GameObject";
-import {MusicPlayer} from "../AudioControl/MusicPlayer";
 import {Music} from "../AudioControl/Music";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
+import {SpawnData} from "../SpawnData";
 
 
 export abstract class AbstractLevel {
@@ -15,7 +14,8 @@ export abstract class AbstractLevel {
     protected _music: Music;
 
     protected _objectsMeshes: {};
-    protected _objects: {} = {}; // Dictionnaire de string name vers une liste de GameObjects
+    //protected _objects: {} = {}; // Dictionnaire de string name vers une liste de GameObjects
+    protected _objects: GameObject[] = [];
     private _id: number;
     private _loading: boolean;
 
@@ -74,13 +74,18 @@ export abstract class AbstractLevel {
         // console.log("root", root);
         // root?.dispose();
 
-        for (let key in this._objects) {
-            for (let object of this._objects[key]) {
-                object.destroy();
-            }
+        // for (let key in this._objects) {
+        //     for (let object of this._objects[key]) {
+        //         object.destroy();
+        //     }
+        // }
+
+        for (let object of this._objects) {
+            object.destroy();
         }
 
         if (this._music) this._music.destroy();
+
     }
 
     getName() {
@@ -95,7 +100,7 @@ export abstract class AbstractLevel {
 
     protected abstract _addTriggers(): void;
 
-    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, playerPosition?: Vector3) {
+    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, spawnData?: SpawnData) {
         const outerMesh = this._game.getGameScene().getMeshByName("outer");
 
         console.log("outerMesh", outerMesh);
@@ -109,7 +114,7 @@ export abstract class AbstractLevel {
                 },
                 () => {
                         // Changer le niveau
-                        this._game.getApp().changeGameScene(destination, playerPosition);
+                        this._game.getApp().changeGameScene(destination, spawnData);
                 },
             ),
         );
@@ -124,5 +129,9 @@ export abstract class AbstractLevel {
 
     protected _disablePlayerCamera(): void {
         this._game.getPlayer().disableCamera();
+    }
+
+    public getObjects() {
+        return this._objects
     }
 }

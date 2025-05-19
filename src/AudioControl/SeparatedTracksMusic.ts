@@ -38,7 +38,7 @@ export class SeparatedTracksMusic implements Music {
         }
 
         for (const elt of trackData) {
-            const sound: Sound = new Sound(elt[0], elt[1], this._scene, soundReady, {loop: true});
+            const sound: Sound = new Sound(elt[0], elt[1], this._scene, soundReady, {loop: true, spatialSound: false});
             this._tracks.push(sound);
         }
 
