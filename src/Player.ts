@@ -142,12 +142,14 @@ export class Player extends TransformNode {
         this._prevAnim = this._animations["walk"];
         this._animations["scarf_right"].play(true);
         this._animations["scarf_left"].play(true);
-        this._animations["idle"].play(false);
+        this._animations["idle"].play(true);
 }
     private _animatePlayer(){
 
+
         if (this._isStartingShooting) {
             this._currentAnim = this._animations["start_sand"];
+            ///this.sandEmetter.start();
         }
 
         else if (this._isEndingShooting) {
@@ -170,6 +172,7 @@ export class Player extends TransformNode {
             this.hoveringSandEmetter.start();
 
         }
+
         else if (this._isFalling){
              this._currentAnim = this._animations["fall_loop"];
              console.log("is falling")
@@ -219,7 +222,7 @@ export class Player extends TransformNode {
 }
     public setPosition(position: Vector3): void {
         console.log("set position", position);
-        this.mesh.position = position;
+        this.mesh.position.copyFrom(position);
     }
 
     // Calculs en fonction des inputs
@@ -653,4 +656,15 @@ export class Player extends TransformNode {
         }
     }
 
+    public disableCamera(): void {
+        this.camera.disable();
+    }
+
+    public setMeshDirection(direction: Vector3): void {
+        this.mesh.setDirection(direction);
+    }
+
+    public getInput(): PlayerInput {
+        return this._inputs[this._currentInput];
+    }
 }

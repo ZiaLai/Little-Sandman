@@ -3,6 +3,7 @@ import {Environment} from "../environment";
 import {Game} from "../game";
 import {Color3, HemisphericLight, PointLight, Scene, Vector3} from "@babylonjs/core";
 import {AdvancedDynamicTexture, Control, Image} from "@babylonjs/gui";
+import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 
 
 export class SugarlessBakery extends AbstractLevel{
@@ -10,13 +11,25 @@ export class SugarlessBakery extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "sugarless_bakery";
+        this._ressourceName = "bakery_level_02_01";
+
+        this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
+                                                [   ["piano1",  "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],
+                                                    ["piano2",  "./musics/sugarlessBakery/sugarless_bakery-Piano_2.ogg"           ],
+                                                    ["flute",   "./musics/sugarlessBakery/sugarless_bakery-Flûte.ogg"             ],
+                                                    ["bass",    "./musics/sugarlessBakery/sugarless_bakery-Basse.ogg"             ],
+                                                    ["battery", "./musics/sugarlessBakery/sugarless_bakery-Set_de_batterie.ogg"   ],
+                                                    ["guitar",  "./musics/sugarlessBakery/sugarless_bakery-Guitare_électrique.ogg"],
+                                                    ["violins", "./musics/sugarlessBakery/sugarless_bakery-Violons.ogg"           ]]);
         this._ressourceName = "bakery_level_11";
     }
 
     protected async load() {
-        super.load();
+        await super.load();
         // todo : charger la musique
         this.setUpGui();
+        this._music.play();
+        // this._upgradeMusic();
     }
 
     update(): void {

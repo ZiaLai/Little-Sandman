@@ -124,7 +124,7 @@ export class Game {
         //let newScene = new Scene(this._engine);
         // this._scene.dispose();
 
-        // this._levels[this._currentLevel].destroy();
+        this._levels[this._currentLevel].destroy();
 
         this._currentLevel = name;
 
@@ -195,6 +195,14 @@ export class Game {
             if (level.getName() === levelName) return level.getRessourceName();
         }
         return null;
+    }
+
+    public getPlayerPosition(): Vector3 {
+        return this.getPlayer().mesh.position;
+    }
+
+    public getDeltaTime(): number {
+        return this.getPlayer().getDeltaTime();
     }
 
 }

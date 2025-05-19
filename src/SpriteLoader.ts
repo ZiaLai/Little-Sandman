@@ -1,5 +1,5 @@
 import {Game} from "./game";
-import {Mesh, SceneLoader, Vector3} from "@babylonjs/core";
+import { SceneLoader, Vector3} from "@babylonjs/core";
 
 export class SpriteLoader {
     private _game: Game;
@@ -9,12 +9,16 @@ export class SpriteLoader {
     }
 
     public async loadSprite(fileName: string) {
-        return SceneLoader.ImportMeshAsync("", "./models/", fileName, this._game.getScene()).then((result) => {
+        return SceneLoader.ImportMeshAsync("", "./models/", fileName, this._game.getGameScene()).then((result) => {
 
             const mesh = result.meshes[0];
             mesh.rotationQuaternion = null;
             mesh.position = Vector3.Zero();
-            return mesh;
+
+            return {
+                mesh: mesh,
+                animationGroups: result.animationGroups
+            };
         })
     }
 

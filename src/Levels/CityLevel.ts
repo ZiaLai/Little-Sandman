@@ -13,10 +13,18 @@ import {AllMonolog} from "../data/AllMonolog";
 
 export class CityLevel extends AbstractLevel{
 
+    private _skateparkMusic: Music;
+    public static SKATEPARK_SPAWN_POSITION: Vector3 = new Vector3(20, -45, 378);
+
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city_v23";
+        this._ressourceName = "city";
+
+        this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', './musics/city/city_intro.ogg'],
+                                                                  ['loop', './musics/city/city_loop.ogg'  ] ]);
+
+        // this._skateparkMusic = new LoopMusic(this._game.)
     }
 
     protected async load() {
@@ -27,6 +35,9 @@ export class CityLevel extends AbstractLevel{
         console.log("after adding triggers");
         this.introduction();
         AllMonolog.play(0);// TODO jouer dialogue uniquement à la fin de l'introduction
+
+        this._music.play();
+
         this._finishedLoading();
     }
 
@@ -42,7 +53,7 @@ export class CityLevel extends AbstractLevel{
             if (m.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", m.name);
                 m.actionManager = new ActionManager(this._game.getScene());
-                this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom");
+                this.setMeshAsChangeLevelTrigger(m, "bakers_bedroom", BakersBedroom.START_POSITION);
             }
         })
     }
@@ -115,7 +126,6 @@ export class CityLevel extends AbstractLevel{
         // TODO trouver position de départ de la cam;
         let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._game.getGameScene());
         this._game.getGameScene().activeCamera = camera;
-
     }
 
 }

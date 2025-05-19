@@ -500,6 +500,10 @@ export class App {
         this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator);
 
         const camera = this._player.camera.activate();
+
+        this._game.initializeLevel();
+
+
     }
 
     private async _goToGame(){
@@ -558,7 +562,7 @@ export class App {
         this._scene.dispose();
         this._state = State.GAME;
         this._scene = scene;
-        this._engine.hideLoadingUI();
+        //this._engine.hideLoadingUI();
 
         //the game is ready, attach control back
         //this._startMusic();
@@ -638,9 +642,10 @@ export class App {
         await this._goToGame();
 
         this._player.reset();
+
         if (playerPosition !== undefined) this._player.setPosition(playerPosition);
 
-        this._game.hideLoadingUI();
+       this._game.hideLoadingUI();
     }
 
     getEnvironment() {
