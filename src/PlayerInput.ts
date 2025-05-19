@@ -7,12 +7,10 @@ export abstract class PlayerInput {
     public horizontal: number;
     public horizontalAxis: number;
     public inputMap: {};
-    public dashing: boolean;
+
     public jumpKeyDown: boolean;
     public hoverKeyDown: boolean;
     public actionKeyDown: boolean;
-    public isShooting: boolean = false;
-
 
     // Camera values
     public camVertical : number;

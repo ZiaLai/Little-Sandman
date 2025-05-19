@@ -8,9 +8,10 @@ import {SpawnData} from "../SpawnData";
 import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 
 enum KnifeState {RISING, RISEN, FALLING, FALLEN}
+import {ActionManager, Mesh} from "@babylonjs/core";
 
 
-export class SugarlessBakery extends AbstractLevel{
+export class SugarlessBakery extends AbstractLevel {
     nb_nightmare_found = 0;
 
     // todo : décomenter
@@ -46,6 +47,8 @@ export class SugarlessBakery extends AbstractLevel{
 
     protected async load() {
         await super.load();
+        this._addTriggers();
+        //this._finishedLoading();
         // todo : charger la musique
         this.setUpGui();
         this._music.play();
@@ -129,6 +132,13 @@ export class SugarlessBakery extends AbstractLevel{
     }
 
     protected _addTriggers(): void {
+        //element_nightmare1 element_dream1 element_dream1_collider_trigger
+        this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
+            if (mesh.name.includes("collider_trigger")) {
+                console.log("adding swap collide observable on : ", mesh.name);
+                this.setMeshAsSwapMeshTrigger(mesh);
+            }
+        })
     }
 
     protected setUpLights(): void {

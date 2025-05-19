@@ -67,19 +67,6 @@ export abstract class AbstractLevel {
     protected abstract setUpSkydome():void;
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
-
-        console.log('in destroy');
-
-        // const root = this._game.getScene().getTransformNodeById("__root__"); // Todo : débugguer ce truc
-        // console.log("root", root);
-        // root?.dispose();
-
-        // for (let key in this._objects) {
-        //     for (let object of this._objects[key]) {
-        //         object.destroy();
-        //     }
-        // }
-
         for (let object of this._objects) {
             object.destroy();
         }
@@ -100,13 +87,13 @@ export abstract class AbstractLevel {
 
     protected abstract _addTriggers(): void;
 
-    protected setMeshAsChangeLevelTrigger(m: Mesh, destination: string, spawnData?: SpawnData) {
+    protected setMeshAsChangeLevelTrigger(mesh: Mesh, destination: string, spawnData?: SpawnData) {
         const outerMesh = this._game.getGameScene().getMeshByName("outer");
 
         console.log("outerMesh", outerMesh);
         console.assert(outerMesh instanceof AbstractMesh);
 
-        m.actionManager.registerAction(
+        mesh.actionManager.registerAction(
             new ExecuteCodeAction(
                 {
                     trigger: ActionManager.OnIntersectionEnterTrigger,
@@ -118,6 +105,32 @@ export abstract class AbstractLevel {
                 },
             ),
         );
+    }
+
+    protected setMeshAsSwapMeshTrigger(mesh: Mesh) {
+        let shootingSystem = this._game.getApp().getShootingSystem()
+        mesh.registerBeforeRender(() => {
+            let shootingRay = shootingSystem.getShootingRay();
+            if (shootingRay && !shootingSystem.isInteracting()) {
+                let hitResult = shootingRay.intersectsMesh(mesh);
+                if (hitResult.hit) {
+                    shootingSystem.setIsInteracting(true);
+                    //this._game.getApp().changeGameScene(destination, playerPosition).then(() => shootingSystem.setIsInteracting(false));
+                    let meshName = mesh.name.split("_");
+                    let index = meshName[1].charAt(meshName[1].length - 1);
+                    let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index)
+                    let elementDream = this._game.getScene().getTransformNodeByName(meshName[0] + "_" + meshName[1])
+                    elementNightMare.getChildMeshes().forEach(mesh => {
+                        mesh.isVisible = false;
+                    })
+                    elementDream.getChildMeshes().forEach(mesh => {
+                        mesh.isVisible = true;
+                    })
+                    shootingSystem.setIsInteracting(false);
+                    console.log("swap done");
+                }
+            }
+        })
     }
 
 
