@@ -44,8 +44,6 @@ export class KeyboardInput extends PlayerInput {
         scene.onBeforeRenderObservable.add(() => {
             this._updateFromKeyboard();
         })
-
-        this._updateFromMouse(scene)
     }
 
     private _updateFromKeyboard(): void {
@@ -129,30 +127,7 @@ export class KeyboardInput extends PlayerInput {
 
     }
 
-    private _updateFromMouse(scene : Scene): void {
-        let left = 0;
-        let right = 2;
-        scene.onPointerDown = (e) => {
 
-            if (e.button === left) {
-                this.isShooting = true;
-                console.log("left click");
-            }
-
-            if (e.button === right) {
-                console.log("right click");
-            }
-        }
-
-        scene.onPointerUp = (e) => {
-            if (e.button === left) {
-                this.isShooting = false;
-            }
-            if (e.button === right) {
-
-            }
-        }
-    }
 
     public reset() {
         for (let key in this.inputMap) {

@@ -1,4 +1,4 @@
-import {Scene, Mesh, Vector3, SceneLoader, AbstractMesh} from "@babylonjs/core";
+import {Scene, Mesh, Vector3, SceneLoader, AbstractMesh, StandardMaterial} from "@babylonjs/core";
 
 export class Environment {
     private _scene: Scene;
@@ -32,39 +32,54 @@ export class Environment {
         ground.scaling = new Vector3(0.1, .02, 0.1);
         this._assets = await this._loadAsset();
         // Loop through all environment meshes that were imported
-        this._assets.allMeshes.forEach((m) => {
-            m.receiveShadows = true;
-            m.checkCollisions = true;
+        this._assets.allMeshes.forEach((mesh: Mesh) => {
+            mesh.receiveShadows = true;
+            mesh.checkCollisions = true;
+            console.log("name ", mesh.name);
 
-            if (m.name.includes("debug")) {
+            if (mesh.name.includes("collider") && mesh.name.includes("trigger")) {
+                mesh.isVisible = true;
+                mesh.isPickable = true;
+                let material: StandardMaterial = new StandardMaterial("transparent", this._scene);
+                material.alpha = 0;
+                mesh.material = material;
+                this._triggers.push(mesh);
+            }
+
+            else if (mesh.name.includes("debug")) {
                 const activateDebug = false;
 
-                m.isVisible = activateDebug;
-                m.isPickable = activateDebug;
-                m.checkCollisions = activateDebug;
+                mesh.isVisible = activateDebug;
+                mesh.isPickable = activateDebug;
+                mesh.checkCollisions = activateDebug;
             }
-            else if (m.name.includes("collider")) {
+            else if (mesh.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                m.isVisible = false;
-                m.isPickable = true;
+                mesh.isVisible = false;
+                mesh.isPickable = true;
             }
 
-            else if (m.name.includes("regularSolid")) {
-                m.isPickable = true;
+            else if (mesh.name.includes("regularSolid")) {
+                mesh.isPickable = true;
             }
-            else if (m.name.includes("trigger")) {
-                m.visible = true;
-                m.isPickable = false;
-                m.checkCollisions = false;
-                this._triggers.push(m);
+
+            else if (mesh.name.includes("trigger")) {
+                mesh.isVisible = false;
+                mesh.isPickable = true;
+                mesh.checkCollisions = false;
+                this._triggers.push(mesh);
+            }
+            else if (mesh.name.includes("dream")) {
+                mesh.isVisible = false;
+                mesh.isPickable = false;
             }
 
             else {
                 // Tous les autres mesh ne vérifient pas les collisions
                // m.isPickable = false;
-                m.isVisible = true;
-                m.checkCollisions = false;
-                m.isPickable = false;
+                mesh.isVisible = true;
+                mesh.checkCollisions = false;
+                mesh.isPickable = true;
             }
 
             // if (m.name.includes("immaterial")) {

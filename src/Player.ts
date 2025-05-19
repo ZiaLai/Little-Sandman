@@ -7,13 +7,14 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3, Matrix, Tools
+    Vector3, Matrix, Tools, RayHelper, PickWithRay
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
 import {GamepadInput} from "./GamepadInput";
 import {PlayerCamera} from "./PlayerCamera";
 import {Sand} from "./util/Sand";
+import {ShootingSystem} from "./ShootingSystem";
 import {StaminaBar} from "./util/StaminaBar";
 
 export class Player extends TransformNode {
@@ -73,8 +74,6 @@ export class Player extends TransformNode {
     private _wasShootingLastFrame: boolean = false;
     private _shootAnimationTimer: number;
 
-
-
     private _animations: {};
     private _currentAnim;
     private _prevAnim;
@@ -107,7 +106,8 @@ export class Player extends TransformNode {
         this._inputs[this._currentInput].isActive = true;
         this._inputs[1 - this._currentInput].isActive = false;
 
-        this._animations = { "end_sand" : assets.animationGroups[0],
+        this._animations = {
+            "end_sand" : assets.animationGroups[0],
             "fall_loop" : assets.animationGroups[1],
             "idle": assets.animationGroups[2],
             "jump": assets.animationGroups[3],
@@ -117,7 +117,8 @@ export class Player extends TransformNode {
             "start_sand": assets.animationGroups[7],
             "walk": assets.animationGroups[8],
             "scarf_left": assets.animationGroups[9],
-            "scarf_right": assets.animationGroups[10]};
+            "scarf_right": assets.animationGroups[10]
+        };
 
         this._setUpAnimations();
 
@@ -299,32 +300,35 @@ export class Player extends TransformNode {
     }
 
 
-    beforeRenderUpdate(): void {
-        //console.log("deltaTime : " + this._deltaTime);
+    beforeRenderUpdate(shootingSystem: ShootingSystem): void {
+        /* console.log("current input : ", this._currentInput);
+        console.log("player inputs : ", this._inputs); */
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
-        //console.log("Player pos", this.mesh.position);
-        this.updateStates();
+        this.updateStates(shootingSystem);
+        shootingSystem.getRayFromShooting(this._scene, this.mesh.position, this.getMeshDirection());
         this.updateSandEmetter();
         this.updateStaminaBar();
 
     }
 
-    private updateStates() {
+
+
+    private updateStates(shootingSystem: ShootingSystem) {
         if (this._gravity.y <= 0) {
             this._isJumping = false;
         }
         this._isFalling = (!this._isJumping) && this._falling > 0;
 
-        if (this._inputs[this._currentInput].isShooting && !this._wasShootingLastFrame) { // Le joueur commence à shooter
+        if (shootingSystem.isShooting() && !this._wasShootingLastFrame) { // Le joueur commence à shooter
             this._shootAnimationTimer = 0;
             this._wasShootingLastFrame = true;
             this._isStartingShooting = true
             this._isShooting = false;
         }
 
-        else if ((this._inputs[this._currentInput].isShooting && this._wasShootingLastFrame && !this._isShooting) || this._isStartingShooting) { // Le joueur continue de shooter
+        else if ((shootingSystem.isShooting() && this._wasShootingLastFrame && !this._isShooting) || this._isStartingShooting) { // Le joueur continue de shooter
             this._shootAnimationTimer += this._deltaTime;
             this._wasShootingLastFrame = true;
 
@@ -335,7 +339,7 @@ export class Player extends TransformNode {
             }
         }
 
-        else if (this._isShooting && (! this._inputs[this._currentInput].isShooting)) { // Le joueur s'arrête de shooter
+        else if (this._isShooting && (! shootingSystem.isShooting())) { // Le joueur s'arrête de shooter
             this._shootAnimationTimer = 0;
             this._isEndingShooting = true;
             this._isShooting = false;
@@ -349,7 +353,7 @@ export class Player extends TransformNode {
         }
 
 
-        if (! this._inputs[this._currentInput].isShooting) { // Arrête de shooter
+        if (! shootingSystem.isShooting()) { // Arrête de shooter
             this._wasShootingLastFrame = false;
         }
        // console.log("shot anim timer =", this._shootAnimationTimer,"startShooting =", this._isStartingShooting, " shooting =", this._isShooting, "end shooting =", this._isEndingShooting, "was shooting last_frame", this._wasShootingLastFrame );

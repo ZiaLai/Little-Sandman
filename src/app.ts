@@ -18,7 +18,6 @@ import {
     Quaternion,
     Matrix,
     SceneLoader, SceneOptimizer, Sound, VideoTexture, PointerEventTypes, Texture,
-    Effect,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
@@ -34,6 +33,7 @@ import {Monolog} from "./util/Monolog";
 import {State} from "./State";
 import {CinematicScene} from "./util/CInematicScene";
 import {AllCinematicData} from "./data/AllCInematicData";
+import {ShootingSystem} from "./ShootingSystem";
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 
 export class App {
@@ -49,6 +49,7 @@ export class App {
     private _environment;
     private _player: Player;
     private _game: Game;
+    private _shootingSystem: ShootingSystem;
 
     //Scene - related
     private _state: number = 0;
@@ -94,6 +95,7 @@ export class App {
         // run the main render loop
         // Instanciation de la classe game
         this._game = new Game(this);
+        this._shootingSystem = new ShootingSystem();
 
         this._main();
     }
@@ -499,11 +501,9 @@ export class App {
 
         //Create the player
         this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, playerPosition);
-
-        const camera = this._player.camera.activate();
-
+        this._shootingSystem.registerPointerEvent(scene);
+        const camera = this._player.camera.activate(this._shootingSystem);
         this._game.initializeLevel();
-
 
     }
 
@@ -672,6 +672,10 @@ export class App {
 
     getPlayer() {
         return this._player;
+    }
+
+    getShootingSystem(): ShootingSystem {
+        return this._shootingSystem;
     }
 }
 new App();
