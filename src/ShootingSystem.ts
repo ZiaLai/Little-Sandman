@@ -33,7 +33,7 @@ export class ShootingSystem {
 
     public getRayFromShooting(scene: Scene, position: Vector3, direction: Vector3): void {
         if (this._isShooting) {
-            this._shootingRay = new Ray(position, direction, 2);
+            this._shootingRay = new Ray(position, direction, 3);
             let rayHelper = new RayHelper(this._shootingRay);
             rayHelper.show(scene);
         }
