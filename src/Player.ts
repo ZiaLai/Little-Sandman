@@ -310,10 +310,7 @@ export class Player extends TransformNode {
         shootingSystem.getRayFromShooting(this._scene, this.mesh.position, this.getMeshDirection());
         this.updateSandEmetter();
         this.updateStaminaBar();
-
     }
-
-
 
     private updateStates(shootingSystem: ShootingSystem) {
         if (this._gravity.y <= 0) {

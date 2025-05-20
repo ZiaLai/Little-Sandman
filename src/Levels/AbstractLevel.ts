@@ -110,6 +110,7 @@ export abstract class AbstractLevel {
     protected setMeshAsSwapMeshTrigger(mesh: Mesh) {
         let shootingSystem = this._game.getApp().getShootingSystem()
         mesh.registerBeforeRender(() => {
+            console.log("SwapMesh, In before render ");
             let shootingRay = shootingSystem.getShootingRay();
             if (shootingRay && !shootingSystem.isInteracting()) {
                 let hitResult = shootingRay.intersectsMesh(mesh);

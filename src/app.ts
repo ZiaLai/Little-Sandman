@@ -42,8 +42,6 @@ export class App {
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
 
-    private _input: PlayerInput;
-
     //Game State Related
     public assets;
     private _environment;
@@ -54,8 +52,6 @@ export class App {
     //Scene - related
     private _state: number = 0;
     private _gamescene: Scene;
-    private _cutScene: Scene;
-    private _lastFrameTime: number = 0;
     private _sceneOptimizer;
 
     // TIMER FRAUDE
@@ -441,7 +437,6 @@ export class App {
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
 
-            // TRUC QUI MARCEH MAIS ON COMMENTE POUR FAIRE UN TEST
             return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_23.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
@@ -522,16 +517,7 @@ export class App {
         //dont detect any inputs from this ui while the game is loading
         scene.detachControl();
 
-        //create a simple button
-        /*const loseBtn = Button.CreateSimpleButton("lose", "LOSE");
-        loseBtn.width = 0.2
-        loseBtn.height = "40px";
-        loseBtn.color = "white";
-        loseBtn.top = "-14px";
-        loseBtn.thickness = 0;
-        loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        playerUI.addControl(loseBtn);*/
-        // Bouton pour tester le changement d'environnement
+        // Bouton pour tester le changement d'environnement // TODO virrer quand on aura fini dev
         const changeButton = Button.CreateSimpleButton("change", "CHANGE");
         changeButton.width = 0.2
         changeButton.height = "40px";
