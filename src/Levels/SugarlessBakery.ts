@@ -12,7 +12,7 @@ import {ActionManager, Mesh} from "@babylonjs/core";
 
 
 export class SugarlessBakery extends AbstractLevel {
-    nb_nightmare_found = 0;
+    private _nbNightmareFound: number = 0;
 
     // todo : décomenter
     // public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
@@ -134,9 +134,34 @@ export class SugarlessBakery extends AbstractLevel {
     protected _addTriggers(): void {
         //element_nightmare1 element_dream1 element_dream1_collider_trigger
         this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
+            let colliderTriggerEffect = (mesh: Mesh) => {
+                let meshName = mesh.name.split("_");
+                let index = meshName[1].charAt(meshName[1].length - 1);
+                let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index)
+                let elementDream = this._game.getScene().getTransformNodeByName(meshName[0] + "_" + meshName[1])
+                let willAdd: boolean = false;
+                elementNightMare.getChildMeshes().forEach(mesh => {
+                    mesh.isVisible = false;
+                })
+                elementDream.getChildMeshes().forEach(mesh => {
+                    if (! mesh.isVisible) {
+                        willAdd = true;
+                        mesh.isVisible = true;
+                    }
+                    else {
+                        willAdd = false;
+                    }
+                })
+                if (willAdd) {
+                    this._nbNightmareFound++;
+                    this.setUpGui();
+                    this._upgradeMusic();
+                }
+                console.log("swap done", this._nbNightmareFound);
+            }
             if (mesh.name.includes("collider_trigger")) {
                 console.log("adding swap collide observable on : ", mesh.name);
-                this.setMeshAsSwapMeshTrigger(mesh);
+                this.setMeshAsSwapMeshTrigger(mesh, colliderTriggerEffect);
             }
         })
     }
@@ -162,7 +187,7 @@ export class SugarlessBakery extends AbstractLevel {
     private setUpGui(): void {
         const ui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-        const compteur = new Image("compteur", "/textures/compteur-"+this.nb_nightmare_found+".png");
+        const compteur = new Image("compteur", "/textures/compteur-"+this._nbNightmareFound+".png");
         compteur.width = "25%";
         compteur.height = "25%";
         compteur.stretch = Image.STRETCH_UNIFORM;
