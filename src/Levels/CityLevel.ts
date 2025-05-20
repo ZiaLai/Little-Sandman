@@ -86,7 +86,7 @@ export class CityLevel extends AbstractLevel{
             if (mesh.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", mesh.name);
                 mesh.actionManager = new ActionManager(this._game.getScene());
-                this.setMeshAsChangeLevelTrigger(mesh, "bakers_bedroom");
+                this.setMeshAsChangeLevelTrigger(mesh, "bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
             }
         })
     }
