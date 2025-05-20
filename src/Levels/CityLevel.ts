@@ -21,11 +21,11 @@ enum CityLocation {SKATEPARK, CITY}
 export class CityLevel extends AbstractLevel{
 
     private _skateparkMusic: Music;
-    public static SKATEPARK_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(20, 1, -378),
+    public static SKATEPARK_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(21.79, 0.84, -376.14),
                                                                   new Vector3(0, 0, 0),
                                                                   -1.557);
 
-    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 13.55, -30.75),
+    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 60, -30.75),
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
@@ -78,10 +78,6 @@ export class CityLevel extends AbstractLevel{
             this._skateparkMusic.play();
 
             this._playTutorial = false;
-
-            if (this._music instanceof IntroLoopMusic) {
-                this._music.skipIntro = true;
-            }
         }
         else {
             this._subLocation = CityLocation.CITY;
@@ -90,10 +86,6 @@ export class CityLevel extends AbstractLevel{
             this._skateparkEntranceTriggerActive = false;
 
             this._music.play();
-
-            if (this._music instanceof IntroLoopMusic) {
-                this._music.skipIntro = false;
-            }
         }
 
         console.log("player position :", this._game.getPlayer().mesh.position);
@@ -143,20 +135,20 @@ export class CityLevel extends AbstractLevel{
 
 
 
-                        this._playCityEntranceCinematic = false;
+
                     }
 
                     this._subLocation = CityLocation.CITY;
                     this._skateparkMusic.destroy();
 
-                    this._music.play();
+                    if (this._music instanceof IntroLoopMusic) {
+                        this._music.play(this._playCityEntranceCinematic); // Si on joue la cinématique, on skip l'intro, sinon on la joue
+                    }
+
+                    this._playCityEntranceCinematic = false;
 
                     this._skateparkExitTriggerActive = false;
                     this._skateparkEntranceTriggerActive = true;
-
-                    if (this._music instanceof IntroLoopMusic) {
-                        this._music.skipIntro = false;
-                    }
                 }
                 this.setMeshAsExecuteActionTrigger(mesh, exitAction);
             }

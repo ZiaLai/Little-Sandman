@@ -8,8 +8,6 @@ export class IntroLoopMusic implements Music {
 
     private _musicData: any; // Liste [[intro_name, intro_path], [loop_name, loop_path]]
 
-    public skipIntro: boolean = false;
-
     constructor(scene: Scene, musicData: any) {
         this._scene = scene;
 
@@ -17,7 +15,7 @@ export class IntroLoopMusic implements Music {
 
     }
 
-    private _initMusic() {
+    private _initMusic(skipIntro?: boolean) {
 
         let soundsReady = 0;
 
@@ -28,7 +26,7 @@ export class IntroLoopMusic implements Music {
             console.log("soundReady : " + soundsReady);
             if (soundsReady === 2) {
 
-                if (! self.skipIntro) {
+                if (! skipIntro) {
                     self._intro.play();
 
                     self._intro.onEndedObservable.add(() => {
@@ -48,8 +46,8 @@ export class IntroLoopMusic implements Music {
         this._loop = loop;
     }
 
-    play(): void {
-        this._initMusic();
+    play(skipIntro?: boolean): void {
+        this._initMusic(skipIntro);
     }
 
     destroy(): void {
