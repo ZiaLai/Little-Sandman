@@ -33,7 +33,7 @@ export class Player extends TransformNode {
     private static PLAYER_SPEED: number = 12;
     private static GRAVITY: number = -30;
     private static JUMP_FORCE: number = 15.6;
-    private static HOVER_TIME: number = 1; // Durée max de l'hovering (en secondes)
+    private static HOVER_TIME: number = 2; // Durée max de l'hovering (en secondes)
 
     // player movement vars
     private _deltaTime: number = 0;
