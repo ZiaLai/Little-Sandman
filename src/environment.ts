@@ -79,7 +79,7 @@ export class Environment {
                // m.isPickable = false;
                 mesh.isVisible = true;
                 mesh.checkCollisions = false;
-                mesh.isPickable = true;
+                mesh.isPickable = false;
             }
 
             // if (m.name.includes("immaterial")) {
