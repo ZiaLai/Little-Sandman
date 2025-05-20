@@ -108,7 +108,7 @@ export abstract class AbstractLevel {
     }
 
     protected setMeshAsSwapMeshTrigger(mesh: Mesh, triggerEffect: (mesh: Mesh) => void) {
-        let shootingSystem = this._game.getApp().getShootingSystem()
+        let shootingSystem = this._game.getApp().getShootingSystem();
         mesh.registerBeforeRender(() => {
             let shootingRay = shootingSystem.getShootingRay();
             if (shootingRay && !shootingSystem.isInteracting()) {
@@ -117,7 +117,7 @@ export abstract class AbstractLevel {
                     triggerEffect(mesh);
                 }
             }
-        })
+        });
     }
 
 

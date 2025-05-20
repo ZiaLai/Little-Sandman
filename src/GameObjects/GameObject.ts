@@ -14,7 +14,7 @@ export abstract class GameObject {
     protected _parentNode;
 
     constructor(game: Game, parentNode: TransformNode, startPosition: Vector3) {
-        console.log("Creating GameObject");
+        //console.log("Creating GameObject");
 
         this._game = game;
 
@@ -78,7 +78,7 @@ export abstract class GameObject {
 
         this._game.destroyGameObject(this);
 
-        console.log("Game object destroyed", this._game.getCurrentLevel().getObjects());
+        //console.log("Game object destroyed", this._game.getCurrentLevel().getObjects());
 
     }
 

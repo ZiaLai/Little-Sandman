@@ -1,6 +1,6 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {Color3, HemisphericLight, PointLight, Scene, Vector3} from "@babylonjs/core";
+import {AbstractMesh, Color3, HemisphericLight, PointLight, Scene, Vector3} from "@babylonjs/core";
 import {AdvancedDynamicTexture, Control, Image} from "@babylonjs/gui";
 import {Scalar, Tools, TransformNode} from "@babylonjs/core";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
@@ -8,6 +8,9 @@ import {SpawnData} from "../SpawnData";
 import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 
 enum KnifeState {RISING, RISEN, FALLING, FALLEN}
+
+enum BarsState {CLOSED, OPENING, OPENED}
+
 import {ActionManager, Mesh} from "@babylonjs/core";
 
 
@@ -15,20 +18,23 @@ export class SugarlessBakery extends AbstractLevel {
     private _nbNightmareFound: number = 0;
 
     // todo : décomenter
-    // public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
-    //                                                              new Vector3(0, 180, 0),
-    //                                                              1.6);
+    public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
+                                                                 new Vector3(0, 180, 0),
+                                                                 1.6);
 
     // todo : supprimer
-    public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(0, 0, 0),
-        new Vector3(0, 180, 0),
-        1.6);
+    // public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(0, 0, 0),
+    //     new Vector3(0, 180, 0),
+    //     1.6);
 
     private _knife: TransformNode;
     private _knifeState: KnifeState = KnifeState.RISING;
     private _knifeTimer: number = 0;
     private _knifeCanCreateBreadSlicePlatform: boolean = true;
     private _breadSlicePlatformTransformNode: TransformNode;
+    private _barsMesh: AbstractMesh;
+    private _barsState: BarsState;
+
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -63,6 +69,8 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._updateKnife();
 
+        this._updateBars();
+
         // console.log("player position :", this._game.getPlayerPosition());
     }
 
@@ -77,7 +85,18 @@ export class SugarlessBakery extends AbstractLevel {
         this._breadSlicePlatformTransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         console.assert(this._breadSlicePlatformTransformNode);
 
+
+
+        this._initBars();
+
         //this._objects["bread_slice"] = [];
+    }
+
+    private _initBars(): void {
+        this._barsMesh = this._game.getGameScene().getMeshByName("bars_regularSolid");
+        console.assert(this._barsMesh);
+
+        this._barsState = BarsState.CLOSED;
     }
 
     private _initKnife() {
@@ -131,14 +150,27 @@ export class SugarlessBakery extends AbstractLevel {
         }
     }
 
+    private _updateBars() {
+        switch (this._barsState) {
+            case BarsState.CLOSED:
+                break;
+            case BarsState.OPENING:
+                this._barsMesh.position.y += 1.5 * this._game.getDeltaTime();
+                if (this._barsMesh.position.y >= 10) this._barsState = BarsState.OPENED;
+                break;
+            case BarsState.OPENED:
+                break;
+        }
+    }
+
     protected _addTriggers(): void {
         //element_nightmare1 element_dream1 element_dream1_collider_trigger
         this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
             let colliderTriggerEffect = (mesh: Mesh) => {
                 let meshName = mesh.name.split("_");
                 let index = meshName[1].charAt(meshName[1].length - 1);
-                let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index)
-                let elementDream = this._game.getScene().getTransformNodeByName(meshName[0] + "_" + meshName[1])
+                let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index);
+                let elementDream = this._game.getScene().getTransformNodeByName(meshName[0] + "_" + meshName[1]);
                 let willAdd: boolean = false;
                 elementNightMare.getChildMeshes().forEach(mesh => {
                     mesh.isVisible = false;
@@ -157,12 +189,25 @@ export class SugarlessBakery extends AbstractLevel {
                     this.setUpGui();
                     this._upgradeMusic();
                 }
-                console.log("swap done", this._nbNightmareFound);
+                //console.log("swap done", this._nbNightmareFound);
+
             }
+
+            if (mesh.name.includes("element_dream6")) {
+                const baseEffect = colliderTriggerEffect;
+
+                colliderTriggerEffect = (mesh: Mesh) => {
+                    baseEffect(mesh);
+                    this._barsState = BarsState.OPENING;
+                }
+            }
+
             if (mesh.name.includes("collider_trigger")) {
-                console.log("adding swap collide observable on : ", mesh.name);
+                //console.log("adding swap collide observable on : ", mesh.name);
                 this.setMeshAsSwapMeshTrigger(mesh, colliderTriggerEffect);
             }
+
+
         })
     }
 

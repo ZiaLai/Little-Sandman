@@ -29,7 +29,7 @@ export class BreadSlicePlatform extends GameObject {
         //console.log("updating breadslice, state", this._currentState, Tools.ToDegrees(this._parentNode.rotationQuaternion.toEulerAngles().x));
         switch(this._currentState) {
             case BreadState.SPAWNING:
-                console.log("SPAWNING", this._parentNode.position);
+               // console.log("SPAWNING", this._parentNode.position);
                 this._move();
                 if (this._parentNode.position.x <=  19.02) {
                     this._parentNode.position.x = 19.02
