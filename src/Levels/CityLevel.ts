@@ -16,6 +16,8 @@ import {LoopMusic} from "../AudioControl/LoopMusic";
 import {SpawnData} from "../SpawnData";
 import {IntroLoopMusic} from "../AudioControl/IntroLoopMusic";
 
+enum CityLocation {SKATEPARK, CITY}
+
 export class CityLevel extends AbstractLevel{
 
     private _skateparkMusic: Music;
@@ -27,7 +29,13 @@ export class CityLevel extends AbstractLevel{
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
+    private _subLocation: CityLocation;
+
     private _playTutorial = true;
+    private _skateparkExitTriggerActive: boolean;
+    private _skateparkEntranceTriggerActive: boolean;
+    private _playCityEntranceCinematic: boolean = true;
+
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -38,8 +46,6 @@ export class CityLevel extends AbstractLevel{
                                                                   ['loop', './musics/city/city_loop.ogg'  ] ]);
 
         this._skateparkMusic = new LoopMusic(this._game.getScene(), ["skatepark", "./musics/skatepark/skatepark_v2.ogg" ]);
-
-        // this._skateparkMusic = new LoopMusic(this._game.)
     }
 
     protected async load() {
@@ -55,8 +61,14 @@ export class CityLevel extends AbstractLevel{
     }
 
     initialize(): void {
+        this._skateparkExitTriggerActive = true;
 
         if (this._playTutorial) {
+            this._subLocation = CityLocation.SKATEPARK
+
+            this._skateparkEntranceTriggerActive = false;
+            this._skateparkExitTriggerActive = true;
+
             this._game.getPlayer().setPosition(CityLevel.SKATEPARK_SPAWN_DATA.position);
 
             this._game.getPlayer().setMeshDirection(CityLevel.SKATEPARK_SPAWN_DATA.direction);
@@ -66,19 +78,29 @@ export class CityLevel extends AbstractLevel{
             this._skateparkMusic.play();
 
             this._playTutorial = false;
+
+            if (this._music instanceof IntroLoopMusic) {
+                this._music.skipIntro = true;
+            }
         }
         else {
+            this._subLocation = CityLocation.CITY;
+
+            this._skateparkExitTriggerActive = true;
+            this._skateparkEntranceTriggerActive = false;
+
             this._music.play();
+
+            if (this._music instanceof IntroLoopMusic) {
+                this._music.skipIntro = false;
+            }
         }
-
-
-
-        //this._game.getPlayer().setPosition( new Vector3(0, -2, 0));
 
         console.log("player position :", this._game.getPlayer().mesh.position);
     }
 
     update(): void {
+
     }
 
     protected _addTriggers() {
@@ -87,6 +109,56 @@ export class CityLevel extends AbstractLevel{
                 console.log("adding collide observable on : ", mesh.name);
                 mesh.actionManager = new ActionManager(this._game.getScene());
                 this.setMeshAsChangeLevelTrigger(mesh, "bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
+            }
+
+            if (mesh.name.includes("entrance_skatepark")) {
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                const entranceAction = () => {
+                    if (! this._skateparkEntranceTriggerActive) return;
+                    console.assert(this._subLocation === CityLocation.CITY);
+
+                    this._skateparkEntranceTriggerActive = false;
+                    this._skateparkExitTriggerActive = true;
+
+                    this._subLocation = CityLocation.SKATEPARK;
+
+                    this._music.destroy();
+
+                    this._skateparkMusic.play();
+                }
+                this.setMeshAsExecuteActionTrigger(mesh, entranceAction);
+            }
+
+            if (mesh.name.includes("exit_skatepark")) {
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                const exitAction = () => {
+                    if (! this._skateparkExitTriggerActive) return;
+                    console.assert(this._subLocation === CityLocation.SKATEPARK);
+
+                    if (this._playCityEntranceCinematic) {
+                        // TODO : add lancer cinématique
+
+
+
+
+
+
+                        this._playCityEntranceCinematic = false;
+                    }
+
+                    this._subLocation = CityLocation.CITY;
+                    this._skateparkMusic.destroy();
+
+                    this._music.play();
+
+                    this._skateparkExitTriggerActive = false;
+                    this._skateparkEntranceTriggerActive = true;
+
+                    if (this._music instanceof IntroLoopMusic) {
+                        this._music.skipIntro = false;
+                    }
+                }
+                this.setMeshAsExecuteActionTrigger(mesh, exitAction);
             }
         })
     }
