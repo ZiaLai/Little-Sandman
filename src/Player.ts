@@ -81,6 +81,7 @@ export class Player extends TransformNode {
     private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
     private _staminaBar;
+    private _lastFloorPickedPoint: Vector3;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
         super("player", scene);
@@ -484,7 +485,14 @@ export class Player extends TransformNode {
     }
 
     private _isGrounded(): boolean {
-        return !this._floorRaycast().equals(Vector3.Zero());
+        const pickedPoint = this._floorRaycast();
+        if (pickedPoint.equals(Vector3.Zero())) {
+            this._lastFloorPickedPoint = null;
+            return false;
+        }
+
+        this._lastFloorPickedPoint = pickedPoint;
+        return true;
     }
 
     private _updateGroundDetection(): void {
@@ -532,6 +540,13 @@ export class Player extends TransformNode {
         this._falling += 1;
         // Contact avec le sol
         if (this._isGrounded()) {
+            const pickedPoint = this._floorRaycast();
+
+            if (!this._lastFloorPickedPoint.equals(Vector3.Zero())) {
+                const newY = this._lastFloorPickedPoint.y + 0.05; // petit offset pour rester juste au-dessus
+                this.mesh.position.y = Scalar.Lerp(this.mesh.position.y, newY, 0.4); // ou directement newY si tu préfères
+            }
+
             this._isJumping = false;
             this._isFalling = false;
             this._gravity.y = 0;
@@ -552,7 +567,7 @@ export class Player extends TransformNode {
                 this._jumpKey = true;
             }
         } else {
-            this._jumpKey = false; //jumpkey evite de sauter en boucke en mainteant le bouton appyer
+            this._jumpKey = false; // jumpkey évite de sauter en boucle en maintenant le bouton appuyé
         }
 
 
