@@ -277,7 +277,7 @@ export class Player extends TransformNode {
 
         // Décélération
         this._speed *= 0.9;
-        if (this._speed < 0.01) {
+        if (this._speed < 0.5) {
             this._speed = 0;
         }
 
@@ -484,11 +484,7 @@ export class Player extends TransformNode {
     }
 
     private _isGrounded(): boolean {
-        if (this._floorRaycast().equals(Vector3.Zero())) {
-            return false;
-        } else {
-            return true;
-        }
+        return !this._floorRaycast().equals(Vector3.Zero());
     }
 
     private _updateGroundDetection(): void {
