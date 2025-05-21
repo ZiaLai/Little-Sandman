@@ -15,6 +15,9 @@ import {Music} from "../AudioControl/Music";
 import {LoopMusic} from "../AudioControl/LoopMusic";
 import {SpawnData} from "../SpawnData";
 import {IntroLoopMusic} from "../AudioControl/IntroLoopMusic";
+import {CinematicScene} from "../util/CInematicScene";
+import {AllCinematicData} from "../data/AllCInematicData";
+import {GameState} from "../GameState";
 
 export class CityLevel extends AbstractLevel{
 
@@ -48,8 +51,8 @@ export class CityLevel extends AbstractLevel{
         console.log(this._game.getEnvironment().getTriggers());
         this._addTriggers();
         console.log("after adding triggers");
-        this.introduction();
-        AllMonolog.play(0);// TODO jouer dialogue uniquement à la fin de l'introduction
+        this.introduction(); // TODO jouer à la sortie du skatepark
+        AllMonolog.play(0);
 
         this._finishedLoading();
     }
@@ -70,8 +73,6 @@ export class CityLevel extends AbstractLevel{
         else {
             this._music.play();
         }
-
-
 
         //this._game.getPlayer().setPosition( new Vector3(0, -2, 0));
 
@@ -163,9 +164,10 @@ export class CityLevel extends AbstractLevel{
     }
 
     private introduction(): void {
-        // TODO trouver position de départ de la cam;
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._game.getGameScene());
-        this._game.getGameScene().activeCamera = camera;
+        let cinematic  = AllCinematicData.getData(3);
+        let cinematicScene = new CinematicScene(this._game.getGameScene(),cinematic);
+        this._game.gamestate = GameState.CINEMATIC;
+        this._game.setCurrentCinematic = cinematic;
     }
 
 }
