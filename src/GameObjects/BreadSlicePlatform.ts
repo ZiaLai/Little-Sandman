@@ -1,6 +1,7 @@
 import {GameObject} from "./GameObject";
 import {Mesh, Quaternion, Tools, Vector3} from "@babylonjs/core";
 import {Game} from "../game";
+import {Force} from "../Force";
 
 enum BreadState {SPAWNING, WAITING_FOR_CUT, ROTATING, MOVING}
 
@@ -49,7 +50,18 @@ export class BreadSlicePlatform extends GameObject {
                 break;
             case BreadState.MOVING:
                 this._move();
-                if (this._detectPlayerFeet()) console.log("touching player", this._game.getPlayer().getDeltaTime());
+
+                const detectPlayerFeet = this._detectPlayerFeet();
+                const hasForce = this._game.getPlayer().hasForce(this);
+
+                if (detectPlayerFeet && !hasForce) {
+                    //console.log("touching player", this._game.getPlayer().getDeltaTime());
+                    this._game.getPlayer().addForce(new Force(this._speed, this));
+                }
+                if (!detectPlayerFeet && hasForce) {
+                    this._game.getPlayer().removeForce(this);
+                }
+
                 if (this._parentNode.position.x <= -65) this.destroy();
 
                 //console.log("bread slice pos", this._parentNode.position);

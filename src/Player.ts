@@ -16,6 +16,7 @@ import {PlayerCamera} from "./PlayerCamera";
 import {Sand} from "./util/Sand";
 import {ShootingSystem} from "./ShootingSystem";
 import {StaminaBar} from "./util/StaminaBar";
+import {Force} from "./Force";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -82,6 +83,8 @@ export class Player extends TransformNode {
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
     private _staminaBar;
     private _lastFloorPickedPoint: Vector3;
+
+    private _externalForces: Force[] = [];
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
         super("player", scene);
@@ -312,6 +315,8 @@ export class Player extends TransformNode {
         this.updateSandEmetter();
         this.updateStaminaBar();
 
+        console.log("FORCES :", this._externalForces);
+
     }
 
 
@@ -533,7 +538,11 @@ export class Player extends TransformNode {
         // moveVector.x *= this._horizontalVelocity;
         // moveVector.z *= this._verticalVelocity;
         move = move.addInPlace(this._gravity.scale(this._deltaTime));
+        move = this._applyExternalForces(move);
+
         this.mesh.moveWithCollisions(move);
+
+
 
         //console.log("moveVector : " + moveVector);
 
@@ -685,6 +694,29 @@ export class Player extends TransformNode {
 
     public getInput(): PlayerInput {
         return this._inputs[this._currentInput];
+    }
+
+    public addForce(force: Force) {
+        this._externalForces.push(force);
+    }
+
+    public hasForce(owner: any) {
+        return this._externalForces.find(elt => elt.owner === owner) !== undefined;
+    }
+
+    public removeForce(owner: any) {
+        const index = this._externalForces.findIndex(elt => elt.owner === owner);
+        if (index !== -1) this._externalForces.splice(index, 1);
+    }
+
+    private _applyExternalForces(move: Vector3) {
+       const result = move;
+
+       for (const force of this._externalForces) {
+           result.addInPlace( force.vector.scale(this.getDeltaTime()) );
+        }
+
+       return result;
     }
 
     // public orientCamera(): void {
