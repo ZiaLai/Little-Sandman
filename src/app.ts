@@ -148,7 +148,7 @@ export class App {
                         this.cinematicTimer+= this._scene.deltaTime/1000;
                     }
                     else {
-                        await this._goToStart();
+                        await this.goToSomething(this.currentCinematic.getWantedState());
                     }
                     break;
                 case State.LES_FRAUDES:
