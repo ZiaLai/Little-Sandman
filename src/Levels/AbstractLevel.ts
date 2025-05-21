@@ -107,6 +107,20 @@ export abstract class AbstractLevel {
         );
     }
 
+    protected setMeshAsExecuteActionTrigger(mesh: Mesh, action: () => void): void {
+        const outerMesh = this._game.getGameScene().getMeshByName("outer");
+
+        mesh.actionManager.registerAction(
+            new ExecuteCodeAction(
+                {
+                    trigger: ActionManager.OnIntersectionEnterTrigger,
+                    parameter: outerMesh
+                },
+                action
+            )
+        )
+    }
+
     protected setMeshAsSwapMeshTrigger(mesh: Mesh) {
         let shootingSystem = this._game.getApp().getShootingSystem()
         mesh.registerBeforeRender(() => {

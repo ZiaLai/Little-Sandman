@@ -15,7 +15,7 @@ export class IntroLoopMusic implements Music {
 
     }
 
-    private _initMusic() {
+    private _initMusic(skipIntro?: boolean) {
 
         let soundsReady = 0;
 
@@ -25,11 +25,17 @@ export class IntroLoopMusic implements Music {
             soundsReady++;
             console.log("soundReady : " + soundsReady);
             if (soundsReady === 2) {
-                self._intro.play();
 
-                self._intro.onEndedObservable.add(() => {
+                if (! skipIntro) {
+                    self._intro.play();
+
+                    self._intro.onEndedObservable.add(() => {
+                        self._loop.play();
+                    });
+                }
+                else {
                     self._loop.play();
-                });
+                }
             }
         }
 
@@ -40,8 +46,8 @@ export class IntroLoopMusic implements Music {
         this._loop = loop;
     }
 
-    play(): void {
-        this._initMusic();
+    play(skipIntro?: boolean): void {
+        this._initMusic(skipIntro);
     }
 
     destroy(): void {
