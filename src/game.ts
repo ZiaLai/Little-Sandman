@@ -10,6 +10,7 @@ import {App} from "./app";
 import {GameState} from "./GameState";
 import {AdvancedDynamicTexture, Button, Rectangle, StackPanel} from "@babylonjs/gui";
 import {GameObject} from "./GameObjects/GameObject";
+import {CinematicData} from "./data/CinematicData";
 
 export class Game {
 
@@ -24,6 +25,8 @@ export class Game {
 
     private frameCount: number;
     private _state : GameState;
+    private cinematicTimer : number;
+    private currentCinematic : CinematicData;
 
     constructor(app: App) {
         this._app = app;
@@ -54,25 +57,37 @@ export class Game {
 
     public update(): void {
         //TODO completer
+        // TODO c'est ici qu'on doit "ecouter" si on appuie sur le bouton qui demmare le menu pause ?
         switch (this._state){
             case GameState.PLAYING:this._levels[this._currentLevel].update();
                 break;
 
-            case GameState.PAUSE: break; // TODO afficher menu pause;
+            case GameState.PAUSE: this.pauseMenu();break; // TODO afficher menu pause;
                 // TODO capter l'event qui permet de passer en pause
-            case GameState.CINEMATIC: break; // TODO joue cinématique sans changer niveau
+
+            case GameState.CINEMATIC: this.playCinematic();break;
 
         }
 
 
     }
+    public playCinematic(): void {
+        if (this.cinematicTimer< this.currentCinematic.getDuration()){
+            this.getScene().render();
+            this.cinematicTimer+= this.getScene().deltaTime/1000;
+        }
+        else {
+            // TODO détruire la cinematique ?
+        }
+    }
     public pauseMenu():void{
+        // TODO implementer
         const advancedTexture =AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
         const pauseMenu = new Rectangle();
         // TODO mettre image
-        pauseMenu.width = "400px";
-        pauseMenu.height = "300px";
+        pauseMenu.width = "80%";
+        pauseMenu.height = "80%";
         pauseMenu.thickness = 0;
         pauseMenu.background = "#222";
         pauseMenu.isVisible = false;
@@ -217,4 +232,6 @@ export class Game {
         return this._levels[this._currentLevel];
     }
 
+    set gamestate(GameState) {this._state = GameState;}
+    set setCurrentCinematic(cinematic ){this.currentCinematic = cinematic;}
 }
