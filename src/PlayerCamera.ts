@@ -62,7 +62,7 @@ export class PlayerCamera {
         this._updateCamRootPosition();
         this._adjustRadiusForWallCollision();
         this._adjustRadiusForGroundClipping();
-        this._adjustForCeiling();
+        //this._adjustForCeiling();
 
         this._smoothRadius = Lerp(this._camera.radius, Math.min(this._raycastRadius, this._groundDetectionRadius), 0.15);
         this._camera.radius = this._smoothRadius;
@@ -137,6 +137,47 @@ export class PlayerCamera {
         } else {
             this._raycastRadius = Lerp(this._camera.radius, 15, 0.05); // zoom out progressif s’il n’y a rien
         }
+    }
+
+    // private _adjustRadiusForWallCollision(): void {
+    //     const backDirection = this._camera.getForwardRay().direction.scale(-1).normalize();
+    //     const origin = this._camRoot.position;
+    //
+    //     const angles = [0, 10, -10, 20, -20]; // en degrés
+    //     const hitDistances: number[] = [];
+    //
+    //     for (const angle of angles) {
+    //         const rotatedDirection = this._rotateAroundY(backDirection, angle * Math.PI / 180);
+    //
+    //         const ray = new Ray(origin, rotatedDirection, this._camera.radius);
+    //         const hit = this._scene.pickWithRay(ray, m => m.isPickable && m.isEnabled());
+    //
+    //         if (hit.hit && hit.pickedPoint) {
+    //             const distance = Vector3.Distance(origin, hit.pickedPoint);
+    //             hitDistances.push(distance);
+    //         }
+    //     }
+    //
+    //     if (hitDistances.length > 0) {
+    //         const minHit = Math.min(...hitDistances);
+    //         const anticipationMargin = 0.5; // pour zoomer avant le mur
+    //         const targetRadius = Math.max(minHit - anticipationMargin, this._camera.lowerRadiusLimit);
+    //
+    //         this._raycastCollision = true;
+    //         this._raycastRadius = Lerp(this._camera.radius, targetRadius, 0.3);
+    //     } else {
+    //         this._raycastRadius = Lerp(this._camera.radius, 15, 0.05);
+    //     }
+    // }
+
+    private _rotateAroundY(direction: Vector3, angle: number): Vector3 {
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        return new Vector3(
+            direction.x * cos - direction.z * sin,
+            direction.y,
+            direction.x * sin + direction.z * cos
+        ).normalize();
     }
 
     private _adjustRadiusForGroundClipping(): void {
