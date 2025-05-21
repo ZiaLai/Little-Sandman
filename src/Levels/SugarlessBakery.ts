@@ -1,6 +1,6 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {Color3, HemisphericLight, PointLight, Scene, Vector3} from "@babylonjs/core";
+import {Color3, HemisphericLight, PointLight, Ray, RayHelper, Scene, Vector3} from "@babylonjs/core";
 import {AdvancedDynamicTexture, Control, Image} from "@babylonjs/gui";
 import {Scalar, Tools, TransformNode} from "@babylonjs/core";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
@@ -29,6 +29,8 @@ export class SugarlessBakery extends AbstractLevel {
     private _knifeTimer: number = 0;
     private _knifeCanCreateBreadSlicePlatform: boolean = true;
     private _breadSlicePlatformTransformNode: TransformNode;
+
+    private _cakes: TransformNode[] = [];
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -63,6 +65,8 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._updateKnife();
 
+
+        this._updateCakes();
         // console.log("player position :", this._game.getPlayerPosition());
     }
 
@@ -77,7 +81,44 @@ export class SugarlessBakery extends AbstractLevel {
         this._breadSlicePlatformTransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         console.assert(this._breadSlicePlatformTransformNode);
 
+        this._initCakes();
+
         //this._objects["bread_slice"] = [];
+    }
+
+    private _initCakes() {
+        for (let i=1; i < 7; i++) {
+            const nightmare = this._game.getGameScene().getTransformNodeByName("element_nightmare" + i);
+            const dream = this._game.getGameScene().getTransformNodeByName("element_dream" + i);
+
+            nightmare.rotationQuaternion = null;
+            dream.rotationQuaternion = null;
+
+            this._cakes.push(nightmare);
+            this._cakes.push(dream);
+        }
+
+        // Pour que les gâteaux pointent tous vers la même direction
+        this._cakes.find(node => node.name === "element_nightmare1")
+            .rotation = new Vector3(Tools.ToRadians(289.5), Tools.ToRadians(202), Tools.ToRadians(91.5));
+
+        this._cakes.find(node => node.name === "element_nightmare2")
+            .rotation = new Vector3(0, Tools.ToRadians(189.2), 0);
+
+        this._cakes.find(node => node.name === "element_nightmare3")
+            .rotation = new Vector3(Tools.ToRadians(90), 0, 0);
+    }
+
+    private _updateCakes() {
+        // TODO : update la rotation des gâteaux
+
+        const playerPos = this._game.getPlayerPosition();
+
+        for (const cake of this._cakes) {
+           cake.lookAt(playerPos);
+
+        }
+
     }
 
     private _initKnife() {

@@ -635,7 +635,7 @@ export class Player extends TransformNode {
         this._inputs[this._currentInput].reset();
     }
 
-    private getMeshDirection(): Vector3 {
+    getMeshDirection(): Vector3 {
         return this.mesh.getDirection(Axis.Z);
     }
 
