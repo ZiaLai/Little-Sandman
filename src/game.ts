@@ -24,8 +24,8 @@ export class Game {
     private _currentLevel : string;
 
     private frameCount: number;
-    private _state : GameState;
-    private cinematicTimer : number;
+    private _state : GameState;z
+    private cinematicTimer : number = 0;
     private currentCinematic : CinematicData;
 
     constructor(app: App) {
@@ -71,12 +71,27 @@ export class Game {
 
 
     }
+    public getGameState() : GameState {return this._state;}
+    public switchPlayerLight(intensity: number): void {
+        const light =  this.getScene().getLightByName("Area");
+        light.intensity = intensity;
+    }
     public playCinematic(): void {
+        if (!this.currentCinematic){
+            this._state = GameState.PLAYING;
+            return ;
+        }
         if (this.cinematicTimer< this.currentCinematic.getDuration()){
+            console.log("in cinematic ");
             this.getScene().render();
-            this.cinematicTimer+= this.getScene().deltaTime/1000;
+            this.cinematicTimer+= this.getDeltaTime();
         }
         else {
+            this._state = GameState.PLAYING;
+            this.getPlayer().camera.enable(this.getScene());
+            this.switchPlayerLight(27);
+            this._levels[this._currentLevel].doAfterCinematic();
+           // this.currentCinematic.stop();
             // TODO détruire la cinematique ?
         }
     }
@@ -232,6 +247,6 @@ export class Game {
         return this._levels[this._currentLevel];
     }
 
-    set gamestate(GameState) {this._state = GameState;}
-    set setCurrentCinematic(cinematic ){this.currentCinematic = cinematic;}
+    public  setGamestate(GameState) {this._state = GameState;}
+    public  setCurrentCinematic(cinematic ){this.currentCinematic = cinematic;}
 }
