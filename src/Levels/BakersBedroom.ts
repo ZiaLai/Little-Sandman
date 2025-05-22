@@ -3,7 +3,7 @@ import {Game} from "../game";
 import {
     AbstractMesh,
     AnimationGroup,
-    FreeCamera,
+    FreeCamera, Sound,
     Tools,
 } from "@babylonjs/core";
 import {CityLevel} from "./CityLevel";
@@ -12,7 +12,9 @@ import {SugarlessBakery} from "./SugarlessBakery";
 
 enum CameraState {ZOOMING_IN, ZOOMING_OUT, ZOOMED_IN, ZOOMED_OUT }
 
-enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, SHOWN}
+enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, APPEARING_4, SHOWN}
+
+
 import {ActionManager, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
 
@@ -28,7 +30,7 @@ export class BakersBedroom extends AbstractLevel {
 
     private _CAMERA_TRIGGER_DISTANCE: number = 6;
 
-    private _CLOUD_ANIMATION_DELAY: number = 0.2;
+    private _CLOUD_ANIMATION_DELAY: number = 0.4;
 
     private _cameraState: CameraState = CameraState.ZOOMING_IN;
     private _cloudState: CloudState = CloudState.HIDDEN;
@@ -39,11 +41,14 @@ export class BakersBedroom extends AbstractLevel {
 
     private _cloudMeshes: AbstractMesh[];
     private _baker: { animationGroups: AnimationGroup[]; mesh: AbstractMesh };
+    private _bakerHit: boolean;
+
+    private _goodNightSound: Sound;
 
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "bakers_bedroom";
-        this._ressourceName = "baker_bedroom v7";
+        this._ressourceName = "baker_bedroom v8";
 
     }
 
@@ -63,6 +68,7 @@ export class BakersBedroom extends AbstractLevel {
         this._camera = camera;
         this._game.getGameScene().activeCamera = camera;
 
+        this._goodNightSound = new Sound("good_night", "./musics/sfx/good_night.ogg", this._game.getGameScene());
 
         this._initCloudMeshes();
 
@@ -95,13 +101,15 @@ export class BakersBedroom extends AbstractLevel {
 
         this._cloudMeshes = allMeshes;
 
-        this._cloudState = CloudState.START_APPEARING;
+        this._cloudState = CloudState.HIDDEN;
     }
 
     update(): void {
         this._updateCamera();
 
         this._updateCloud();
+
+        //console.log("BAKER HIT:", this._bakerHit);
     }
 
     private _updateCamera(): void {
@@ -145,6 +153,20 @@ export class BakersBedroom extends AbstractLevel {
                 m.actionManager = new ActionManager(this._game.getScene());
                 this.setMeshAsChangeLevelTrigger(m, "city", CityLevel.BAKERY_EXIT_SPAWN_DATA);
             }
+
+            if (m.name.includes("baker_trigger")) {
+                //console.log("ADDING TRIGGER ON MESH:", m);
+                m.actionManager = new ActionManager(this._game.getScene());
+                const action = () => {
+                    //console.log("ACTION TRIGGERED !!!");
+                    if (this._bakerHit) return;
+
+                    this._cloudState = CloudState.START_APPEARING
+                    this._bakerHit = true;
+                }
+
+                this.setMeshAsSwapMeshTrigger(m, action);
+            }
         })
     }
 
@@ -170,6 +192,7 @@ export class BakersBedroom extends AbstractLevel {
         const baker = await this._game.spriteLoader.loadSprite("BOULANGERE.glb");
 
         this._baker = baker;
+        this._bakerHit = false;
         //const bakerRoot = this._game.getGameScene().getTransformNodeByName("Armature");
         const bakerRoot = baker.mesh;
 
@@ -202,6 +225,7 @@ export class BakersBedroom extends AbstractLevel {
             case CloudState.HIDDEN:
                 break;
             case CloudState.START_APPEARING:
+                this._goodNightSound.play();
                 this._cloudTimer = 0;
                 this._cloudState = CloudState.APPEARING_1;
                 break;
@@ -230,12 +254,20 @@ export class BakersBedroom extends AbstractLevel {
                 this._cloudMeshes[4].isVisible = true;
                 this._cloudMeshes[5].isVisible = true;
                 if (this._cloudTimer > this._CLOUD_ANIMATION_DELAY) {
-                    this._cloudState = CloudState.SHOWN;
+                    this._cloudState = CloudState.APPEARING_4;
                     this._cloudTimer = 0;
 
                     this._cloudMeshes[6].isVisible = true;
                     this._cloudMeshes[7].isVisible = true;
                     this._cloudMeshes[8].isVisible = true;
+                }
+                break;
+
+            case CloudState.APPEARING_4:
+                this._cloudTimer += this._game.getDeltaTime();
+                if (this._cloudTimer > this._CLOUD_ANIMATION_DELAY) {
+                    this._cloudState = CloudState.SHOWN;
+                    this._cloudTimer = 0;
                 }
                 break;
 
