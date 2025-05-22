@@ -32,8 +32,13 @@ export class ShootingSystem {
     }
 
     public getRayFromShooting(scene: Scene, position: Vector3, direction: Vector3): void {
+        const rayPosition = new Vector3(position.x, position.y + 1.2, position.z);
+
         if (this._isShooting) {
-            this._shootingRay = new Ray(position, direction, 3);
+            this._shootingRay = new Ray(rayPosition, direction, 3);
+
+            const rayHelper = new RayHelper(this._shootingRay);
+            rayHelper.show(scene);
         }
         else {
             this._shootingRay = null;
