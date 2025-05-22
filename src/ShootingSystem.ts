@@ -36,9 +36,8 @@ export class ShootingSystem {
 
         if (this._isShooting) {
             this._shootingRay = new Ray(rayPosition, direction, 3);
-
-            const rayHelper = new RayHelper(this._shootingRay);
-            rayHelper.show(scene);
+            // const rayHelper = new RayHelper(this._shootingRay);
+            // rayHelper.show(scene);
         }
         else {
             this._shootingRay = null;
