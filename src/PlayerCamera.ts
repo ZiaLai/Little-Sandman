@@ -18,6 +18,7 @@ export class PlayerCamera {
     private _groundDetectionRadius: number;
     private _raycastRadius: number;
     private _isActive: boolean = true;
+    private _canvas: HTMLCanvasElement;
 
 
 
@@ -72,6 +73,8 @@ export class PlayerCamera {
         this._camera.alpha = 1.6;
         this._camera.beta = 1.4;
         this._camera.attachControl(canvas, true);
+
+        this._canvas = canvas;
 
 
         return this._camera;
@@ -169,6 +172,8 @@ export class PlayerCamera {
     }
 
     public update(): void {
+        console.log("PLAYER CAMERA POS:", this._camera.position);
+
         if (! this._isActive) return;
 
         this._updatePosition();
@@ -203,6 +208,12 @@ export class PlayerCamera {
         this._isActive = false;
     }
 
+    public enable(scene: Scene): void {
+        this._camera.attachControl(this._canvas);
+        this._isActive = true;
+
+        scene.activeCamera = this._camera;
+    }
     getIsActive(): boolean {
         return this._isActive;
     }
