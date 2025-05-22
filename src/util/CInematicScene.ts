@@ -8,43 +8,58 @@ import {
     Vector3,
     VideoTexture
 } from "@babylonjs/core";
-import {AdvancedDynamicTexture, Button, Control, Rectangle} from "@babylonjs/gui";
 import {CinematicData} from "../data/CinematicData";
 
-export class CinematicScene{
-    constructor(scene: Scene, cinematicData : CinematicData ){
+export class CinematicScene {
+    private videoTexture;
+    constructor(scene: Scene, cinematicData : CinematicData, position : Vector3 = new Vector3(0,0,0.1)){
         let path_video = cinematicData.getPath();
-        let skippable = cinematicData.isSkippable();
-        let wantedState = cinematicData.getWantedState();
-        let camera = new ArcRotateCamera("arcR", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene);
-        //camera.setTarget(new Vector3(0, 0, 0.2));
+        //this.setVideoTexture(path_video, scene);
+        this.videoTexture =  new VideoTexture("truc_mushe", path_video, scene);
 
-        let planeOpts = {
-            height: 12,
-            //width: 7.3967,
-            width: 22,
-            sideOrientation: Mesh.DOUBLESIDE
-        };
-        let backgroudopt = {
-            height: 1000,
-            //width: 7.3967,
-            width: 10000,
-            sideOrientation: Mesh.DOUBLESIDE
-        };
-        let ANote0Video = MeshBuilder.CreatePlane("plane", planeOpts, scene);
-        let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
+        this.videoTexture.onLoadObservable.addOnce(() => {
+            let camera = new ArcRotateCamera("cinematic camera", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene); // TODO camera doit dépendre de position ?
+            //camera.setTarget(new Vector3(0, 0, 0.2));
 
-        let vidPos = (new Vector3(0, 0, 0.1))
-        ANote0Video.position = vidPos;
-        background.position = new Vector3(0, 0, 0.2);
-        let ANote0VideoMat = new StandardMaterial("m", scene);
-        let ANote0VideoVidTex = new VideoTexture("truc_mushe", path_video, scene);// "https://dl.dropbox.com/scl/fi/i7ltk5bf40pv8kbmj4gen/cinematic_intro_ls_ss.mp4?rlkey=40fph0epvxqs3m2slpy2c64yr&st=w0dwxn5u&dl=0"
+            let planeOpts = {
+                // TODO cette taille est correcte pour toutes les cinematiques ?
+                height: 12,
+                //width: 7.3967,
+                width: 22,
+                sideOrientation: Mesh.DOUBLESIDE
+            };
+            let backgroudopt = {
+                height: 24,
+                //width: 7.3967,
+                width: 44,
+                color: new Color3(1, 1, 1),
+                sideOrientation: Mesh.DOUBLESIDE
+            };
+            let cinematic_plane = MeshBuilder.CreatePlane("cinematic_plane", planeOpts, scene);
+            cinematic_plane.position = position;
+            // let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
 
-        ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-        ANote0VideoMat.roughness = 1;
-        ANote0VideoMat.emissiveColor = Color3.White();
-        ANote0Video.material = ANote0VideoMat;
+            //background.position = new Vector3(0, 0, 0.2);
+            let material = new StandardMaterial("m", scene);
+            material.diffuseTexture = this.videoTexture;
+            material.roughness = 1;
+            material.emissiveColor = Color3.White();
+            cinematic_plane.material = material;
+        })
 
+
+    }
+    public stop(): void {
+        this.videoTexture.video.pause();
+    }
+
+    public executeActionAfterVideoLoaded(action: () => void) {
+        this.videoTexture.onLoadObservable.addOnce(() => {
+            action();
+        });
+    }
+    public play(): void {
+        this.videoTexture.video.play();
     }
 
 
