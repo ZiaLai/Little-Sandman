@@ -31,6 +31,10 @@ export class Environment {
         var ground = Mesh.CreateBox("ground", 24, this._scene);
         ground.scaling = new Vector3(0.1, .02, 0.1);
         this._assets = await this._loadAsset();
+
+        const transparentMaterial: StandardMaterial = new StandardMaterial("transparent", this._scene);
+        transparentMaterial.alpha = 0;
+
         // Loop through all environment meshes that were imported
         this._assets.allMeshes.forEach((mesh: Mesh) => {
             mesh.receiveShadows = true;
@@ -40,9 +44,8 @@ export class Environment {
             if (mesh.name.includes("collider") && mesh.name.includes("trigger")) {
                 mesh.isVisible = true;
                 mesh.isPickable = true;
-                let material: StandardMaterial = new StandardMaterial("transparent", this._scene);
-                material.alpha = 0;
-                mesh.material = material;
+
+                mesh.material = transparentMaterial;
                 this._triggers.push(mesh);
             }
 
@@ -64,9 +67,10 @@ export class Environment {
             }
 
             else if (mesh.name.includes("trigger")) {
-                mesh.isVisible = false;
                 mesh.isPickable = true;
                 mesh.checkCollisions = false;
+                mesh.material = transparentMaterial;
+
                 this._triggers.push(mesh);
             }
             else if (mesh.name.includes("dream")) {
