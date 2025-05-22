@@ -113,4 +113,7 @@ export class Breach1 extends AbstractLevel {
 
     protected setUpSkydome(): void {
     }
+
+    doAfterCinematic(): void {
+    }
 }

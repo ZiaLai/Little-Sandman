@@ -162,4 +162,5 @@ export abstract class AbstractLevel {
     public getObjects() {
         return this._objects
     }
+    public abstract doAfterCinematic(): void;
 }

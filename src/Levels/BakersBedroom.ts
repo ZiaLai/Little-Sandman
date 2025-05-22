@@ -1,10 +1,10 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {
-    AbstractMesh,
-    AnimationGroup,
-    FreeCamera,
-    Tools,
+    AbstractMesh, ActionManager,
+    AnimationGroup, Color3,
+    FreeCamera, HemisphericLight, PointLight,
+    Tools, Vector3,
 } from "@babylonjs/core";
 import {CityLevel} from "./CityLevel";
 import {SpawnData} from "../SpawnData";
@@ -13,7 +13,6 @@ import {SugarlessBakery} from "./SugarlessBakery";
 enum CameraState {ZOOMING_IN, ZOOMING_OUT, ZOOMED_IN, ZOOMED_OUT }
 
 enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, SHOWN}
-import {ActionManager, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
 
 export class BakersBedroom extends AbstractLevel {
@@ -159,7 +158,7 @@ export class BakersBedroom extends AbstractLevel {
 
         const aura = new PointLight("aura_cauchemar", new Vector3(7.4, 4.5, 2), this._game.getGameScene());
         aura.diffuse = new Color3(0.559,0.359,1);
-        aura.intensity =10;
+        aura.intensity =1;
     }
 
     protected setUpSkydome(): void {
@@ -248,5 +247,8 @@ export class BakersBedroom extends AbstractLevel {
 
                 break;
         }
+    }
+
+    doAfterCinematic(): void {
     }
 }
