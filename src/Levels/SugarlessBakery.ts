@@ -11,7 +11,9 @@ enum KnifeState {RISING, RISEN, FALLING, FALLEN}
 
 enum BarsState {CLOSED, OPENING, OPENED}
 
-import {ActionManager, Mesh} from "@babylonjs/core";
+import {Mesh} from "@babylonjs/core";
+import {ClearNightmareParticles} from "../util/ClearNightmareParticles";
+import {State} from "../State";
 
 
 export class SugarlessBakery extends AbstractLevel {
@@ -167,7 +169,7 @@ export class SugarlessBakery extends AbstractLevel {
     protected _addTriggers(): void {
         //element_nightmare1 element_dream1 element_dream1_collider_trigger
         this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
-            let colliderTriggerEffect = (mesh: Mesh) => {
+            let colliderTriggerEffect: (mesh: Mesh) => void = async (mesh: Mesh) => {
                 let meshName = mesh.name.split("_");
                 let index = meshName[1].charAt(meshName[1].length - 1);
                 let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index);
@@ -177,11 +179,10 @@ export class SugarlessBakery extends AbstractLevel {
                     mesh.isVisible = false;
                 })
                 elementDream.getChildMeshes().forEach(mesh => {
-                    if (! mesh.isVisible) {
+                    if (!mesh.isVisible) {
                         willAdd = true;
                         mesh.isVisible = true;
-                    }
-                    else {
+                    } else {
                         willAdd = false;
                     }
                 })
@@ -189,6 +190,10 @@ export class SugarlessBakery extends AbstractLevel {
                     this._nbNightmareFound++;
                     this.setUpGui();
                     this._upgradeMusic();
+                    if (this._nbNightmareFound == 6) {
+                        await this._game.getApp().goToSomething(State.CINEMATIC, 1);
+                        this.destroy();
+                    }
                 }
                 //console.log("swap done", this._nbNightmareFound);
 
