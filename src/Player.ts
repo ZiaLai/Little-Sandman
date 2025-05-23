@@ -81,6 +81,7 @@ export class Player extends TransformNode {
     private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
     private _staminaBar;
+    private _isActive: boolean = true;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
         super("player", scene);
@@ -301,6 +302,8 @@ export class Player extends TransformNode {
 
 
     beforeRenderUpdate(shootingSystem: ShootingSystem): void {
+
+        if (! this._isActive) return;
         /* console.log("current input : ", this._currentInput);
         console.log("player inputs : ", this._inputs); */
         this._updateFromControls();
@@ -676,4 +679,8 @@ export class Player extends TransformNode {
     // public orientCamera(): void {
     //     this.camera.setAlpha(this.getMeshDirection().z);
     // }
+
+    public setIsActive(isActive: boolean): void {
+        this._isActive = isActive;
+    }
 }
