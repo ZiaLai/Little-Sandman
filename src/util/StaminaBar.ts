@@ -37,6 +37,8 @@ export class StaminaBar{
         this.staminaBarFill.background = "yellow";
         this.staminaBarFill.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.staminaBarContainer.addControl(this.staminaBarFill);
+
+        this.staminaPlane.visibility = 0;
     }
     public updateStaminaBarAnimated(currentStamina, displayedStamina) {
         // Interpolation douce vers la vraie valeur

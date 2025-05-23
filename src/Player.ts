@@ -7,7 +7,7 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3, Matrix, Tools, RayHelper, PickWithRay
+    Vector3, Tools
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -649,7 +649,10 @@ export class Player extends TransformNode {
     }
 
     private updateStaminaBar(){
-        this._staminaBar.updateStaminaBarAnimated(this._hoverTimer- this._deltaTime, this._hoverTimer);
+        const currentStamina = (this._hoverTimer - this._deltaTime) / Player.HOVER_TIME;
+        const displayedStamina = this._hoverTimer / Player.HOVER_TIME;
+
+        this._staminaBar.updateStaminaBarAnimated(currentStamina, displayedStamina);
         let x = this.getMeshDirection()._x;
 
         let z = this.getMeshDirection()._z;
