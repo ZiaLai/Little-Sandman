@@ -56,6 +56,8 @@ export class CityLevel extends AbstractLevel{
         await super.load();
         console.log("In city load");
         console.log(this._game.getEnvironment().getTriggers());
+
+        this._initSounds();
         this._addTriggers();
         console.log("after adding triggers");
         this.introduction();
@@ -92,7 +94,7 @@ export class CityLevel extends AbstractLevel{
             this._music.play();
         }
 
-        this._initSounds();
+
 
         console.log("player position :", this._game.getPlayer().mesh.position);
     }
@@ -110,9 +112,22 @@ export class CityLevel extends AbstractLevel{
                 mesh.actionManager = new ActionManager(this._game.getScene());
 
                 const sfxAction6 = () => {
-                    this._sounds["on_the_right_track_6"].play();
-                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
+                    if (this._sounds["on_the_right_track_6"].isReady()) {
+                        this._sounds["on_the_right_track_6"].play();
+                        this._game.getPlayer().disableCamera();
+                        // TODO : stopper le player
+                    }
+                    else {
+                        this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
+                    }
                 }
+
+                const observer = this._sounds["on_the_right_track_6"].onEndedObservable.add(() => {
+                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
+
+                    // Optionnel : retirer l’observer si tu veux éviter des appels multiples plus tard
+                    this._sounds["on_the_right_track_6"].onEndedObservable.remove(observer);
+                });
 
                 this.setMeshAsExecuteActionTrigger(mesh, sfxAction6);
             }
