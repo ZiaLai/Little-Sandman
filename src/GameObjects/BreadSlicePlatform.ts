@@ -18,6 +18,10 @@ export class BreadSlicePlatform extends GameObject {
 
         this._parentNode.rotationQuaternion = Quaternion.FromEulerAngles(0, Tools.ToRadians(-90), Tools.ToRadians(180));
 
+        this._parentNode.getChildren().forEach((mesh: Mesh) => {
+            mesh.checkCollisions = true;
+        })
+
         // this._parentNode.rotationQuaternion = null;
         //
         // this._parentNode.rotation = new Vector3(Tools.ToRadians(180), Tools.ToRadians(90), 0);
