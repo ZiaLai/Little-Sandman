@@ -50,8 +50,6 @@ export abstract class AbstractLevel {
         //
         // });
         this.setUpLights();
-        this.setUpSkydome();
-
     }
 
     // Méthode appelée au "premier" démarrage du niveau (pas si on revisite le niveau après être allé dans un autre)
@@ -67,7 +65,6 @@ export abstract class AbstractLevel {
     }
 
     protected abstract setUpLights():void;
-    protected abstract setUpSkydome():void;
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
         for (let object of this._objects) {
