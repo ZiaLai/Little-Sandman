@@ -39,6 +39,7 @@ export class SugarlessBakery extends AbstractLevel {
 
     constructor(game: Game, id: number) {
         super(game, id);
+        this._isNightmareLevel = true;
         this._name = "sugarless_bakery";
         this._ressourceName = "bakery_level_12";
 
