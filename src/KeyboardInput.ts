@@ -2,21 +2,26 @@ import {PlayerInput} from "./PlayerInput";
 import {ActionManager, ExecuteCodeAction, Scalar, Scene} from "@babylonjs/core";
 
 export class KeyboardInput extends PlayerInput {
-    private _specialKeys: string[] = ["Shift"];
+    private _specialKeys: string[] = ["Shift","Enter"];
     private _pointerLocked: boolean = false;
     private _canvas: HTMLCanvasElement;
+    private _lockPointer: boolean;
 
 
 
     constructor(scene: Scene, canvas: HTMLCanvasElement) {
         super();
         this._canvas = canvas;
+        this._lockPointer = true;
         scene.actionManager = new ActionManager();
 
         this.inputMap = {};
 
         this._canvas.addEventListener("click", event => {
+            if (! this._lockPointer) return;
+
             if(this._canvas.requestPointerLock) {
+
                 this._canvas.requestPointerLock().catch(err => console.error(err));
             }
         }, false);
@@ -47,6 +52,8 @@ export class KeyboardInput extends PlayerInput {
     }
 
     private _updateFromKeyboard(): void {
+        console.log("updating input");
+
         if (this.isActive) {
             if (this.inputMap["ArrowUp"]) {
                 this.camVertical = Scalar.Lerp(this.camVertical, 1, 0.2);
@@ -111,6 +118,8 @@ export class KeyboardInput extends PlayerInput {
             this.hoverKeyDown = !!this.inputMap["Shift"];
 
             this.actionKeyDown = !!this.inputMap["f"];
+
+            this.pauseKeyDown = !!this.inputMap["Enter"];
         }
 
 
@@ -133,5 +142,21 @@ export class KeyboardInput extends PlayerInput {
         for (let key in this.inputMap) {
             this.inputMap[key] = false;
         }
+    }
+
+    public setLockPointer(lockPointer: boolean): void {
+        this._lockPointer = lockPointer;
+    }
+
+    exitPointerLock(): void {
+        this._canvas.ownerDocument.exitPointerLock();
+    }
+
+    requestPointerLock(): void {
+        this._canvas.requestPointerLock().catch(err => console.error(err));
+    }
+
+    getLockPointer(): boolean {
+        return this._lockPointer;
     }
 }
