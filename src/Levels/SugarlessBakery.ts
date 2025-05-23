@@ -150,12 +150,11 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     protected setUpLights(): void {
-        // TODO add lights sur les gateaux + lumiere rouge dans le four
         var light0 = new HemisphericLight("nightLight", new Vector3(0, 1, 0), this._game.getGameScene());
         light0.diffuse = new Color3(0.066,0.082,1); // TODO plus violet ?
         light0.intensity = 2;
         //---FOUR---
-        const light = new PointLight("four", new Vector3(-8, 25, -90), this._game.getGameScene());// TODO CHANGE POS
+        const light = new PointLight("four", new Vector3(-8, 25, -90), this._game.getGameScene());
         light.diffuse = new Color3(1,0,0);
         light.intensity = 2000;
         // const cake1 = new PointLight("cake 1", new Vector3(4, 2.8, 1), this._game.getGameScene());
@@ -164,9 +163,6 @@ export class SugarlessBakery extends AbstractLevel {
 
     }
 
-    protected setUpSkydome(): void {
-        // TODO implement (esce qu'on peut changer de texture losqu'on corrige un element ? )
-    }
     private setUpGui(): void {
         const ui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
