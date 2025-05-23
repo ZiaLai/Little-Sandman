@@ -6,7 +6,7 @@ import {
     HemisphericLight,
     Mesh, MeshBuilder, PointLight,
     Scene,
-    SetValueAction, StandardMaterial, Texture, Tools,
+    SetValueAction, Sound, StandardMaterial, Texture, Tools,
     Vector3
 } from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
@@ -35,6 +35,10 @@ export class CityLevel extends AbstractLevel{
     private _skateparkExitTriggerActive: boolean;
     private _skateparkEntranceTriggerActive: boolean;
     private _playCityEntranceCinematic: boolean = true;
+    private _sounds: Record<string, Sound>;
+    private _soundsPlayed: Record<string, boolean>;
+
+    private _platformingTriggersActivation: boolean[];
 
 
     constructor(game: Game, id: number) {
@@ -88,6 +92,8 @@ export class CityLevel extends AbstractLevel{
             this._music.play();
         }
 
+        this._initSounds();
+
         console.log("player position :", this._game.getPlayer().mesh.position);
     }
 
@@ -96,11 +102,61 @@ export class CityLevel extends AbstractLevel{
     }
 
     protected _addTriggers() {
-        this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
+        this._platformingTriggersActivation = [true, false, false, false, false];
+
+            this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
             if (mesh.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", mesh.name);
                 mesh.actionManager = new ActionManager(this._game.getScene());
-                this.setMeshAsChangeLevelTrigger(mesh, "bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
+
+                const sfxAction6 = () => {
+                    this._sounds["on_the_right_track_6"].play();
+                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
+                }
+
+                this.setMeshAsExecuteActionTrigger(mesh, sfxAction6);
+            }
+
+            if (mesh.name.includes("sound_reset")) {
+
+                const resetAction = () => {
+                    if (this._platformingTriggersActivation[0]) return;
+                    this._platformingTriggersActivation = [true, false, false, false, false];
+                }
+
+                mesh.isPickable = false;
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                this.setMeshAsExecuteActionTrigger(mesh, resetAction);
+            }
+
+            if (mesh.name.includes("platforming")) {
+                mesh.isPickable = false;
+
+                let i: number;
+                if (mesh.name.includes(".001")) {
+                    i = 2;
+                } else if (mesh.name.includes(".002")) {
+                    i = 3;
+                } else if (mesh.name.includes(".003")) {
+                    i = 4;
+                } else if (mesh.name.includes(".004")) {
+                    i = 5;
+                } else {
+                    i = 1;
+                }
+
+                const sfxAction = () => {
+                    if (! this._platformingTriggersActivation[i - 1]) return;
+
+                    this._sounds["on_the_right_track_" + i].play();
+
+                    this._platformingTriggersActivation[i - 1] = false;
+                    this._platformingTriggersActivation[i] = true;
+
+                }
+
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                this.setMeshAsExecuteActionTrigger(mesh, sfxAction);
             }
 
             if (mesh.name.includes("entrance_skatepark")) {
@@ -232,4 +288,23 @@ export class CityLevel extends AbstractLevel{
         this._game.getGameScene().activeCamera = camera;
     }
 
+    private _initSounds() {
+        const soundsNames = [];
+
+        for (let i=1; i < 7; i++) {
+            soundsNames.push("on_the_right_track_" + i);
+        }
+
+        this._sounds = {}
+
+        for (const name of soundsNames) {
+            this._sounds[name] = new Sound("", "./musics/sfx/OnTheRightTrack/" + name + ".ogg");
+        }
+
+        this._soundsPlayed = {};
+
+        for (const name of Object.keys(this._sounds)) {
+            this._soundsPlayed[name] = false;
+        }
+    }
 }
