@@ -18,10 +18,13 @@ export abstract class AbstractLevel {
     protected _objects: GameObject[] = [];
     private _id: number;
     private _loading: boolean;
+    protected _isNightmareLevel: boolean;
+    protected _lastSpawnData: SpawnData;
 
     protected constructor(game: Game, id: number) {
         this._game = game;
         this._id = id;
+        this._isNightmareLevel = false;
     }
 
     public getRessourceName(): string {
@@ -133,7 +136,7 @@ export abstract class AbstractLevel {
                     //this._game.getApp().changeGameScene(destination, playerPosition).then(() => shootingSystem.setIsInteracting(false));
                     let meshName = mesh.name.split("_");
                     let index = meshName[1].charAt(meshName[1].length - 1);
-                    let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index)
+                    let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index) // TODO faire tout ca uniquement si c'est un level nightmare
                     let elementDream = this._game.getScene().getTransformNodeByName(meshName[0] + "_" + meshName[1])
                     elementNightMare.getChildMeshes().forEach(mesh => {
                         mesh.isVisible = false;
@@ -162,5 +165,16 @@ export abstract class AbstractLevel {
     public getObjects() {
         return this._objects
     }
+    public isNightmareLevel() {
+        return this._isNightmareLevel;
+    }
     public abstract doAfterCinematic(): void;
+
+    SetLastSpawnData(spawnData: SpawnData) {
+        this._lastSpawnData = spawnData;
+    }
+
+    getLastSpawnData(): SpawnData {
+        return this._lastSpawnData;
+    }
 }
