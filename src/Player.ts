@@ -182,7 +182,6 @@ export class Player extends TransformNode {
 
         else if (this._isFalling){
              this._currentAnim = this._animations["fall_loop"];
-             console.log("is falling")
          }
         else if (this._isJumping){
             this._currentAnim = this._animations["jump"];
@@ -228,7 +227,6 @@ export class Player extends TransformNode {
 
 }
     public setPosition(position: Vector3): void {
-        console.log("set position", position);
         this.mesh.position.copyFrom(position);
     }
 
@@ -314,9 +312,6 @@ export class Player extends TransformNode {
         shootingSystem.getRayFromShooting(this._scene, this.mesh.position, this.getMeshDirection());
         this.updateSandEmetter();
         this.updateStaminaBar();
-
-        console.log("FORCES :", this._externalForces);
-
     }
 
 
