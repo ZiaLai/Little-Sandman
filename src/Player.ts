@@ -7,7 +7,7 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3, Tools
+    Vector3, Tools, Sound
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -86,6 +86,9 @@ export class Player extends TransformNode {
 
     private _externalForces: Force[] = [];
 
+    private _sounds: Record<string, Sound>;
+    private _soundsPlaying: Record<string, boolean>;
+
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
         super("player", scene);
         this.scene = scene;
@@ -133,6 +136,20 @@ export class Player extends TransformNode {
         // -- STAMINA BAR
         this._staminaBar = new StaminaBar(this.mesh, this.scene);
 
+
+        this._sounds = {"jump" :  new Sound("jump", "./musics/sfx/jump.ogg"),
+                         "hover" : new Sound("hover", "./musics/sfx/hover.ogg"),
+                         "throw_sand" : new Sound("throw_sand", "./musics/sfx/throw_sand.ogg") };
+
+        this._soundsPlaying = {}
+        for (const key of Object.keys(this._sounds)) {
+            this._soundsPlaying[key] = false;
+        }
+
+        this._sounds["jump"].setVolume(0.5);
+        this._sounds["hover"].setVolume(0.5);
+        this._sounds["throw_sand"].setVolume(0.8);
+
     }
     private _setUpAnimations(){
         this.scene.stopAllAnimations();
@@ -177,7 +194,6 @@ export class Player extends TransformNode {
         else if (this._hovering ){
             this._currentAnim = this._animations["fall_loop"];
             this.hoveringSandEmetter.start();
-
         }
 
         else if (this._isFalling){
@@ -228,6 +244,31 @@ export class Player extends TransformNode {
 }
     public setPosition(position: Vector3): void {
         this.mesh.position.copyFrom(position);
+    }
+
+    private _updateSounds() {
+        if (this._hovering) {
+            if (! this._soundsPlaying["hover"]) {
+                this._sounds["hover"].play();
+                this._soundsPlaying["hover"] = true;
+            }
+        }
+        else {
+            this._sounds["hover"].stop(0.02);
+            this._soundsPlaying["hover"] = false;
+        }
+
+        if (this._isShooting) {
+            if (! this._soundsPlaying["throw_sand"]) {
+                this._sounds["throw_sand"].play();
+                this._soundsPlaying["throw_sand"] = true;
+            }
+
+        }
+        else {
+            this._sounds["throw_sand"].stop(0.025);
+            this._soundsPlaying["throw_sand"] = false;
+        }
     }
 
     // Calculs en fonction des inputs
@@ -312,6 +353,8 @@ export class Player extends TransformNode {
         shootingSystem.getRayFromShooting(this._scene, this.mesh.position, this.getMeshDirection());
         this.updateSandEmetter();
         this.updateStaminaBar();
+
+        this._updateSounds();
     }
 
 
@@ -566,6 +609,7 @@ export class Player extends TransformNode {
         if (this._inputs[this._currentInput].jumpKeyDown) {
             if (!this._jumpKey && this._falling < 3 && this._jumpCount > 0) {
                 this._isJumping = true;
+                this._sounds["jump"].play();
                 this._gravity.y = Player.JUMP_FORCE;
                 this._jumpCount--;
                 this._jumpKey = true;
