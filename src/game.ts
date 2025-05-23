@@ -11,11 +11,13 @@ import {GameState} from "./GameState";
 import {AdvancedDynamicTexture, Button, Rectangle, StackPanel} from "@babylonjs/gui";
 import {GameObject} from "./GameObjects/GameObject";
 import {CinematicData} from "./data/CinematicData";
+import {PauseMenu} from "./util/PauseMenu";
+import {SpawnData} from "./SpawnData";
 
 export class Game {
 
     private _app: App;
-
+    private _pauseMenu: PauseMenu;
     private _player: Player;
     spriteLoader: SpriteLoader;
 
@@ -27,6 +29,7 @@ export class Game {
     private _state : GameState;z
     private cinematicTimer : number = 0;
     private currentCinematic : CinematicData;
+    private createPauseMenu: boolean = true;
 
     constructor(app: App) {
         this._app = app;
@@ -56,16 +59,51 @@ export class Game {
     }
 
     public update(): void {
-        //TODO completer
-        // TODO c'est ici qu'on doit "ecouter" si on appuie sur le bouton qui demmare le menu pause ?
+        console.log("LOCK POINTER:", this.getPlayer().getInput().getLockPointer());
         switch (this._state){
-            case GameState.PLAYING:this._levels[this._currentLevel].update();
+            case GameState.PLAYING:
+                this.getPlayer().getInput().setLockPointer(true);
+                this.getPlayer().setIsActive(true);
+                this._levels[this._currentLevel].update();
+                if (this.getPlayer().getInput().pauseKeyDown){
+                    this._state = GameState.ENTERING_PAUSE;
+                    this.getPlayer().setIsActive(false);
+                    //this.getPlayer().disableCamera();
+                }
                 break;
 
-            case GameState.PAUSE: this.pauseMenu();break; // TODO afficher menu pause;
-                // TODO capter l'event qui permet de passer en pause
+            case GameState.ENTERING_PAUSE:
+                this.getPlayer().getInput().setLockPointer(false);
+                this.getPlayer().getInput().exitPointerLock();
+                this.displayPauseMenu();
+                if (! this.getPlayer().getInput().pauseKeyDown){
+                    this._state = GameState.PAUSE;
+                }
+                break;
 
-            case GameState.CINEMATIC: this.playCinematic();break;
+            case GameState.PAUSE:
+                this.getPlayer().getInput().setLockPointer(false);
+                if (this.getPlayer().getInput().pauseKeyDown){
+                    this._state = GameState.UNPAUSE;
+                }
+                break;
+
+            case GameState.UNPAUSE:
+
+                if (! this.getPlayer().getInput().pauseKeyDown){
+                    this._state = GameState.PLAYING;
+                    this._pauseMenu.hide();
+
+                    this.getPlayer().getInput().requestPointerLock();
+                    this.getPlayer().setIsActive(true);
+                    //this.getPlayer().camera.enable(this.getScene());
+                }
+
+                break;
+
+            case GameState.CINEMATIC:
+                this.playCinematic();
+                break;
 
         }
 
@@ -95,56 +133,22 @@ export class Game {
             // TODO détruire la cinematique ?
         }
     }
-    public pauseMenu():void{
-        // TODO implementer
-        const advancedTexture =AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-        const pauseMenu = new Rectangle();
-        // TODO mettre image
-        pauseMenu.width = "80%";
-        pauseMenu.height = "80%";
-        pauseMenu.thickness = 0;
-        pauseMenu.background = "#222";
-        pauseMenu.isVisible = false;
-        advancedTexture.addControl(pauseMenu);
-
-    // Créer un StackPanel pour les boutons
-        const buttonPanel = new StackPanel();
-        buttonPanel.width = "100%";
-        buttonPanel.isVertical = true;
-        pauseMenu.addControl(buttonPanel);
-
-        // Fonction pour créer des boutons cohérents
-        function createMenuButton(text, callback) {
-            const button = Button.CreateSimpleButton("btn_" + text, text);
-            button.width = "80%";
-            button.height = "50px";
-            button.color = "white";
-            button.cornerRadius = 10;
-            button.background = "#444";
-            button.paddingTop = "10px";
-            button.onPointerUpObservable.add(callback);
-            return button;
-        }
-
-    // Ajouter des boutons au panel
-        buttonPanel.addControl(createMenuButton("Reprendre", () => {
-            pauseMenu.isVisible = false;
-            console.log("Reprendre");
-        }));
-
-        buttonPanel.addControl(createMenuButton("Retourner au point de départ", () => {
-            console.log("Options cliquées");
-        }));
-
-        buttonPanel.addControl(createMenuButton("Quitter", () => {
-            console.log("Quitter cliqué");
-        }));
+    public displayPauseMenu():void{
+        // if (this.createPauseMenu) {
+        //     this._pauseMenu = new PauseMenu(this);
+        //     this.createPauseMenu = false;
+        // }
+        // else {
+        //     this._pauseMenu.show();
+        // }
+        this._pauseMenu.show();
         // TODO si pas dans un niveau, ajouter "recommencer" et " retour à la ville"
     }
 
     public initializeLevel(): void {
         this._levels[this._currentLevel].initialize();
+        this.createPauseMenu = true;
     }
 
     public async setActiveLevel(name: string, playerPosition?: Vector3): Promise<void> {
@@ -157,6 +161,8 @@ export class Game {
         this._levels[this._currentLevel].destroy();
 
         this._currentLevel = name;
+
+        this._pauseMenu = new PauseMenu(this);
 
         await this._levels[this._currentLevel].setActive();
 
@@ -249,4 +255,16 @@ export class Game {
 
     public  setGamestate(GameState) {this._state = GameState;}
     public  setCurrentCinematic(cinematic ){this.currentCinematic = cinematic;}
+
+    spawnPlayerAt(spawnData: SpawnData) {
+        if (spawnData === undefined) {
+            spawnData = SpawnData.DEFAULT_VALUE;
+
+        }
+        this.getPlayer().setPosition(spawnData.position);
+        this.getPlayer().setMeshDirection(spawnData.direction);
+        if (spawnData.alpha) this.getPlayer().camera.setAlpha(spawnData.alpha);
+
+        this.getCurrentLevel().SetLastSpawnData(spawnData);
+    }
 }
