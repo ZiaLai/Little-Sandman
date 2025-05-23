@@ -31,6 +31,8 @@ export class CityLevel extends AbstractLevel{
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
+    static FOUNTAIN_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(0,54,0),new Vector3(0,0,0), 0);
+
     private _subLocation: CityLocation;
 
     private _playTutorial = true;
