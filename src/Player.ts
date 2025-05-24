@@ -355,10 +355,6 @@ export class Player extends TransformNode {
 
 
     beforeRenderUpdate(shootingSystem: ShootingSystem): void {
-        /* console.log("current input : ", this._currentInput);
-        console.log("player inputs : ", this._inputs); */
-        console.log("SPEED :", this._speed);
-
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
