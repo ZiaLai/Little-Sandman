@@ -1,7 +1,7 @@
 import {TextBlock} from "@babylonjs/gui";
 
 export class FadeText{
-    public static async fadeOut(textBlock: TextBlock, duration: number = 2000) {
+    public static async fadeOut(textBlock: TextBlock, duration: number = 1000) {
         return new Promise<void>((resolve) => {
 
             textBlock.alpha = 1;
@@ -20,7 +20,7 @@ export class FadeText{
             }, step);
         });
     }
-    public static async fadeIn(textBlock: TextBlock, duration: number = 2000) {
+    public static async fadeIn(textBlock: TextBlock, duration: number = 1000) {
         return new Promise<void>((resolve) => {
             textBlock.alpha = 0;
             const step = 16;
