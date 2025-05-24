@@ -14,6 +14,7 @@ enum BarsState {CLOSED, OPENING, OPENED}
 import {Mesh} from "@babylonjs/core";
 import {ClearNightmareParticles} from "../util/ClearNightmareParticles";
 import {State} from "../State";
+import {AllMonolog} from "../data/AllMonolog";
 
 
 export class SugarlessBakery extends AbstractLevel {
@@ -61,6 +62,8 @@ export class SugarlessBakery extends AbstractLevel {
         // todo : charger la musique
         this.setUpGui();
         this._music.play();
+        this.setClearNightmareParticles();
+
         // this._upgradeMusic();
     }
 
@@ -88,9 +91,9 @@ export class SugarlessBakery extends AbstractLevel {
         this._breadSlicePlatformTransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         console.assert(this._breadSlicePlatformTransformNode);
 
-
-
         this._initBars();
+
+        AllMonolog.play(2);
 
         //this._objects["bread_slice"] = [];
     }
@@ -165,7 +168,27 @@ export class SugarlessBakery extends AbstractLevel {
                 break;
         }
     }
+    private setClearNightmareParticles(){
+        for (let i = 0; i < 7; i++) {
+            if (i==0){
+                this.clearNigthmareParticleEmmitter.push(null);
 
+            }
+            else if  (i == 6){
+                this.clearNigthmareParticleEmmitter.push(
+                    new ClearNightmareParticles(this._game.getGameScene(),
+                        this._game.getGameScene().getTransformNodeByName("element_dream6").getAbsolutePosition(),
+                        0.4));
+            }
+            else {
+                this.clearNigthmareParticleEmmitter.push(
+                    new ClearNightmareParticles(this._game.getGameScene(),
+                        this._game.getGameScene().getTransformNodeByName("element_dream"+i).getAbsolutePosition()));
+
+            }
+        }
+
+    }
     protected _addTriggers(): void {
         //element_nightmare1 element_dream1 element_dream1_collider_trigger
         this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
@@ -189,6 +212,7 @@ export class SugarlessBakery extends AbstractLevel {
                 if (willAdd) {
                     this._nbNightmareFound++;
                     this.setUpGui();
+                    this.clearNigthmareParticleEmmitter[index].start();
                     this._upgradeMusic();
                     if (this._nbNightmareFound == 6) {
                         await this._game.getApp().goToSomething(State.CINEMATIC, 1);
