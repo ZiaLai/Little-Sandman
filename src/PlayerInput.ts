@@ -1,4 +1,5 @@
 import {ActionManager, ExecuteCodeAction, Scalar, Scene} from "@babylonjs/core";
+import {KeyboardInput} from "./KeyboardInput";
 
 export abstract class PlayerInput {
     public isActive: boolean = false;
@@ -18,5 +19,15 @@ export abstract class PlayerInput {
     public camVerticalAxis: number;
     public camHorizontalAxis: number;
 
+    public pauseKeyDown: boolean;
+
+    public abstract setLockPointer(lockPointer: boolean):void;
+
+    public abstract exitPointerLock():void;
+
+    public abstract requestPointerLock():void;
+
     public abstract reset(): void;
+
+    public abstract getLockPointer(): boolean;
 }

@@ -2,38 +2,32 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import {
+    Color4,
     Engine,
-    Scene,
-    ArcRotateCamera,
-    Vector3,
-    HemisphericLight,
+    FreeCamera,
+    Matrix,
     Mesh,
     MeshBuilder,
-    FreeCamera,
-    Color4,
-    StandardMaterial,
-    Color3,
     PointLight,
-    ShadowGenerator,
     Quaternion,
-    Matrix,
-    SceneLoader, SceneOptimizer, Sound, VideoTexture, PointerEventTypes, Texture,
+    Scene,
+    SceneLoader,
+    SceneOptimizer,
+    ShadowGenerator, Sound,
+    Vector3,
 } from "@babylonjs/core";
-import { AdvancedDynamicTexture, StackPanel, TextBlock, Rectangle, Button, Control, Image } from "@babylonjs/gui";
-import { Environment } from "./environment";
-import { Player } from "./Player";
-import {PlayerInput} from "./PlayerInput";
+import {AdvancedDynamicTexture, Button, Control, Image, Rectangle, TextBlock} from "@babylonjs/gui";
+import {Environment} from "./environment";
+import {Player} from "./Player";
 import {Game} from "./game";
 import {TestRunner} from "./Test/TestRunner";
-import {AllMonolog} from "./data/AllMonolog";
-import {FadeText} from "./util/FadeText";
 import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 import {SpawnData} from "./SpawnData";
-import {Monolog} from "./util/Monolog";
 import {State} from "./State";
 import {CinematicScene} from "./util/CInematicScene";
 import {AllCinematicData} from "./data/AllCInematicData";
 import {ShootingSystem} from "./ShootingSystem";
+
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 
 export class App {
@@ -41,8 +35,6 @@ export class App {
     private _scene: Scene;
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
-
-    private _input: PlayerInput;
 
     //Game State Related
     public assets;
@@ -54,8 +46,6 @@ export class App {
     //Scene - related
     private _state: number = 0;
     private _gamescene: Scene;
-    private _cutScene: Scene;
-    private _lastFrameTime: number = 0;
     private _sceneOptimizer;
 
     // TIMER FRAUDE
@@ -67,7 +57,7 @@ export class App {
     private cinematicTimer = 0;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "city";
+    private START_LEVEL = "bakers_bedroom";
 
     constructor() {
         if (this.EXECUTE_TEST) new TestRunner().main();
@@ -126,8 +116,8 @@ export class App {
     }
 
     private async _main(): Promise<void> {
-        //await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
-        await this._goToStart(); // TODO enlever quand on  aura fini dev
+        await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
+        //await this._goToStart(); // TODO enlever quand on  aura fini dev
 
         // Register a render loop to repeatedly render the scene
 
@@ -152,7 +142,7 @@ export class App {
                         this.cinematicTimer+= this._scene.deltaTime/1000;
                     }
                     else {
-                        await this._goToStart();
+                        await this.goToSomething(this.currentCinematic.getWantedState());
                     }
                     break;
                 case State.LES_FRAUDES:
@@ -185,7 +175,7 @@ export class App {
         //console.log("fps" + this._sceneOptimizer.targetFrameRate + " deltaTime : " + this._scene.deltaTime);
     }
 
-    public async goToSomething(wantedState): Promise<void> {
+    public async goToSomething(wantedState :State, cinematicIndex = -1): Promise<void> {
         switch(wantedState) {
             //TODO ajouter en fonction des besoins
             case State.START :
@@ -196,6 +186,9 @@ export class App {
                 break;
             case State.GAME:
                 await this._goToGame();
+                break;
+            case State.CINEMATIC :
+                await this._goToCinematic(cinematicIndex);
                 break;
 
         }
@@ -228,6 +221,13 @@ export class App {
 
 
         // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)(op)
+        function playsound(){
+            setTimeout(() => {
+                sound.play();
+                }, 2000);
+
+        }
+        let sound = new Sound("les fraudes", "./musics/Les fraudes.m4a", null, playsound);
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -263,6 +263,13 @@ export class App {
         logo.height = "406px";
         logo.paddingTop = 150;
         logo.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        const imageLoadPromise = new Promise<void>((resolve, reject) => {
+
+            logo.onImageLoadedObservable.addOnce(() => {
+                resolve();
+            });
+
+        });
         imageRect.addControl(logo);
         const text = new TextBlock("text", "Pour une meilleure expérience,\npensez à activer le son !") // TODO : si on veut décentrer vers le bas, il faut changer text alignement et block alignement sur bottom
         text.color ="white";
@@ -292,6 +299,7 @@ export class App {
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
+        await imageLoadPromise;
         this._engine.hideLoadingUI();
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
@@ -441,7 +449,6 @@ export class App {
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
 
-            // TRUC QUI MARCEH MAIS ON COMMENTE POUR FAIRE UN TEST
             return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_23.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
@@ -522,16 +529,7 @@ export class App {
         //dont detect any inputs from this ui while the game is loading
         scene.detachControl();
 
-        //create a simple button
-        /*const loseBtn = Button.CreateSimpleButton("lose", "LOSE");
-        loseBtn.width = 0.2
-        loseBtn.height = "40px";
-        loseBtn.color = "white";
-        loseBtn.top = "-14px";
-        loseBtn.thickness = 0;
-        loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        playerUI.addControl(loseBtn);*/
-        // Bouton pour tester le changement d'environnement
+        // Bouton pour tester le changement d'environnement // TODO virrer quand on aura fini dev
         const changeButton = Button.CreateSimpleButton("change", "CHANGE");
         changeButton.width = 0.2
         changeButton.height = "40px";
@@ -625,9 +623,17 @@ export class App {
         const draw = new Image("draw", "/textures/thanks_for_playing (1).png");
         draw.height = "100%";
         draw.stretch = Image.STRETCH_UNIFORM;
+        const imageLoadPromise = new Promise<void>((resolve, reject) => {
+
+            draw.onImageLoadedObservable.addOnce(() => {
+                resolve();
+            });
+
+        });
         imageRect.addControl(draw);
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
+        await imageLoadPromise;
         this._engine.hideLoadingUI();
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
@@ -644,12 +650,7 @@ export class App {
 
         this._player.reset();
 
-        if (spawnData !== undefined) {
-            this._player.setPosition(spawnData.position);
-            this._player.setMeshDirection(spawnData.direction);
-
-            if (spawnData.alpha) this._player.camera.setAlpha(spawnData.alpha);
-        }
+        this._game.spawnPlayerAt(spawnData);
 
        this._engine.hideLoadingUI();
     }

@@ -83,6 +83,7 @@ export class Player extends TransformNode {
     private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
     private _staminaBar;
+    private _isActive: boolean = true;
     private _lastFloorPickedPoint: Vector3;
 
     private _externalForces: Force[] = [];
@@ -96,8 +97,8 @@ export class Player extends TransformNode {
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
 
-        // this.mesh.position.y = 3.5   // Temporairement, en attendant qu'il y ait une startPos dans la ville
-        //this.mesh.position = new Vector3(51, 18, 11);
+        this.scene.getLightByName("Area").intensity = 5;
+
         if (playerPosition === undefined) playerPosition = new Vector3(0, 3.5, 0);
         this.setPosition(playerPosition);
 
@@ -332,7 +333,6 @@ export class Player extends TransformNode {
         let direction = this._direction.clone();
         this._moveVector = direction.scaleInPlace(trueSpeed);
 
-        // Décélération
 
 
         this._isWalking = true;
@@ -355,6 +355,7 @@ export class Player extends TransformNode {
 
 
     beforeRenderUpdate(shootingSystem: ShootingSystem): void {
+        if (! this._isActive) return;
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
@@ -770,7 +771,8 @@ export class Player extends TransformNode {
        return result;
     }
 
-    // public orientCamera(): void {
-    //     this.camera.setAlpha(this.getMeshDirection().z);
-    // }
+
+    public setIsActive(isActive: boolean): void {
+        this._isActive = isActive;
+    }
 }

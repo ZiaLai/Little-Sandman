@@ -1,11 +1,8 @@
 import {PlayerInput} from "./PlayerInput";
 import {
-    ActionManager,
     DualShockPad,
-    ExecuteCodeAction,
     GamepadManager,
     GenericPad,
-    Scalar,
     Scene, StickValues,
     Xbox360Pad
 } from "@babylonjs/core";
@@ -120,6 +117,19 @@ export class GamepadInput extends PlayerInput {
 
     public reset() {
 
+    }
+
+    setLockPointer(lockPointer: boolean): void {
+    }
+
+    exitPointerLock(): void {
+    }
+
+    requestPointerLock(): void {
+    }
+
+    getLockPointer(): boolean {
+        return false;
     }
 
 }

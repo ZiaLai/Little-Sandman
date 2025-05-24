@@ -1,12 +1,10 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {
-    ActionManager, Camera, Color3,
-    ExecuteCodeAction, FreeCamera,
+    ActionManager, ArcRotateCamera, Color3, FreeCamera,
     HemisphericLight,
-    Mesh, MeshBuilder, PointLight,
-    Scene,
-    SetValueAction, Sound, StandardMaterial, Texture, Tools,
+    Mesh, Sound,
+    Tools,
     Vector3
 } from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
@@ -15,6 +13,10 @@ import {Music} from "../AudioControl/Music";
 import {LoopMusic} from "../AudioControl/LoopMusic";
 import {SpawnData} from "../SpawnData";
 import {IntroLoopMusic} from "../AudioControl/IntroLoopMusic";
+import {CinematicScene} from "../util/CInematicScene";
+import {AllCinematicData} from "../data/AllCInematicData";
+import {GameState} from "../GameState";
+
 
 enum CityLocation {SKATEPARK, CITY}
 
@@ -29,6 +31,8 @@ export class CityLevel extends AbstractLevel{
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
+    static FOUNTAIN_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(0,54,0),new Vector3(0,0,0), 0);
+
     private _subLocation: CityLocation;
 
     private _playTutorial = true;
@@ -39,6 +43,9 @@ export class CityLevel extends AbstractLevel{
     private _soundsPlayed: Record<string, boolean>;
 
     private _platformingTriggersActivation: boolean[];
+
+    private cinematicScene: CinematicScene;
+    private cinematicCamera = new FreeCamera("cinematic camera",new Vector3(0,10,-12));
 
 
     constructor(game: Game, id: number) {
@@ -60,8 +67,9 @@ export class CityLevel extends AbstractLevel{
         this._initSounds();
         this._addTriggers();
         console.log("after adding triggers");
-        this.introduction();
-        AllMonolog.play(0);// TODO jouer dialogue uniquement à la fin de l'introduction
+        this.cinematicScene = new CinematicScene(this._game.getGameScene(), AllCinematicData.getData(2), new Vector3(0, 10, 1));
+        this.cinematicScene.stop();
+        AllMonolog.play(0);
 
         this._finishedLoading();
     }
@@ -95,8 +103,6 @@ export class CityLevel extends AbstractLevel{
         }
 
 
-
-        console.log("player position :", this._game.getPlayer().mesh.position);
     }
 
     update(): void {
@@ -194,36 +200,29 @@ export class CityLevel extends AbstractLevel{
 
             if (mesh.name.includes("exit_skatepark")) {
                 mesh.actionManager = new ActionManager(this._game.getScene());
-                const exitAction = () => {
-                    if (! this._skateparkExitTriggerActive) return;
+                const exitAction = async () => {
+                    if (!this._skateparkExitTriggerActive) return;
                     console.assert(this._subLocation === CityLocation.SKATEPARK);
-
-                    if (this._playCityEntranceCinematic) {
-                        // TODO : add lancer cinématique
-
-
-
-
-
-
-
-                    }
-
-                    this._subLocation = CityLocation.CITY;
                     this._skateparkMusic.destroy();
-
-                    if (this._music instanceof IntroLoopMusic) {
-                        this._music.play(this._playCityEntranceCinematic); // Si on joue la cinématique, on skip l'intro, sinon on la joue
+                    if (this._playCityEntranceCinematic) {
+                        await this.introduction();
                     }
-
-                    this._playCityEntranceCinematic = false;
-
-                    this._skateparkExitTriggerActive = false;
-                    this._skateparkEntranceTriggerActive = true;
+                    else {
+                        this._firstCityEntrance();
+                    }
                 }
                 this.setMeshAsExecuteActionTrigger(mesh, exitAction);
             }
         })
+    }
+    private _firstCityEntrance(){
+        this._subLocation = CityLocation.CITY;
+        if (this._music instanceof IntroLoopMusic) {
+            this._music.play(this._playCityEntranceCinematic); // Si on joue la cinématique, on skip l'intro, sinon on la joue
+        }
+        this._playCityEntranceCinematic = false;
+        this._skateparkExitTriggerActive = false;
+        this._skateparkEntranceTriggerActive = true;
     }
 
     protected setUpLights(): void {
@@ -271,36 +270,28 @@ export class CityLevel extends AbstractLevel{
 
     }
 
-    protected setUpSkydome(): void {
-        // const skydome = MeshBuilder.CreateSphere('skydome', {
-        //     segments: 32,
-        //     diameter: 1000,
-        //     //slice: 0.5, // prendre seulement la moitié de la sphère
-        // }, this._game.getGameScene());
-        // skydome.infiniteDistance = true;
-        //
-        // // Material pour le ciel
-        // const skyMaterial = new StandardMaterial('skyMaterial', this._game.getGameScene());
-        // skyMaterial.diffuseTexture = new Texture("models/skydome_2.jpeg", this._game.getGameScene());
-        // //skyMaterial.diffuseTexture.scale(8);
-        //
-        // //skyMaterial.diffuseTexture.wrapU = Texture.WRAP_ADDRESSMODE;
-        // //skyMaterial.diffuseTexture.wrapV = Texture.WRAP_ADDRESSMODE;
-        // skyMaterial.diffuseTexture.coordinatesMode = Texture.SPHERICAL_MODE;
-        // skyMaterial.backFaceCulling = false;
-        // skydome.material = skyMaterial;
-    }
-
     public destroy(): void {
         super.destroy();
 
         if (this._skateparkMusic) this._skateparkMusic.destroy();
     }
 
-    private introduction(): void {
-        // TODO trouver position de départ de la cam;
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._game.getGameScene());
-        this._game.getGameScene().activeCamera = camera;
+    private async introduction(): Promise<void> {
+        let cinematic  = AllCinematicData.getData(2);
+        this.cinematicScene.play();
+        //this._game.setGamestate(GameState.DO_NOTHING); // TODO : stopper le joueur proprement ?
+        this._game.getScene().activeCamera = new FreeCamera("cinematic camera",new Vector3(0,10,-12));
+        this._game.getPlayer().disableCamera();
+        this._game.switchPlayerLight(0);
+        this._game.setGamestate(GameState.CINEMATIC);
+        this._game.setCurrentCinematic(cinematic);
+
+
+    }
+
+    doAfterCinematic(): void {
+        this._firstCityEntrance();
+        this.cinematicScene.stop();
     }
 
     private _initSounds() {

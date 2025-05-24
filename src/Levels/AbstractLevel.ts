@@ -4,6 +4,7 @@ import {GameObject} from "../GameObjects/GameObject";
 import {Music} from "../AudioControl/Music";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 import {SpawnData} from "../SpawnData";
+import {ClearNightmareParticles} from "../util/ClearNightmareParticles";
 
 
 export abstract class AbstractLevel {
@@ -18,10 +19,15 @@ export abstract class AbstractLevel {
     protected _objects: GameObject[] = [];
     private _id: number;
     private _loading: boolean;
+    protected _isNightmareLevel: boolean;
+    protected _lastSpawnData: SpawnData;
+    protected clearNigthmareParticleEmmitter:ClearNightmareParticles[] = [];
+
 
     protected constructor(game: Game, id: number) {
         this._game = game;
         this._id = id;
+        this._isNightmareLevel = false;
     }
 
     public getRessourceName(): string {
@@ -47,8 +53,6 @@ export abstract class AbstractLevel {
         //
         // });
         this.setUpLights();
-        this.setUpSkydome();
-
     }
 
     // Méthode appelée au "premier" démarrage du niveau (pas si on revisite le niveau après être allé dans un autre)
@@ -64,7 +68,6 @@ export abstract class AbstractLevel {
     }
 
     protected abstract setUpLights():void;
-    protected abstract setUpSkydome():void;
     // Détruit la ressource du niveau, et ses objets
     public destroy() {
         for (let object of this._objects) {
@@ -122,7 +125,7 @@ export abstract class AbstractLevel {
     }
 
     protected setMeshAsSwapMeshTrigger(mesh: Mesh, triggerEffect: (mesh: Mesh) => void) {
-        let shootingSystem = this._game.getApp().getShootingSystem()
+        let shootingSystem = this._game.getApp().getShootingSystem();
         mesh.registerBeforeRender(() => {
             let shootingRay = shootingSystem.getShootingRay();
             if (shootingRay && !shootingSystem.isInteracting()) {
@@ -147,5 +150,17 @@ export abstract class AbstractLevel {
 
     public getObjects() {
         return this._objects
+    }
+    public isNightmareLevel() {
+        return this._isNightmareLevel;
+    }
+    public abstract doAfterCinematic(): void;
+
+    SetLastSpawnData(spawnData: SpawnData) {
+        this._lastSpawnData = spawnData;
+    }
+
+    getLastSpawnData(): SpawnData {
+        return this._lastSpawnData;
     }
 }

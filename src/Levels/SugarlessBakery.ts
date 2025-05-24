@@ -11,7 +11,10 @@ enum KnifeState {RISING, RISEN, FALLING, FALLEN}
 
 enum BarsState {CLOSED, OPENING, OPENED}
 
-import {ActionManager, Mesh} from "@babylonjs/core";
+import {Mesh} from "@babylonjs/core";
+import {ClearNightmareParticles} from "../util/ClearNightmareParticles";
+import {State} from "../State";
+import {AllMonolog} from "../data/AllMonolog";
 
 
 export class SugarlessBakery extends AbstractLevel {
@@ -38,6 +41,7 @@ export class SugarlessBakery extends AbstractLevel {
 
     constructor(game: Game, id: number) {
         super(game, id);
+        this._isNightmareLevel = true;
         this._name = "sugarless_bakery";
         this._ressourceName = "bakery_level_12";
 
@@ -58,6 +62,8 @@ export class SugarlessBakery extends AbstractLevel {
         // todo : charger la musique
         this.setUpGui();
         this._music.play();
+        this.setClearNightmareParticles();
+
         // this._upgradeMusic();
     }
 
@@ -85,9 +91,9 @@ export class SugarlessBakery extends AbstractLevel {
         this._breadSlicePlatformTransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         console.assert(this._breadSlicePlatformTransformNode);
 
-
-
         this._initBars();
+
+        AllMonolog.play(2);
 
         //this._objects["bread_slice"] = [];
     }
@@ -162,11 +168,31 @@ export class SugarlessBakery extends AbstractLevel {
                 break;
         }
     }
+    private setClearNightmareParticles(){
+        for (let i = 0; i < 7; i++) {
+            if (i==0){
+                this.clearNigthmareParticleEmmitter.push(null);
 
+            }
+            else if  (i == 6){
+                this.clearNigthmareParticleEmmitter.push(
+                    new ClearNightmareParticles(this._game.getGameScene(),
+                        this._game.getGameScene().getTransformNodeByName("element_dream6").getAbsolutePosition(),
+                        0.4));
+            }
+            else {
+                this.clearNigthmareParticleEmmitter.push(
+                    new ClearNightmareParticles(this._game.getGameScene(),
+                        this._game.getGameScene().getTransformNodeByName("element_dream"+i).getAbsolutePosition()));
+
+            }
+        }
+
+    }
     protected _addTriggers(): void {
         //element_nightmare1 element_dream1 element_dream1_collider_trigger
         this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
-            let colliderTriggerEffect = (mesh: Mesh) => {
+            let colliderTriggerEffect: (mesh: Mesh) => void = async (mesh: Mesh) => {
                 let meshName = mesh.name.split("_");
                 let index = meshName[1].charAt(meshName[1].length - 1);
                 let elementNightMare = this._game.getScene().getTransformNodeByName(meshName[0] + "_nightmare" + index);
@@ -176,18 +202,22 @@ export class SugarlessBakery extends AbstractLevel {
                     mesh.isVisible = false;
                 })
                 elementDream.getChildMeshes().forEach(mesh => {
-                    if (! mesh.isVisible) {
+                    if (!mesh.isVisible) {
                         willAdd = true;
                         mesh.isVisible = true;
-                    }
-                    else {
+                    } else {
                         willAdd = false;
                     }
                 })
                 if (willAdd) {
                     this._nbNightmareFound++;
                     this.setUpGui();
+                    this.clearNigthmareParticleEmmitter[index].start();
                     this._upgradeMusic();
+                    if (this._nbNightmareFound == 6) {
+                        await this._game.getApp().goToSomething(State.CINEMATIC, 1);
+                        this.destroy();
+                    }
                 }
                 //console.log("swap done", this._nbNightmareFound);
 
@@ -212,23 +242,19 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     protected setUpLights(): void {
-        // TODO add lights sur les gateaux + lumiere rouge dans le four
         var light0 = new HemisphericLight("nightLight", new Vector3(0, 1, 0), this._game.getGameScene());
-        light0.diffuse = new Color3(0.066,0.082,1); // TODO plus violet ? z
+        light0.diffuse = new Color3(0.066,0.082,1); // TODO plus violet ?
         light0.intensity = 2;
         //---FOUR---
-        const light = new PointLight("four", new Vector3(-8, 25, -90), this._game.getGameScene());// TODO CHANGE POS
+        const light = new PointLight("four", new Vector3(-8, 25, -90), this._game.getGameScene());
         light.diffuse = new Color3(1,0,0);
-        light.intensity =2000;
+        light.intensity = 2000;
         // const cake1 = new PointLight("cake 1", new Vector3(4, 2.8, 1), this._game.getGameScene());
         // cake1.diffuse = new Color3(0.585, 1, 0.573);
-        // cake1.intensity =10;
+        // cake1.intensity =10 ;
 
     }
 
-    protected setUpSkydome(): void {
-        // TODO implement (esce qu'on peut changer de texture losqu'on corrige un element ? )
-    }
     private setUpGui(): void {
         const ui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
@@ -242,5 +268,8 @@ export class SugarlessBakery extends AbstractLevel {
         compteur.paddingLeft = 40;
         ui.addControl(compteur);
 
+    }
+
+    doAfterCinematic(): void {
     }
 }

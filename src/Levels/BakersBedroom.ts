@@ -17,6 +17,7 @@ enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3,
 
 import {ActionManager, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
+import {UIActionButton} from "../util/UIActionButton";
 
 export class BakersBedroom extends AbstractLevel {
     public static START_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(3.89, 2.45, -7.52),
@@ -44,6 +45,7 @@ export class BakersBedroom extends AbstractLevel {
     private _bakerHit: boolean;
 
     private _goodNightSound: Sound;
+    private fButton : UIActionButton;
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -70,6 +72,8 @@ export class BakersBedroom extends AbstractLevel {
 
         this._goodNightSound = new Sound("good_night", "./musics/sfx/good_night.ogg", this._game.getGameScene());
 
+        this.fButton = new UIActionButton("Commencer", "/textures/fButton.png");
+        this.fButton.hide();
         this._initCloudMeshes();
 
         this._hideCloud();
@@ -108,8 +112,6 @@ export class BakersBedroom extends AbstractLevel {
         this._updateCamera();
 
         this._updateCloud();
-
-        //console.log("BAKER HIT:", this._bakerHit);
     }
 
     private _updateCamera(): void {
@@ -139,15 +141,16 @@ export class BakersBedroom extends AbstractLevel {
                 break;
 
             case CameraState.ZOOMED_IN:
-                if (distanceToPlayer > this._CAMERA_TRIGGER_DISTANCE) this._cameraState = CameraState.ZOOMING_OUT;
+                if (distanceToPlayer > this._CAMERA_TRIGGER_DISTANCE) {
+                    this._cameraState = CameraState.ZOOMING_OUT;
+                    this.fButton.hide();
+                }
 
                 break;
         }
     }
 
     protected _addTriggers() {
-        // TODO trigged boulangere (sand)
-        //TODO triger nuage (rentrer dans le reve)
         this._game.getEnvironment().getTriggers().forEach(m => {
             if (m.name.includes("exit")) {
                 m.actionManager = new ActionManager(this._game.getScene());
@@ -181,7 +184,7 @@ export class BakersBedroom extends AbstractLevel {
 
         const aura = new PointLight("aura_cauchemar", new Vector3(7.4, 4.5, 2), this._game.getGameScene());
         aura.diffuse = new Color3(0.559,0.359,1);
-        aura.intensity =10;
+        aura.intensity =1;
     }
 
     protected setUpSkydome(): void {
@@ -273,12 +276,19 @@ export class BakersBedroom extends AbstractLevel {
 
             case CloudState.SHOWN:
 
-                if (this._game.getPlayer().getInput().actionKeyDown && this._cameraState === CameraState.ZOOMED_IN) {
-                    this._game.getApp().changeGameScene("sugarless_bakery", SugarlessBakery.ENTRANCE_SPAWN_DATA);
-                    this._cloudState = null;
+                if (this._cameraState === CameraState.ZOOMED_IN) {
+                    this.fButton.show();
+
+                    if (this._game.getPlayer().getInput().actionKeyDown) {
+                        this._game.getApp().changeGameScene("sugarless_bakery", SugarlessBakery.ENTRANCE_SPAWN_DATA);
+                        this._cloudState = null;
+                    }
                 }
 
                 break;
         }
+    }
+
+    doAfterCinematic(): void {
     }
 }
