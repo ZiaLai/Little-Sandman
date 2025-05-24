@@ -43,7 +43,7 @@ export class SugarlessBakery extends AbstractLevel {
         super(game, id);
         this._isNightmareLevel = true;
         this._name = "sugarless_bakery";
-        this._ressourceName = "bakery_level_12";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/5ix5uduz3npupr4wkvxh7/bakery_level_14.glb?rlkey=yb119txemkw7enl9xe7llovf0&st=pgrgd8ef&dl=0";
 
         this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
                                                 [   ["piano1",  "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],
@@ -59,7 +59,6 @@ export class SugarlessBakery extends AbstractLevel {
         await super.load();
         this._addTriggers();
         //this._finishedLoading();
-        // todo : charger la musique
         this.setUpGui();
         this._music.play();
         this.setClearNightmareParticles();
@@ -215,6 +214,11 @@ export class SugarlessBakery extends AbstractLevel {
                     this.clearNigthmareParticleEmmitter[index].start();
                     this._upgradeMusic();
                     if (this._nbNightmareFound == 6) {
+                        function sleep(ms) {
+                            return new Promise(resolve => setTimeout(resolve, ms));
+                        }
+
+                        await sleep(3000);
                         await this._game.getApp().goToSomething(State.CINEMATIC, 1);
                         this.destroy();
                     }
