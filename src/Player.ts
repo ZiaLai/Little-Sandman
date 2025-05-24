@@ -27,7 +27,6 @@ export class Player extends TransformNode {
     //Player
     public mesh: Mesh; //outer collisionbox of player
 
-
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
     private static PLAYER_SPEED: number = 12;
@@ -89,8 +88,8 @@ export class Player extends TransformNode {
         this.scene.collisionsEnabled = true;
         this.mesh = assets.mesh;
 
-        // this.mesh.position.y = 3.5   // Temporairement, en attendant qu'il y ait une startPos dans la ville
-        //this.mesh.position = new Vector3(51, 18, 11);
+        this.scene.getLightByName("Area").intensity = 5;
+
         if (playerPosition === undefined) playerPosition = new Vector3(0, 3.5, 0);
         this.setPosition(playerPosition);
 
