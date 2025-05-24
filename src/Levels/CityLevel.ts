@@ -51,7 +51,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "city";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/ys6eh55kopu7bt0hgq03i/city-v26.glb?rlkey=8l6nl1pshdmhmkuw6v585ftal&st=wm0t4x8k&dl=0";
 
         this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', './musics/city/city_intro.ogg'],
                                                                   ['loop', './musics/city/city_loop.ogg'  ] ]);
@@ -117,23 +117,25 @@ export class CityLevel extends AbstractLevel{
                 console.log("adding collide observable on : ", mesh.name);
                 mesh.actionManager = new ActionManager(this._game.getScene());
 
-                const sfxAction6 = () => {
-                    if (this._sounds["on_the_right_track_6"].isReady()) {
-                        this._sounds["on_the_right_track_6"].play();
-                        this._game.getPlayer().disableCamera();
-                        // TODO : stopper le player
+                const sfxAction6 = async () => {
+                    this._game.getPlayer().setIsActive(false);
+                    this._sounds["on_the_right_track_6"].play();
+                    this._game.getPlayer().disableCamera();
+
+                    function sleep(ms) {
+                        return new Promise(resolve => setTimeout(resolve, ms));
                     }
-                    else {
-                        this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
-                    }
+
+                    await sleep(2000);
+                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
                 }
 
-                const observer = this._sounds["on_the_right_track_6"].onEndedObservable.add(() => {
-                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
-
-                    // Optionnel : retirer l’observer si tu veux éviter des appels multiples plus tard
-                    this._sounds["on_the_right_track_6"].onEndedObservable.remove(observer);
-                });
+                // const observer = this._sounds["on_the_right_track_6"].onEndedObservable.add(() => {
+                //     this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
+                //
+                //     // Optionnel : retirer l’observer si tu veux éviter des appels multiples plus tard
+                //     this._sounds["on_the_right_track_6"].onEndedObservable.remove(observer);
+                // });
 
                 this.setMeshAsExecuteActionTrigger(mesh, sfxAction6);
             }
@@ -280,6 +282,7 @@ export class CityLevel extends AbstractLevel{
         let cinematic  = AllCinematicData.getData(2);
         this.cinematicScene.play();
         //this._game.setGamestate(GameState.DO_NOTHING); // TODO : stopper le joueur proprement ?
+        this._game.getPlayer().setIsActive(false);
         this._game.getScene().activeCamera = new FreeCamera("cinematic camera",new Vector3(0,10,-12));
         this._game.getPlayer().disableCamera();
         this._game.switchPlayerLight(0);
@@ -290,6 +293,7 @@ export class CityLevel extends AbstractLevel{
     }
 
     doAfterCinematic(): void {
+        this._game.getPlayer().setIsActive(true);
         this._firstCityEntrance();
         this.cinematicScene.stop();
     }
