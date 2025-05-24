@@ -31,7 +31,8 @@ export class Player extends TransformNode {
 
     // Constants
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
-    private static PLAYER_SPEED: number = 12;
+    private static PLAYER_SPEED: number = 10;
+    private static HOVER_SPEED: number = 15;
     private static GRAVITY: number = -30;
     private static JUMP_FORCE: number = 15.6;
     private static HOVER_TIME: number = 2; // Durée max de l'hovering (en secondes)
@@ -304,12 +305,25 @@ export class Player extends TransformNode {
         }
 
         // Gestion de la vitesse
+        const currentSpeed = this._hovering ? Player.HOVER_SPEED : Player.PLAYER_SPEED;
+
+        this._acceleration = this._hovering ? (1 / 32) * currentSpeed : (1 / 7) * currentSpeed;
+
         // Acceleration
         if (this._inputAmt > 0.1) {
             this._speed += this._acceleration;
         }
-        if (this._speed > Player.PLAYER_SPEED) {
-            this._speed = Player.PLAYER_SPEED;
+        else {
+            this._speed *= 0.9;
+            if (this._speed < 0.5) {
+                this._speed = 0;
+            }
+        }
+
+
+
+        if (this._speed > currentSpeed) {
+            this._speed = currentSpeed;
         }
 
         let trueSpeed =  this._speed * this._deltaTime;
@@ -319,10 +333,7 @@ export class Player extends TransformNode {
         this._moveVector = direction.scaleInPlace(trueSpeed);
 
         // Décélération
-        this._speed *= 0.9;
-        if (this._speed < 0.5) {
-            this._speed = 0;
-        }
+
 
         this._isWalking = true;
         // Rotations
@@ -346,6 +357,8 @@ export class Player extends TransformNode {
     beforeRenderUpdate(shootingSystem: ShootingSystem): void {
         /* console.log("current input : ", this._currentInput);
         console.log("player inputs : ", this._inputs); */
+        console.log("SPEED :", this._speed);
+
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
