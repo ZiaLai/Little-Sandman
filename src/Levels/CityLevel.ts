@@ -6,7 +6,7 @@ import {
     HemisphericLight,
     Mesh, MeshBuilder, PointLight,
     Scene,
-    SetValueAction, StandardMaterial, Texture, Tools,
+    SetValueAction, Sound, StandardMaterial, Texture, Tools,
     Vector3
 } from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
@@ -16,18 +16,30 @@ import {LoopMusic} from "../AudioControl/LoopMusic";
 import {SpawnData} from "../SpawnData";
 import {IntroLoopMusic} from "../AudioControl/IntroLoopMusic";
 
+enum CityLocation {SKATEPARK, CITY}
+
 export class CityLevel extends AbstractLevel{
 
     private _skateparkMusic: Music;
-    public static SKATEPARK_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(20, 1, -378),
+    public static SKATEPARK_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(21.79, 0.84, -376.14),
                                                                   new Vector3(0, 0, 0),
                                                                   -1.557);
 
-    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 13.55, -30.75),
+    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 60, -30.75),
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
+    private _subLocation: CityLocation;
+
     private _playTutorial = true;
+    private _skateparkExitTriggerActive: boolean;
+    private _skateparkEntranceTriggerActive: boolean;
+    private _playCityEntranceCinematic: boolean = true;
+    private _sounds: Record<string, Sound>;
+    private _soundsPlayed: Record<string, boolean>;
+
+    private _platformingTriggersActivation: boolean[];
+
 
     constructor(game: Game, id: number) {
         super(game, id);
@@ -38,14 +50,14 @@ export class CityLevel extends AbstractLevel{
                                                                   ['loop', './musics/city/city_loop.ogg'  ] ]);
 
         this._skateparkMusic = new LoopMusic(this._game.getScene(), ["skatepark", "./musics/skatepark/skatepark_v2.ogg" ]);
-
-        // this._skateparkMusic = new LoopMusic(this._game.)
     }
 
     protected async load() {
         await super.load();
         console.log("In city load");
         console.log(this._game.getEnvironment().getTriggers());
+
+        this._initSounds();
         this._addTriggers();
         console.log("after adding triggers");
         this.introduction();
@@ -55,8 +67,14 @@ export class CityLevel extends AbstractLevel{
     }
 
     initialize(): void {
+        this._skateparkExitTriggerActive = true;
 
         if (this._playTutorial) {
+            this._subLocation = CityLocation.SKATEPARK
+
+            this._skateparkEntranceTriggerActive = false;
+            this._skateparkExitTriggerActive = true;
+
             this._game.getPlayer().setPosition(CityLevel.SKATEPARK_SPAWN_DATA.position);
 
             this._game.getPlayer().setMeshDirection(CityLevel.SKATEPARK_SPAWN_DATA.direction);
@@ -68,25 +86,142 @@ export class CityLevel extends AbstractLevel{
             this._playTutorial = false;
         }
         else {
+            this._subLocation = CityLocation.CITY;
+
+            this._skateparkExitTriggerActive = true;
+            this._skateparkEntranceTriggerActive = false;
+
             this._music.play();
         }
 
 
 
-        //this._game.getPlayer().setPosition( new Vector3(0, -2, 0));
-
         console.log("player position :", this._game.getPlayer().mesh.position);
     }
 
     update(): void {
+
     }
 
     protected _addTriggers() {
-        this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
+        this._platformingTriggersActivation = [true, false, false, false, false];
+
+            this._game.getEnvironment().getTriggers().forEach((mesh: Mesh) => {
             if (mesh.name.includes("bakers_bedroom")) {
                 console.log("adding collide observable on : ", mesh.name);
                 mesh.actionManager = new ActionManager(this._game.getScene());
-                this.setMeshAsChangeLevelTrigger(mesh, "bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
+
+                const sfxAction6 = () => {
+                    if (this._sounds["on_the_right_track_6"].isReady()) {
+                        this._sounds["on_the_right_track_6"].play();
+                        this._game.getPlayer().disableCamera();
+                        // TODO : stopper le player
+                    }
+                    else {
+                        this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
+                    }
+                }
+
+                const observer = this._sounds["on_the_right_track_6"].onEndedObservable.add(() => {
+                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA);
+
+                    // Optionnel : retirer l’observer si tu veux éviter des appels multiples plus tard
+                    this._sounds["on_the_right_track_6"].onEndedObservable.remove(observer);
+                });
+
+                this.setMeshAsExecuteActionTrigger(mesh, sfxAction6);
+            }
+
+            if (mesh.name.includes("sound_reset")) {
+
+                const resetAction = () => {
+                    if (this._platformingTriggersActivation[0]) return;
+                    this._platformingTriggersActivation = [true, false, false, false, false];
+                }
+
+                mesh.isPickable = false;
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                this.setMeshAsExecuteActionTrigger(mesh, resetAction);
+            }
+
+            if (mesh.name.includes("platforming")) {
+                mesh.isPickable = false;
+
+                let i: number;
+                if (mesh.name.includes(".001")) {
+                    i = 2;
+                } else if (mesh.name.includes(".002")) {
+                    i = 3;
+                } else if (mesh.name.includes(".003")) {
+                    i = 4;
+                } else if (mesh.name.includes(".004")) {
+                    i = 5;
+                } else {
+                    i = 1;
+                }
+
+                const sfxAction = () => {
+                    if (! this._platformingTriggersActivation[i - 1]) return;
+
+                    this._sounds["on_the_right_track_" + i].play();
+
+                    this._platformingTriggersActivation[i - 1] = false;
+                    this._platformingTriggersActivation[i] = true;
+
+                }
+
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                this.setMeshAsExecuteActionTrigger(mesh, sfxAction);
+            }
+
+            if (mesh.name.includes("entrance_skatepark")) {
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                const entranceAction = () => {
+                    if (! this._skateparkEntranceTriggerActive) return;
+                    console.assert(this._subLocation === CityLocation.CITY);
+
+                    this._skateparkEntranceTriggerActive = false;
+                    this._skateparkExitTriggerActive = true;
+
+                    this._subLocation = CityLocation.SKATEPARK;
+
+                    this._music.destroy();
+
+                    this._skateparkMusic.play();
+                }
+                this.setMeshAsExecuteActionTrigger(mesh, entranceAction);
+            }
+
+            if (mesh.name.includes("exit_skatepark")) {
+                mesh.actionManager = new ActionManager(this._game.getScene());
+                const exitAction = () => {
+                    if (! this._skateparkExitTriggerActive) return;
+                    console.assert(this._subLocation === CityLocation.SKATEPARK);
+
+                    if (this._playCityEntranceCinematic) {
+                        // TODO : add lancer cinématique
+
+
+
+
+
+
+
+                    }
+
+                    this._subLocation = CityLocation.CITY;
+                    this._skateparkMusic.destroy();
+
+                    if (this._music instanceof IntroLoopMusic) {
+                        this._music.play(this._playCityEntranceCinematic); // Si on joue la cinématique, on skip l'intro, sinon on la joue
+                    }
+
+                    this._playCityEntranceCinematic = false;
+
+                    this._skateparkExitTriggerActive = false;
+                    this._skateparkEntranceTriggerActive = true;
+                }
+                this.setMeshAsExecuteActionTrigger(mesh, exitAction);
             }
         })
     }
@@ -168,4 +303,23 @@ export class CityLevel extends AbstractLevel{
         this._game.getGameScene().activeCamera = camera;
     }
 
+    private _initSounds() {
+        const soundsNames = [];
+
+        for (let i=1; i < 7; i++) {
+            soundsNames.push("on_the_right_track_" + i);
+        }
+
+        this._sounds = {}
+
+        for (const name of soundsNames) {
+            this._sounds[name] = new Sound("", "./musics/sfx/OnTheRightTrack/" + name + ".ogg");
+        }
+
+        this._soundsPlayed = {};
+
+        for (const name of Object.keys(this._sounds)) {
+            this._soundsPlayed[name] = false;
+        }
+    }
 }

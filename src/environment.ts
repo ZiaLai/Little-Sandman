@@ -97,7 +97,7 @@ export class Environment {
 
         let result;
         if (this._currentAssetName === "city") { // Import de la ville sur dropbox car fichier lourd
-            result = await SceneLoader.ImportMeshAsync(null, "", "https://dl.dropbox.com/scl/fi/ys6eh55kopu7bt0hgq03i/city-v26.glb?rlkey=8l6nl1pshdmhmkuw6v585ftal&st=wm0t4x8k&dl=0");
+            result = await SceneLoader.ImportMeshAsync(null, "", "https://dl.dropbox.com/scl/fi/qqhgx4nbvashye9ik5tgv/city_v24.glb?rlkey=4ph5ocelohxg5az8x0aznijur&st=atidxmss&dl=0");
         }
         else {
             result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",
