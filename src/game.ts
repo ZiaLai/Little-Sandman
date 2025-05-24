@@ -63,7 +63,6 @@ export class Game {
         switch (this._state){
             case GameState.PLAYING:
                 this.getPlayer().getInput().setLockPointer(true);
-                this.getPlayer().setIsActive(true);
                 this._levels[this._currentLevel].update();
                 if (this.getPlayer().getInput().pauseKeyDown){
                     this._state = GameState.ENTERING_PAUSE;
