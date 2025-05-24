@@ -8,10 +8,28 @@ export class Monolog {
     textBlock: TextBlock;
     constructor(sentences) {
         this.sentences = sentences;
-        this.init_textBlock()
 
     }
     private init_textBlock() {
+         this.textBlock = new TextBlock();
+         this.textBlock.color = "#FDF1bf";
+         this.textBlock.fontSize = 34;
+         this.textBlock.fontFamily = "Trebuchet MS";
+         this.textBlock.shadowOffsetX = 1;
+         this.textBlock.shadowBlur = 15;
+         this.textBlock.shadowColor = "#594000FF";
+         this.textBlock.fontWeight = "bold";
+         this.textBlock.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
+         this.textBlock.paddingBottom = 100;
+         this.textBlock.alpha = 0;
+
+    }
+    public isPlayed(): boolean {
+        return this.isFinished;
+    }
+    public async play(): Promise<void> {
+        //TODO bloquer joueur
+        const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("Monolog");
         this.textBlock = new TextBlock();
         this.textBlock.color = "#FDF1bf";
         this.textBlock.fontSize = 34;
@@ -23,15 +41,9 @@ export class Monolog {
         this.textBlock.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
         this.textBlock.paddingBottom = 100;
         this.textBlock.alpha = 0;
-    }
-    public isPlayed(): boolean {
-        return this.isFinished;
-    }
-    public async play(): Promise<void> {
-        //TODO bloquer joueur
-        const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("Monolog")
         this.textBlock.text = this.sentences[0];
-        advancedTexture.addControl(this.textBlock)
+
+        advancedTexture.addControl(this.textBlock);
         await FadeText.fadeIn(this.textBlock);
         const next = Button.CreateSimpleButton("next", "");
         next.width = 100;
