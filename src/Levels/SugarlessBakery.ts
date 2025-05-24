@@ -1,18 +1,16 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {Color3, HemisphericLight, PointLight, Ray, RayHelper, Scene, Vector3} from "@babylonjs/core";
 import {AdvancedDynamicTexture, Control, Image} from "@babylonjs/gui";
-import {Scalar, Tools, TransformNode} from "@babylonjs/core";
+import {Scalar, Tools, TransformNode, Mesh, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 import {SpawnData} from "../SpawnData";
 import {BreadSlicePlatform} from "../GameObjects/BreadSlicePlatform";
 
 enum KnifeState {RISING, RISEN, FALLING, FALLEN}
-import {ActionManager, Mesh} from "@babylonjs/core";
 
 
 export class SugarlessBakery extends AbstractLevel {
-    nb_nightmare_found = 0;
+    private _nbNightmareFound = 0;
 
     // todo : décomenter
     // public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
@@ -35,7 +33,7 @@ export class SugarlessBakery extends AbstractLevel {
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "sugarless_bakery";
-        this._ressourceName = "bakery_level_12";
+        this._ressourceName = "bakery_level_14";
 
         this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
                                                 [   ["piano1",  "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],
@@ -66,7 +64,7 @@ export class SugarlessBakery extends AbstractLevel {
         this._updateKnife();
 
 
-        this._updateCakes();
+        //this._updateCakes();
         // console.log("player position :", this._game.getPlayerPosition());
     }
 
@@ -87,6 +85,21 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     private _initCakes() {
+        let scene = this._game.getGameScene();
+        for (let i=1; i < 7; i++) {
+            const nightmareElement = this._game.getGameScene().getTransformNodeByName("element_nightmare" + i);
+            scene.registerBeforeRender(() => {
+                let origin = nightmareElement.getAbsolutePosition();
+                let playerPosition = this._game.getPlayer().mesh.getAbsolutePosition();
+                let direction = playerPosition.subtract(origin);
+                console.log(direction.x, direction.z);
+                direction.x = -direction.x;
+                //direction.z = -direction.z; //Laisser même si commentée car je suis bête
+                console.log(direction.x, direction.z);
+                nightmareElement.setDirection(direction);
+            })
+        }
+        /*
         for (let i=1; i < 7; i++) {
             const nightmare = this._game.getGameScene().getTransformNodeByName("element_nightmare" + i);
             const dream = this._game.getGameScene().getTransformNodeByName("element_dream" + i);
@@ -107,6 +120,7 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._cakes.find(node => node.name === "element_nightmare3")
             .rotation = new Vector3(Tools.ToRadians(90), 0, 0);
+         */
     }
 
     private _updateCakes() {
@@ -115,7 +129,7 @@ export class SugarlessBakery extends AbstractLevel {
         const playerPos = this._game.getPlayerPosition();
 
         for (const cake of this._cakes) {
-           cake.lookAt(playerPos);
+            cake.lookAt(playerPos);
 
         }
 
@@ -203,7 +217,7 @@ export class SugarlessBakery extends AbstractLevel {
     private setUpGui(): void {
         const ui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-        const compteur = new Image("compteur", "/textures/compteur-"+this.nb_nightmare_found+".png");
+        const compteur = new Image("compteur", "/textures/compteur-"+this._nbNightmareFound+".png");
         compteur.width = "25%";
         compteur.height = "25%";
         compteur.stretch = Image.STRETCH_UNIFORM;
