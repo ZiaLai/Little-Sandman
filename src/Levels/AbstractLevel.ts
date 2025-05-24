@@ -4,6 +4,7 @@ import {GameObject} from "../GameObjects/GameObject";
 import {Music} from "../AudioControl/Music";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 import {SpawnData} from "../SpawnData";
+import {ClearNightmareParticles} from "../util/ClearNightmareParticles";
 
 
 export abstract class AbstractLevel {
@@ -20,6 +21,8 @@ export abstract class AbstractLevel {
     private _loading: boolean;
     protected _isNightmareLevel: boolean;
     protected _lastSpawnData: SpawnData;
+    protected clearNigthmareParticleEmmitter:ClearNightmareParticles[] = [];
+
 
     protected constructor(game: Game, id: number) {
         this._game = game;
