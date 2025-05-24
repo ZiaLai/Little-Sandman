@@ -65,12 +65,14 @@ export class PauseMenu {
         buttonPanel.addControl(createMenuButton("Continuer", () => {
             this.pauseMenu.isVisible = false;
             game.setGamestate(GameState.PLAYING);
+            game.getPlayer().setIsActive(true);
         }));
 
         buttonPanel.addControl(createMenuButton("Se téléporter au point de départ", () => {
             console.log("retourner point de depart cliquées");
             this.pauseMenu.isVisible = false;
             game.setGamestate(GameState.PLAYING);
+            game.getPlayer().setIsActive(true);
 
 
             const spawnData = game.getCurrentLevel().getLastSpawnData();
@@ -90,6 +92,7 @@ export class PauseMenu {
 
                 this.pauseMenu.isVisible = false;
                 game.setGamestate(GameState.PLAYING);
+                game.getPlayer().setIsActive(true);
             }))
             buttonPanel.addControl(createMenuButton("Retour à la ville", ()=>{
                 console.log("Retour à la ville");
