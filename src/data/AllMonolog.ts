@@ -23,7 +23,9 @@ export class AllMonolog {
     static play(index: number) {
         if (index < this.getAllMonolog().length){
             if (!this.getAllMonolog()[index].isPlayed()) {
-                this.getAllMonolog()[index].play();
+                setTimeout(() => {
+                    this.getAllMonolog()[index].play();
+                }, 2000); //TODO ajuster valeur delais
             }
             else{console.log("monolog" + index + " already played")}
         }
