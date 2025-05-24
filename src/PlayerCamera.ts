@@ -172,7 +172,6 @@ export class PlayerCamera {
     }
 
     public update(): void {
-        console.log("PLAYER CAMERA POS:", this._camera.position);
 
         if (! this._isActive) return;
 
@@ -184,7 +183,6 @@ export class PlayerCamera {
     }
 
     public activate(shootingSystem: ShootingSystem): ArcRotateCamera {
-        console.log("activating camera")
         this._scene.registerBeforeRender(() => {
             //console.log(this._player.mesh.position);
             this._player.beforeRenderUpdate(shootingSystem);
