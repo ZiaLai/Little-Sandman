@@ -355,7 +355,10 @@ export class Player extends TransformNode {
 
 
     beforeRenderUpdate(shootingSystem: ShootingSystem): void {
-        if (! this._isActive) return;
+        if (! this._isActive) {
+            this._speed = 0;
+            return;
+        }
         this._updateFromControls();
         this._updateGroundDetection();
         this._animatePlayer();
