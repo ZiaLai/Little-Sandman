@@ -27,7 +27,7 @@ export class CityLevel extends AbstractLevel{
                                                                   new Vector3(0, 0, 0),
                                                                   -1.557);
 
-    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 60, -30.75),
+    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 61.17, -30.75),
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
