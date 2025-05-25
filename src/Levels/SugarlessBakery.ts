@@ -18,7 +18,7 @@ import {AllMonolog} from "../data/AllMonolog";
 
 
 export class SugarlessBakery extends AbstractLevel {
-    private _nbNightmareFound: number = 0;
+    private _nbNightmareFound: number;
 
     // todo : décomenter
     public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
@@ -80,6 +80,8 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     public initialize() {
+        this._nbNightmareFound = 0;
+
         const breadSlice: TransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         breadSlice.getChildMeshes().forEach(mesh => {
             mesh.isVisible = false;
