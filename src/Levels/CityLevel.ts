@@ -51,7 +51,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "https://dl.dropbox.com/scl/fi/ys6eh55kopu7bt0hgq03i/city-v26.glb?rlkey=8l6nl1pshdmhmkuw6v585ftal&st=wm0t4x8k&dl=0";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/05pd7y7dkcewk3aff1v1o/city_v27.glb?rlkey=28q0e3sifduwhlhc4xgh8ieat&st=dgjl0cl1&dl=0";
 
         this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', './musics/city/city_intro.ogg'],
                                                                   ['loop', './musics/city/city_loop.ogg'  ] ]);
@@ -75,6 +75,8 @@ export class CityLevel extends AbstractLevel{
     }
 
     initialize(): void {
+        this._game.getGameScene().getMeshByName(" pont collider stairs").name = "pont collider";
+
         this._skateparkExitTriggerActive = true;
 
         if (this._playTutorial) {
