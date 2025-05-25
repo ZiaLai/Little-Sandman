@@ -19,11 +19,7 @@ export class KeyboardInput extends PlayerInput {
 
         this._canvas.addEventListener("click", event => {
             if (! this._lockPointer) return;
-
-            if(this._canvas.requestPointerLock) {
-
-                this._canvas.requestPointerLock().catch(err => console.error(err));
-            }
+                this.requestPointerLock();
         }, false);
         // scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (evt) => {
         //     this._pointerLocked = true;
@@ -121,19 +117,6 @@ export class KeyboardInput extends PlayerInput {
 
             this.pauseKeyDown = !!this.inputMap["Enter"];
         }
-
-
-
-        // if (this.inputMap["a"]) {
-        //     this._pointerLocked = false;
-        // }
-        //
-        // if (!this._pointerLocked) {
-        //     if (this._canvas.requestPointerLock) {
-        //         this._canvas.requestPointerLock();
-        //     }
-        // }
-
     }
 
 
@@ -153,7 +136,17 @@ export class KeyboardInput extends PlayerInput {
     }
 
     requestPointerLock(): void {
-        this._canvas.requestPointerLock().catch(err => console.error(err));
+        if (! this._canvas) return;
+
+        const requestPointerLock = this._canvas.requestPointerLock ||
+            (this._canvas as any).mozRequestPointerLock ||
+            (this._canvas as any).webkitRequestPointerLock;
+
+        if (requestPointerLock) {
+            requestPointerLock.call(this._canvas);
+        } else {
+            console.error("requestPointerLock n'est pas pris en charge par ce navigateur.");
+        }
     }
 
     getLockPointer(): boolean {
