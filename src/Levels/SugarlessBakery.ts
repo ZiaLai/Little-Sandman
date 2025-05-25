@@ -100,10 +100,10 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     private _initSmallBakery(): void {
-        // TODO : ajouter un sol pickable, et décomenter
-        // this._game.getGameScene().getTransformNodeByName("mur_plafond_regularSolid").getChildMeshes().forEach(mesh => {
-        //     mesh.isPickable = false;
-        // });
+        this._game.getGameScene().getTransformNodeByName("mur_plafond_regularSolid").getChildMeshes().forEach(mesh => {
+            if (mesh.name === "mur_plafond_regularSolid_primitive3") return;
+            mesh.isPickable = false;
+        });
     }
 
     private _initBars(): void {
@@ -141,7 +141,6 @@ export class SugarlessBakery extends AbstractLevel {
                 this._knifeTimer += this._game.getDeltaTime();
                 if (this._knifeTimer >= 1 && this._knifeCanCreateBreadSlicePlatform) {
                     this._knifeCanCreateBreadSlicePlatform = false;
-
 
                     this._objects.push(new BreadSlicePlatform(this._game, this._breadSlicePlatformTransformNode, new Vector3(21.2, 21.65, 26.81)))
                 }
