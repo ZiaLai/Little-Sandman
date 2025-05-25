@@ -102,6 +102,8 @@ export class CityLevel extends AbstractLevel{
             this._music.play();
         }
 
+        this._initBaker();
+
 
     }
 
@@ -296,6 +298,24 @@ export class CityLevel extends AbstractLevel{
         this._game.getPlayer().setIsActive(true);
         this._firstCityEntrance();
         this.cinematicScene.stop();
+    }
+
+    private async _initBaker() {
+        const baker = await this._game.spriteLoader.loadSprite("BOULANGERE.glb");
+
+        //const bakerRoot = this._game.getGameScene().getTransformNodeByName("Armature");
+        const bakerRoot = baker.mesh;
+
+        const armature = bakerRoot.getChildTransformNodes()[0];
+
+        bakerRoot.rotationQuaternion = null;
+        armature.rotationQuaternion = null;
+
+        armature.position = new Vector3(-42, 63.6, 34.5);
+        armature.rotation.y = Tools.ToRadians(90);
+        armature.rotation.x = Tools.ToRadians(90);
+
+        baker.animationGroups[0].play(true);
     }
 
     private _initSounds() {
