@@ -9,14 +9,12 @@ import {
     VideoTexture
 } from "@babylonjs/core";
 import {CinematicData} from "../data/CinematicData";
-import {Image} from "@babylonjs/gui";
 
 export class CinematicScene {
     private videoTexture;
-    constructor(scene: Scene, cinematicData : CinematicData, position : Vector3 = new Vector3(0,0,0.1)){
+    constructor(scene: Scene, cinematicData : CinematicData, position : Vector3 = new Vector3(0,0,0.1), isBackgroundActive:boolean = true) {
         let camera = new ArcRotateCamera("cinematic camera", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene); // TODO camera doit dépendre de position ?
         let path_video = cinematicData.getPath();
-        //this.setVideoTexture(path_video, scene);
         this.videoTexture =  new VideoTexture("truc_mushe", path_video, scene);
         //camera.setTarget(new Vector3(0, 0, 0.2));
 
@@ -37,15 +35,14 @@ export class CinematicScene {
         };
         let cinematic_plane = MeshBuilder.CreatePlane("cinematic_plane", planeOpts, scene);
         cinematic_plane.position = position;
-        let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
-
-        let mat= new StandardMaterial("mat", scene);
-        mat.diffuseTexture = new Texture("/textures/etoiles.png", scene);
-        mat.emissiveColor = Color3.White();
-        background.material = mat;
-
-        background.position = new Vector3(0, 0, 0.2);
-
+        if (isBackgroundActive){
+            let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
+            let mat= new StandardMaterial("mat", scene);
+            mat.diffuseTexture = new Texture("/textures/etoiles.png", scene);
+            mat.emissiveColor = Color3.White();
+            background.material = mat;
+            background.position = new Vector3(0, 0, 0.2);
+        }
         let material = new StandardMaterial("m", scene);
         material.diffuseTexture = this.videoTexture;
         material.roughness = 1;
