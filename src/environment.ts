@@ -46,7 +46,6 @@ export class Environment {
             if (mesh.name.includes("collider") && mesh.name.includes("trigger")) {
                 mesh.isVisible = true;
                 mesh.isPickable = true;
-
                 mesh.material = transparentMaterial;
                 this._triggers.push(mesh);
             }

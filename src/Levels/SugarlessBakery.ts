@@ -90,6 +90,8 @@ export class SugarlessBakery extends AbstractLevel {
         this._breadSlicePlatformTransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         console.assert(this._breadSlicePlatformTransformNode);
 
+        this._initCakes();
+
         this._initBars();
 
         this._initSmallBakery();
@@ -97,6 +99,57 @@ export class SugarlessBakery extends AbstractLevel {
         AllMonolog.play(2);
 
         //this._objects["bread_slice"] = [];
+    }
+
+    private _initCakes() {
+        let scene = this._game.getGameScene();
+        for (let i=1; i < 7; i++) {
+            const nightmareElement = this._game.getGameScene().getTransformNodeByName("element_nightmare" + i);
+            scene.registerBeforeRender(() => {
+                let origin = nightmareElement.getAbsolutePosition();
+                let playerPosition = this._game.getPlayer().mesh.getAbsolutePosition();
+                let direction = playerPosition.subtract(origin);
+                console.log(direction.x, direction.z);
+                direction.x = -direction.x;
+                //direction.z = -direction.z; //Laisser même si commentée car je suis bête
+                console.log(direction.x, direction.z);
+                nightmareElement.setDirection(direction);
+            })
+        }
+        /*
+        for (let i=1; i < 7; i++) {
+            const nightmare = this._game.getGameScene().getTransformNodeByName("element_nightmare" + i);
+            const dream = this._game.getGameScene().getTransformNodeByName("element_dream" + i);
+
+            nightmare.rotationQuaternion = null;
+            dream.rotationQuaternion = null;
+
+            this._cakes.push(nightmare);
+            this._cakes.push(dream);
+        }
+
+        // Pour que les gâteaux pointent tous vers la même direction
+        this._cakes.find(node => node.name === "element_nightmare1")
+            .rotation = new Vector3(Tools.ToRadians(289.5), Tools.ToRadians(202), Tools.ToRadians(91.5));
+
+        this._cakes.find(node => node.name === "element_nightmare2")
+            .rotation = new Vector3(0, Tools.ToRadians(189.2), 0);
+
+        this._cakes.find(node => node.name === "element_nightmare3")
+            .rotation = new Vector3(Tools.ToRadians(90), 0, 0);
+         */
+    }
+
+    private _updateCakes() {
+        // TODO : update la rotation des gâteaux
+
+        const playerPos = this._game.getPlayerPosition();
+
+        for (const cake of this._cakes) {
+            cake.lookAt(playerPos);
+
+        }
+
     }
 
     private _initSmallBakery(): void {
@@ -249,8 +302,6 @@ export class SugarlessBakery extends AbstractLevel {
                 //console.log("adding swap collide observable on : ", mesh.name);
                 this.setMeshAsSwapMeshTrigger(mesh, colliderTriggerEffect);
             }
-
-
         })
     }
 
@@ -264,7 +315,7 @@ export class SugarlessBakery extends AbstractLevel {
         light.intensity = 2000;
         // const cake1 = new PointLight("cake 1", new Vector3(4, 2.8, 1), this._game.getGameScene());
         // cake1.diffuse = new Color3(0.585, 1, 0.573);
-        // cake1.intensity =10 ;
+        // cake1.intensity = 10;
 
     }
 
