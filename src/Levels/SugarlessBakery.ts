@@ -94,7 +94,7 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._initSmallBakery();
 
-        AllMonolog.play(2);
+        AllMonolog.play(2, this._game);
 
         //this._objects["bread_slice"] = [];
     }

@@ -1,31 +1,40 @@
 import {Monolog} from "../util/Monolog";
+import {Game} from "../game";
 
 export class AllMonolog {
+    private static _game: Game;
 
     static getAllMonolog(): Monolog[] {
         return [
-        new Monolog(["Te voici dans la Réalité… le monde humain.",
+        this._createMonolog(["Te voici dans la Réalité… le monde humain.",
             "Ta mission commence mainteant.",
             "Plonge dans le sommeil les éveillés… Repeuple le pays des rêves.",
             "Va, Jeune Sable. Pour cette première mission, je te guiderai.",
             "Plusieurs âmes dans les environs n'ont pas encore rejoint le rêve…",
             "Trouve-les…"]),
 
-            new Monolog(["N'aie crainte, nous sommes invisibles aux yeux des mortels…",
+        this._createMonolog(["N'aie crainte, nous sommes invisibles aux yeux des mortels…",
             "Approche-toi, puis utilise le clic gauche pour répandre le sable…"]),
 
-            new Monolog(["Je sens une perturbation dans le rêve… Si le rêveur cauchemarde, il risque de quitter le rêve…",
+        this._createMonolog(["Je sens une perturbation dans le rêve… Si le rêveur cauchemarde, il risque de quitter le rêve…",
             "Ton sable peut arranger cela.",
             "Mais tu vas devoir explorer le rêve et affronter ses peurs…"])
         ]
     }
 
-    static play(index: number) {
+    private static _createMonolog(sentences: string[]): Monolog {
+        return new Monolog(sentences, this._game);
+    }
+
+
+    static play(index: number, game: Game) {
+        this._game = game;
+
         if (index < this.getAllMonolog().length){
             if (!this.getAllMonolog()[index].isPlayed()) {
                 setTimeout(() => {
                     this.getAllMonolog()[index].play();
-                }, 2000); //TODO ajuster valeur delais
+                }, 1000); //TODO ajuster valeur delais
             }
             else{console.log("monolog" + index + " already played")}
         }

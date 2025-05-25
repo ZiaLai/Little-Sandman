@@ -1,12 +1,17 @@
 import {AdvancedDynamicTexture, Button, TextBlock} from "@babylonjs/gui";
 import {FadeText} from "./FadeText";
+import {Game} from "../game";
 
 export class Monolog {
-    sentences;
+    sentences: string[];
     current_sentence = 0;
     isFinished = false;
     textBlock: TextBlock;
-    constructor(sentences) {
+    private _game: Game;
+
+
+    constructor(sentences: string[], game: Game) {
+        this._game = game;
         this.sentences = sentences;
 
     }
@@ -28,7 +33,9 @@ export class Monolog {
         return this.isFinished;
     }
     public async play(): Promise<void> {
-        //TODO bloquer joueur
+        // bloquer joueur
+        this._game.getPlayer().setIsActive(false);
+
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("Monolog");
         this.textBlock = new TextBlock();
         this.textBlock.color = "#FDF1bf";
@@ -61,7 +68,9 @@ export class Monolog {
                     advancedTexture.addControl(this.textBlock);
                     next.isVisible = false;
                     advancedTexture.addControl(next);
-                    //TODO debloquer joueur
+                    // debloquer joueur
+                    this._game.getPlayer().setIsActive(true);
+
                     //TODO détruire ce gui ? (cest la fin de la fonction)
                 }
                 else {
