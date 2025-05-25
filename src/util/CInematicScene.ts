@@ -18,6 +18,7 @@ export class CinematicScene {
         let path_video = cinematicData.getPath();
         //this.setVideoTexture(path_video, scene);
         this.videoTexture =  new VideoTexture("truc_mushe", path_video, scene);
+        this.videoTexture.video.loop = false;
         //camera.setTarget(new Vector3(0, 0, 0.2));
 
         let planeOpts = {
