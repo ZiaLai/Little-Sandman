@@ -92,9 +92,18 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._initBars();
 
+        this._initSmallBakery();
+
         AllMonolog.play(2);
 
         //this._objects["bread_slice"] = [];
+    }
+
+    private _initSmallBakery(): void {
+        // TODO : ajouter un sol pickable, et décomenter
+        // this._game.getGameScene().getTransformNodeByName("mur_plafond_regularSolid").getChildMeshes().forEach(mesh => {
+        //     mesh.isPickable = false;
+        // });
     }
 
     private _initBars(): void {
