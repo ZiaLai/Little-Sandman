@@ -48,7 +48,6 @@ export class KeyboardInput extends PlayerInput {
     }
 
     private _updateFromKeyboard(): void {
-        console.log("updating input");
 
         if (this.isActive) {
             if (this.inputMap["ArrowUp"]) {

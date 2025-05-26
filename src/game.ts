@@ -59,7 +59,6 @@ export class Game {
     }
 
     public update(): void {
-        console.log("LOCK POINTER:", this.getPlayer().getInput().getLockPointer());
         switch (this._state){
             case GameState.PLAYING:
                 this.getPlayer().getInput().setLockPointer(true);
