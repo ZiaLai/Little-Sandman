@@ -69,7 +69,12 @@ export class CityLevel extends AbstractLevel{
         console.log("after adding triggers");
         this.cinematicScene = new CinematicScene(this._game.getGameScene(), AllCinematicData.getData(2), new Vector3(0, 10, 1));
         this.cinematicScene.stop();
-        AllMonolog.play(0, this._game);
+
+        if (this._playWelcomeMonolog) {
+            AllMonolog.play(0, this._game);
+            this._playWelcomeMonolog = false;
+        }
+
 
         this._finishedLoading();
     }
