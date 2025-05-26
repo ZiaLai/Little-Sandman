@@ -24,6 +24,8 @@ export class SeparatedTracksMusic implements Music {
     }
 
     private _initTracks(trackData: []) {
+        this._nbOfTracksPlaying = this._nbOfTracksPlayingAtStart;
+
         let soundsReady = 0;
         const self = this;
 
@@ -37,6 +39,7 @@ export class SeparatedTracksMusic implements Music {
             }
         }
 
+        this._tracks = [];
         for (const elt of trackData) {
             const sound: Sound = new Sound(elt[0], elt[1], this._scene, soundReady, {loop: true, spatialSound: false});
             this._tracks.push(sound);
@@ -55,13 +58,13 @@ export class SeparatedTracksMusic implements Music {
     }
 
     upgrade(): void {
+        this._upgradeSound.play();
+
         if (this._nbOfTracksPlaying >= this._nbOfTracks) return;
 
 
         this._tracks[this._nbOfTracksPlaying].setVolume(1);
         this._nbOfTracksPlaying++;
-
-        this._upgradeSound.play();
     }
 
     destroy(): void {
@@ -70,5 +73,4 @@ export class SeparatedTracksMusic implements Music {
             track.dispose()
         }
     }
-
 }
