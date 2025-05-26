@@ -34,7 +34,7 @@ export class Monolog {
     }
     public async play(): Promise<void> {
         // bloquer joueur
-        this._game.getPlayer().setIsActive(false);
+        this._game.getPlayer().addMovementBlock();
 
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("Monolog");
         this.textBlock = new TextBlock();
@@ -69,7 +69,7 @@ export class Monolog {
                     next.isVisible = false;
                     advancedTexture.addControl(next);
                     // debloquer joueur
-                    this._game.getPlayer().setIsActive(true);
+                    this._game.getPlayer().removeMovementBlock();
 
                     //TODO détruire ce gui ? (cest la fin de la fonction)
                 }

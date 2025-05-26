@@ -83,8 +83,9 @@ export class Player extends TransformNode {
     private hoveringSandEmetter;
     private _landAnimationTimer: number // Sauvegarde le temps écoulé depuis le début de la dernière animation
     private _staminaBar;
-    private _isActive: boolean = true;
     private _lastFloorPickedPoint: Vector3;
+
+    private _blockMovementCounter: number = 0; // Joueur bloqué si > 0
 
     private _externalForces: Force[] = [];
 
@@ -355,7 +356,7 @@ export class Player extends TransformNode {
 
 
     beforeRenderUpdate(shootingSystem: ShootingSystem): void {
-        if (! this._isActive) {
+        if (this.isMovementBlocked()) {
             this._speed = 0;
             return;
         }
@@ -774,8 +775,19 @@ export class Player extends TransformNode {
        return result;
     }
 
+    public addMovementBlock(): void {
+        this._blockMovementCounter ++;
+    }
 
-    public setIsActive(isActive: boolean): void {
-        this._isActive = isActive;
+    public removeMovementBlock(): void {
+        this._blockMovementCounter --;
+    }
+
+    public isMovementBlocked(): boolean {
+        return this._blockMovementCounter > 0;
+    }
+
+    public freeAllMovementBlocking(): void {
+        this._blockMovementCounter = 0;
     }
 }

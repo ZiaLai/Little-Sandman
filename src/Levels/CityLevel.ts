@@ -122,7 +122,7 @@ export class CityLevel extends AbstractLevel{
                 mesh.actionManager = new ActionManager(this._game.getScene());
 
                 const sfxAction6 = async () => {
-                    this._game.getPlayer().setIsActive(false);
+                    this._game.getPlayer().addMovementBlock();
                     this._sounds["on_the_right_track_6"].play();
                     this._game.getPlayer().disableCamera();
 
@@ -286,7 +286,7 @@ export class CityLevel extends AbstractLevel{
         let cinematic  = AllCinematicData.getData(2);
         this.cinematicScene.play();
         //this._game.setGamestate(GameState.DO_NOTHING); // TODO : stopper le joueur proprement ?
-        this._game.getPlayer().setIsActive(false);
+        this._game.getPlayer().addMovementBlock();
         this._game.getScene().activeCamera = new FreeCamera("cinematic camera",new Vector3(0,10,-12));
         this._game.getPlayer().disableCamera();
         this._game.switchPlayerLight(0);
@@ -297,7 +297,7 @@ export class CityLevel extends AbstractLevel{
     }
 
     doAfterCinematic(): void {
-        this._game.getPlayer().setIsActive(true);
+        this._game.getPlayer().removeMovementBlock();
         this._firstCityEntrance();
         this.cinematicScene.stop();
     }
