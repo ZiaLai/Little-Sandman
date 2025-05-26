@@ -7,7 +7,7 @@ export class AllMonolog {
     static getAllMonolog(): Monolog[] {
         return [
         this._createMonolog(["Te voici dans la Réalité… le monde humain.",
-            "Ta mission commence mainteant.",
+            "Ta mission commence maintenant.",
             "Plonge dans le sommeil les éveillés… Repeuple le pays des rêves.",
             "Va, Jeune Sable. Pour cette première mission, je te guiderai.",
             "Plusieurs âmes dans les environs n'ont pas encore rejoint le rêve…",
