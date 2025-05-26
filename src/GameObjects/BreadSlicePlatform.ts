@@ -98,7 +98,7 @@ export class BreadSlicePlatform extends GameObject {
         // La rotation en x descend jusqu'à -90, puis elle remonte. Elle ne dépasse jamais 90
 
         //if (this._parentNode.rotationQuaternion.toEulerAngles().x >= (Tools.ToRadians(-90) + this._rotationSpeed * this._game.getPlayer().getDeltaTime()) ) {
-        if (Math.abs(this._parentNode.rotationQuaternion.toEulerAngles().x - Tools.ToRadians(90)) < 0.01) {
+        if (Math.abs(this._parentNode.rotationQuaternion.toEulerAngles().x - Tools.ToRadians(90)) < 0.02) {
             this._currentState = BreadState.MOVING;
             this._parentNode.rotationQuaternion = Quaternion.FromEulerAngles(Tools.ToRadians(90), Tools.ToRadians(90), 0);
         }
