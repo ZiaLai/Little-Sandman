@@ -92,6 +92,14 @@ export class App {
         this._main();
     }
 
+    public quit(): void {
+        this._engine.stopRenderLoop();
+        this._canvas.remove();
+
+        new App();
+    }
+
+
     private _createCanvas(): HTMLCanvasElement {
 
         //Commented out for development

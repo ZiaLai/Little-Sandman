@@ -106,9 +106,8 @@ export class PauseMenu {
 
         buttonPanel.addControl(createMenuButton("Quitter", () => {
             console.log("Quitter cliqué");
-            game.getApp().goToSomething(State.START);
-            this.pauseMenu.isVisible = false;
-            game.setGamestate(GameState.PLAYING);
+            game.getCurrentLevel().destroy();
+            game.getApp().quit();
             //TODO (afficher un dialogue qui met en garde ; "attention toute votre progression sera perdue ? ))
         }));
     }
