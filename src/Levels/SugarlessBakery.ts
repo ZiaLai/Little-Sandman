@@ -43,7 +43,7 @@ export class SugarlessBakery extends AbstractLevel {
         super(game, id);
         this._isNightmareLevel = true;
         this._name = "sugarless_bakery";
-        this._ressourceName = "https://dl.dropbox.com/scl/fi/5ix5uduz3npupr4wkvxh7/bakery_level_14.glb?rlkey=yb119txemkw7enl9xe7llovf0&st=pgrgd8ef&dl=0";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/pi41u2d059uklokttg4tn/bakery_level_15.glb?rlkey=kh09x2afbbt30qdtnhh4w8h3e&st=2kjwjhut&dl=0";
 
         this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
                                                 [   ["piano1",  "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],
@@ -102,8 +102,8 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     private _initSmallBakery(): void {
-        this._game.getGameScene().getTransformNodeByName("mur_plafond_regularSolid").getChildMeshes().forEach(mesh => {
-            if (mesh.name === "mur_plafond_regularSolid_primitive3") return;
+        this._game.getGameScene().getTransformNodeByName("murs_plafond_regularSolid").getChildMeshes().forEach(mesh => {
+            if (mesh.name === "murs_plafond_regularSolid_primitive3") return;
             mesh.isPickable = false;
         });
     }

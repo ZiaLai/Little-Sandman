@@ -58,7 +58,7 @@ export class App {
     private cinematicTimer = 0;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "city";
+    private START_LEVEL = "bakers_bedroom";
     private START_SPAWN_DATA: SpawnData = this.START_LEVEL === "city" ? CityLevel.SKATEPARK_SPAWN_DATA : SpawnData.DEFAULT_VALUE;
 
     constructor() {
