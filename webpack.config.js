@@ -8,6 +8,7 @@ module.exports = {
     entry: path.resolve(appDirectory, "src/app.ts"), //path to the main .ts file
     output: {
         filename: "js/bundleName.js", //name for the js file that is created/compiled in memory
+        publicPath: "/Little-Sandman/",
         clean: true,
     },
     resolve: {
@@ -32,14 +33,15 @@ module.exports = {
         ],
     },
     plugins: [
-        /*
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
-        }),*/
+        }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: 'public', to: 'public' }, // copie le dossier assets vers dist/assets
+                { from: 'public/models', to: 'models' }, // copie le dossier assets vers dist/assets
+                { from: 'public/musics', to: 'musics' },
+                { from: 'public/textures', to: 'textures' },
             ],
         }),
     ],
