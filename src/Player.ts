@@ -247,6 +247,9 @@ export class Player extends TransformNode {
 }
     public setPosition(position: Vector3): void {
         this.mesh.position.copyFrom(position);
+
+        if (! this.camera) return;
+        this.camera.setPosition(position);
     }
 
     private _updateSounds() {

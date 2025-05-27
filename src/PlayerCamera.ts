@@ -183,6 +183,11 @@ export class PlayerCamera {
         this._camera.alpha = alpha;
     }
 
+    public setPosition(position: Vector3) {
+        const targetPos = new Vector3(position.x, position.y + 2, position.z);
+        this._camRoot.position = targetPos;
+    }
+
     private _adjustForCeiling(): void {
         const upward = new Vector3(0, 1, 0);
         const origin = this._camRoot.position.clone();
