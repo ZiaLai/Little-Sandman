@@ -39,9 +39,9 @@ module.exports = {
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: path.resolve(appDirectory, "public/models"), to: 'models' }, // copie le dossier assets vers dist/assets
-                { from: path.resolve(appDirectory, "public/musics"), to: 'musics' },
-                { from: path.resolve(appDirectory, "public/textures"), to: 'textures' },
+                { from: path.resolve(__dirname, "public/models"), to: 'models' }, // copie le dossier assets vers dist/assets
+                { from: path.resolve(__dirname, "public/musics"), to: 'musics' },
+                { from: path.resolve(__dirname, "public/textures"), to: 'textures' },
             ],
         }),
     ],
