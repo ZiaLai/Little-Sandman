@@ -192,6 +192,7 @@ export class CityLevel extends AbstractLevel{
             }
 
             if (mesh.name.includes("entrance_skatepark")) {
+                mesh.isPickable = false;
                 mesh.actionManager = new ActionManager(this._game.getScene());
                 const entranceAction = () => {
                     if (! this._skateparkEntranceTriggerActive) return;
@@ -210,6 +211,7 @@ export class CityLevel extends AbstractLevel{
             }
 
             if (mesh.name.includes("exit_skatepark")) {
+                mesh.isPickable = false;
                 mesh.actionManager = new ActionManager(this._game.getScene());
                 const exitAction = async () => {
                     if (!this._skateparkExitTriggerActive) return;
