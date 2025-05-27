@@ -127,6 +127,7 @@ export class App {
 
     private async _main(): Promise<void> {
         await this._goToLesFraudes();
+        //hihi
         //await this._goToStart();
 
         // Register a render loop to repeatedly render the scene

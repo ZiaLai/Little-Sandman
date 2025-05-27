@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const appDirectory = fs.realpathSync(process.cwd());
 
 module.exports = {
@@ -18,7 +19,7 @@ module.exports = {
         static: path.resolve(appDirectory, "public"), //tells webpack to serve from the public folder
         hot: true,
         devMiddleware: {
-            publicPath: "/",
+            publicPath: "/Little-Sandman",
         }
     },
     module: {
@@ -34,7 +35,13 @@ module.exports = {
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
-        })
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: 'public', to: 'public' }, // copie le dossier assets vers dist/assets
+            ],
+        }),
     ],
     mode: "development",
+
 };
