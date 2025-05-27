@@ -126,8 +126,8 @@ export class App {
     }
 
     private async _main(): Promise<void> {
-        //await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
-        await this._goToStart(); // TODO enlever quand on  aura fini dev
+        await this._goToLesFraudes();
+        //await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
 
