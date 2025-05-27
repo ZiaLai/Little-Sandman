@@ -1,0 +1,481 @@
+===================================
+Planning :
+https://docs.google.com/spreadsheets/d/1wY1d4xigQfcB7zREt-sLo0T2_EJqLwas95yTEHs8QYk/edit?gid=0#gid=0
+===================================
+
+RUSH LIST
+==========
+
+[x] Débugguer la transition entre deux scènes
+
+    
+
+[x] Débugguer direction
+
+[x] Faire le niveau sur blender
+
+[x] Les triggers ne marchent plus. (Depuis le nouveau système de chargement de scène)
+========================================================================================================================
+    Le problème vient du fait qu'on n'a pas load le level avec sa classe.
+    On a juste mis les meshs dans une scène.
+
+    Il faut juste appeler la méthode load sur le level. Mais on doit modifier celle-ci, pour pas qu'elle recharge la scène.
+
+    Level ne gère plus le changement de scène. (Changement de scène dans app)
+
+    Quand on essaye de récupérer l'outer dans setMeshAsChangeLevelTrigger, on obtient undefined, il faudrait stocker le mesh quelque part
+========================================================================================================================
+
+[x] Ajouter écran de chargement entre deux scène (ou au moins un fadein/fadeout)
+
+[x] Gérer correctement la position de spawn du joueur
+
+===
+
+[x] Effet de camera bizarre quand on spawn
+    Oui, c'est parce que la camera spawnait sous le sol. Maintenant elle spawne sur le joueur, mais comme le joueur spawne dans le ciel, c'est toujours buggué.
+
+[/] Corriger y du spawn du joueur
+
+===
+[] Camera détection mur ?
+
+======================
+[] MERGE LES BRANCHES
+======================
+
+[] Jouer la musique
+    [] Ville
+    [] Bakery
+
+[] Entrer dans le niveau
+    [] Lancer sable sur boulangère
+
+[] Evenements du niveau
+    [] Spawner bread slice
+
+    [] Lancer sable sur gateau
+        [] Cacher gateau moche
+        [] Montrer gateau joli
+        [] Upgrade la musique
+        [] Si tous les gâteaux sont trouvés, écran de fin
+
+    [] Plateformes tombantes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================================================================================
+[x] Revoir la camera car si la camera est bugguée, alors les déplacements dont buggés
+    [x] Faire en sorte qu'on puisse obtenir l'orientation de la camera
+    En fait il faut juste utiliser l'alpha et de la trigo
+[x] Refaire déplacements en utilisant le tuto
+    [x] Ajuster les angles de trigo en ajoutant des PI pour qu'on avance dans le bon sens
+    [x] Clamper le mouvement diagonal
+    [x] Rotation du personnage
+
+===================================
+Méthode pour déplacer le personnage
+===================================
+1. On récupère les valeurs des inputs sur les deux axes
+2. Trouver un vecteur forward, qui donne la direction vers laquelle la cam pointe
+3. Trouver un vecteur right, qui donne la direction à droite de la caméra
+4. "corriger" ces deux vecteurs en les scalant par les inputs
+5. Additionner les deux vecteurs
+6. Scaler par la vitesse du perso (et le deltaTime)
+7. Annuler la valeur en y (pour être sûr que le perso s'envole pas)
+===================================
+
+[x] Corriger le bug de plannage
+    Pour déclencher le bug : Sauter, appuyer sur shift, relâcher shift avant la fin de l'hovering
+    Le bug est causé par les || keyMap[même lettre en majuscule]
+    En fait, on démarre l'action en minuscule, mais on l'annule avec une majuscule (donc elle continue indéfiniment)
+
+    Après avoir enlevé ces "ou",
+    On a toujours le même problème, car le fait de shifter fait qu'on relâche pas la "bonne" touche
+
+    La pseudo solution marche pas... pour l'instant
+    Maintenant ça marche
+
+[x] Corriger le problème de caméra qui passe sous le sol
+
+[x] Importer le sandman
+    [x] Ajuster la cam
+    [x] Modifier la capsule de collision
+    Pas besoin de faire tout ça en fait
+
+[x] Tourner la camera sans avoir besoin de cliquer
+[x] Empecher la camera de passer au travers des murs (collisions)
+    Idée : caster des rays vers l'arrière de la camera, pour repositionner la camera en la rapprochant du Player
+
+[x] Coder le déplacement sur une pente (tuto)
+
+CAMERA
+        [x] Ne pas bouger la caméra quand le joueur saute
+        [x] Enlever l'interpolation de la camera sur les côtés
+        [x] Faire en sorte que le joueur ne sorte pas du champ de vision de la camera quand on tombe d'un espace surélevé
+
+FPS
+    [x] Limiter les fps ? Quand on est uniquement sur le PC portable, ça passe en 120 fps.
+        C'est un problème avec les delta time
+        [x] Vitesse de déplacement
+        [x] Hauteur du saut
+        [x] Durée du hovering
+
+[x] Sauter plus haut si on laisse espace appuyé (tuto Griffpatch ?)
+    Méthode
+    #######
+    Si speedY < (1/3 de la jumpForce * dt) ou espace pressé:
+        Gravité normale
+    Sinon:
+        Doubler la gravité
+==================================================================
+[X] Empêcher de sauter à nouveau si on laisse espace appuyé sans relâcher
+   Méthode
+       #######
+       Variable falling compte le nombre de frames passées dans les airs
+       Elle est remise à 0 dès qu'on touche le sol
+       jumpKey permet de vérifier si on relâche la touche de saut entre deux sauts
+       Si la touche de saut est pressée:
+           Si jumpKey = 0 ET falling < 3:
+               On booste le speedY
+               On met falling à 6 (ou n'importe quelle valeur > 3)
+               On met jumpKey à 1w
+       Sinon:
+           On met jumpKey à 0
+==================================================================
+[x] Ajouter du momentum (tuto Griffpatch ?)
+    Pas besoin du tuto. Il suffit de rajouter de l'interpolation sur v et h
+
+########################################################################################################################
+
+########################################################################################################################
+
+Petit problème : dans un niveau, on change de scènes entre la cuisine et les brèches. Il faut qu'on garde en mémoire
+l'état de la scène précédente, pour ne pas faire respawn tous les éléments.
+
+[] Faire une classe Level
+    [] constructeur avec ressource d'environnement
+    [] load() charge les ressources : environnement, musiques, sprites des objets
+    [] initialize(), initialise les objets du niveau
+    [] setActive(), rend le niveau actif
+    [] destruct(), détruit les ressources
+    [] update(), met à jour tous les objets du niveau
+
+
+[] Pour créer les niveaux, on fera des sous classes implémentant Level (par ex Level1_1_1, Level1_1_2, Level1_1_3)
+
+[] Démarrer le niveau ville, en créant la game.
+
+
+
+[] Pour utiliser les fonctions update, il faudra mettre les update en beforeRender
+https://forum.babylonjs.com/t/which-best-method-for-mesh-rendering-updated-every-frame/2834/2
+En fait, je sais pas...
+
+
+========================================================================================================================
+BRECHE 1
+
+[] Il faut modifier la liste objects (de la super classe) par un dictionnaire car on aimerait accéder aux objets par leur nom
+   Mais c'est ppas ce qu'on fait déjà dans Breach1 ? J'ai l'impression que j'ai fait un mix des deux.
+   J'ai une liste objects, et un dico meshObjects...
+   En fait le dico objectMeshes contient uniquement les meshs des objets, pas les instances
+   CE QU'ON VEUT FAIRE :
+   Changer le type de objects en dictionnaire. Il faudra mettre un id dans le nom car on peut avoir plusieurs breadSlices, couteaux, etc
+   D'ailleurs c'est à cause de cette incohérence que j'avais des erreurs la dernière fois. Dans ma tête, c'était logique
+   que objects était un dictionnaire.
+   On peut peut-être mettre en clé un nom d'objet, et en valeur la liste des instances de cet objet.
+   Oui c'est bien ça.
+
+   [] Refaire load_objects dans Breach1
+
+Pour placer les objets, etc, il faut le faire dans la classe niveau implémentant AbstractLevel.
+ (Et pas dans le classe de l'objet). J'avais pensé à faire un système d'identifiant, qui fait tourner des boucles updates
+ différentes. Mais il faut peut-être éviter de faire ça. À la limite on pourrait avoir 2-3 types de plateformes différents
+ et les gérer dans la classe de l'objet. Mais on va pas rajouter un case à chaque fois qu'on crée une plateforme. Non ?
+ En fait, si on veut que l'objet ait un comportement spécial, on est un peu obligé de faire ça.
+ Pour faire ça, il faudrait ajouter un paramètre booléen "personalized" qui fait tourner une boucle update personnalisée.
+ Si il est à false, c'est l'update par défaut qui va tourner.
+
+BREAD SLICE
+.[] Rotation de la breadSlice
+    .[] Placer la breadSlice au bon endroit
+        [] Faire en sorte qu'on récupère la position du game object dans l'environment
+        De manière à ce que si on change sa pos sur Blender, ça change sa pos dans Babylon
+            [] On utilise un blenderId pour différentier les meshs. Il faut garder en mémoire la position pour chaque mesh.
+                Dans Environment, mémoriser les GameObjects dans un attribut. Il faudra donc mettre un tag GAME_OBJECT sur ces meshs dans blender
+
+                On a un problème de positionnement des meshs. Problème d'axe avec Blender
+                Et peut-être aussi un problème d'origine de l'environnement.
+                Mettre un mesh à l'origine dans blender ? Mais est-ce que c'est vraiment utile ?
+
+
+    On a compliqué pour rien.
+    Il suffit juste de récupérer le mesh qui est dans l'environnement et de le passer en paramètre quand on crée l'objet.
+    Donc dans Breach1
+
+    Changer de scène quand on change d'environnement ? Bof en fait...
+    On revient à l'idée de placer les éléments "à la main"
+
+    Problème de rotation : on bouge le transform node au lieu de bouger le mesh
+
+    Problème réglé : le mesh de la bread slice n'était pas à l'origine sur blender
+
+    Maintenant, on peut en fait revenir à la version où on récupère les meshs de l'environnement.  ?
+    Quoique... Est-ce qu'on arrive à récupérer le transformNode parent quand on fait ça ?
+    NE SURTOUT PAS FAIRE ça : Le centre du transform node du mesh ne sera plus l'origine et on aura des problèmes de rotation.
+
+
+    Au pire, la méthode actuelle devrait fonctionner : OUI, utiliser cette méthode.
+    à la limite, on peut récupérer les positions des meshs de l'environnement et placer nos meshs crées individuellement à ces emplacements
+
+    IMPORTANT : Quand on applique une rotation, les valeurs sont en radians (contrairement aux valeurs affichées dans l'inspecteur)
+
+    [x] Lui appliquer le bon centre de rotation
+
+    .[] Peaufiner la rotation (ajouter du déplacement pour pas que la tranche n'intersecte avec le gros bout de pain)
+        [X] Utiliser des quaternions (j'ai l'impression qu'on peut obtenir la bonne rotation dans le cas actuel)
+        .[x] Mettre une limite à la rotation, puis passer à l'état move
+            On est en train de galérer à mettre une limite car la rotation passe de positif à négaitf...
+
+            En fait en réduisant la vitesse ça marche (à peu près)
+
+            En calculant correctement la limite en soustrayant la vitesse ça marche à tous les coups
+
+        [x] Ajouter un déplacement en même temps que la tranche tourne
+
+.[] On peut monter sur la breadSlice
+    Il faut réussir à faire ça proprement.
+    Là on peut le faire, mais c'est à cause d'une sorte de bug de raycast.
+    Et quand ça arrive, on a aucun moyen de savoir que c'est sur ce mesh qu'on fait un raycast...
+
+    On pourrait ajouter une hitbox à la bread slice
+
+    CE QU'ON VEUT FAIRE : Détecter si les pieds du joueur touchent la breadSlice
+    =====================
+     Créer une footbox au Player ?
+     ça a l'air bien ça
+     Quoique en fait le raycast est plus performant, on pourrait juste récupérer le ray et calculer avec la hitbox de la breadSlice
+     OUI c'est ça !
+
+     [x] Faire un get ray dans Player (pour pouvoir l'obtenir dans BreadSlice)
+     [] Vérifier la collision entre le ray et la hitbox de la breadSlice
+        En fait, pas besoin de hitbox pour la breadSlice. Sa géométrie par défaut est déjà ok.
+
+        Je sais pas pourquoi, la détection du joueur sur la breadSlice ne fonctionne pas...
+
+[] Le déplacement de la breadSlice s'applique au joueur
+
+
+KNIFE
+[] Recentrer le mesh sur blender
+
+[] Créer une classe couteau implémentant GameObjects
+[] Animation du couteau
+[] Placer les couteaux à la fin du niveau
+
+[] Ajouter un couteau qui tranche le pain
+[] Génération périodique de breadSlice
+
+
+BUG
+Quand on va dans la bakersbedroom, qu'on retourne dans la ville, et qu'on retourne dans la bakersbedroom,
+on tombe systématiquement dans un vide sans fond...
+
+En fait il faudrait peut-être penser à destruct les modèles dont on n'a plus besoin,
+ça pourrait peut-être régler le problème
+Ou alors utiliser des scènes pour faciliter la gestion des ressources
+En fait ça pose pas trop de problème qu'on doive recharger le Player, car ses ressources graphiques
+sont chargées globalement
+
+>>>
+[] Créer une nouvelle scène lorsqu'on change d'univers, transition entre les deux scènes.
+    Dans la méthode setActiveLevel de Game
+
+    [] Méthode destroy, détruire tous les meshs sauf celui du joueur
+
+
+
+
+========================================================================================================================
+
+[x] mettre le joueur à la start position quand on charge le niveau
+    On abandonne ?
+    On peut juste hard code la position de départ sinon.
+    Il faudrait quand même qu'on puisse récupérer la position, parce qu'on aura besoin de placer
+    d'autres éléments à part le joueur.
+    - soit en utilisant des meshs
+    - soit en essayant de récupérer la position d'un TransformNode
+
+[x] Modifier la liste d'AbstractLevel en dico pour y accéder par nom
+
+[x] Créer le niveau "chambre boulangère"
+
+[x] Y accéder avec le bouton "change"
+
+[x] Y accéder avec une collision avec un trigger
+
+
+========================================================================================================================
+
+[x] Supprimer anciens modèles
+
+[x] Séparer la camera du player dans une autre classe
+
+[x] Faire du raycasting sur des meshs invisibles
+
+[x] Équilibrer la camera à la Mario
+
+
+
+========================================================================================================================
+
+[] Voir avec Zia pour ajuster la startPosition (là on spawn sous la ville)
+    En fait le problème vient probablement du fait que le joueur peut charger avant la ville
+    et donc passer sous le sol.
+    Il faut faire de l'asynchrone
+
+[x] Faire en sorte qu'il puisse y avoir plusieurs positions de départ.
+    Passer la position en argument de setActiveLevel ?
+    On pourrait avoir une position par default, mais pouvoir changer si nécessaire
+    (Quand on sort de la baker's bedroom on doit spawner derrière la fenêtre)
+
+[] Arriver proprement dans la bakers_bedroom
+
+[] Détection de proximité avec la boulangère
+
+[] Démarrer le niveau
+
+
+========================================================================================================================
+[x] Réactiver le raycast pour les objets immatériels
+
+[x] Réduire vitesse de déplacement
+[x] Vérifier/enlever interpolation de la cam pour éviter les bugs quand on se déplace
+    En fait le problème vient du fait que le sol n'est pas parfaitement plat
+    Bug de camera quand on marche vers l'arrière en se regardant
+
+[x] Corriger bug camera qui passe dans les murs (Laisser plus d'espace entre le mur et la cam)
+    Ajouter d'autres raycasts ?
+
+[] Bug : on peut spawner dans le sol.
+    Il faut s'assurer que la map soit chargée avant qu'on place le player.
+
+
+[] Gérer la lumière (trop de lumière dans la cuisine)
+[] Ajouter un plafond artificiel (il faudra donc coder la ceiling detection)
+
+
+
+
+AVEC ZIA
+[] Mettre la startPosition dans la ville
+[] Résoudre les bugs de collision
+    En fait, c'est la géométrie de psychopathe qui cause ces problèmes.
+    Dans la première version de la ville, les collisions sont complètement ok.
+
+
+SIDE QUESTS
+[] Empêcher la caméra de passer sous le sol
+
+POLISH
+
+[] Ajouter la ceiling detection
+    Faire des raycasts vers le haut comme pour la détection du sol ?
+
+[x] Faire en sorte qu'on puisse regarder vers le ciel
+    Il faut que la camera se rapproche du joueur quand la camera descend vers le sol
+    Dans genshin, le perso devient transparent aussi
+
+    Il faut pas Lerper vers une position fixe. Il faudrait une fonction qui au beta associe le radius.
+
+    On est pas loin, il faut juste recalculer une fonction qui zoome un peu plus (On avait pris 5 comme radius)
+    On peut essayer avec 4.
+
+
+
+
+BUGS
+[x] Bug Quand on clique, puis appuie sur échap
+    Rattrappage de l'erreur
+
+[] Bugs de camera. Vérifier l'interpolation ?
+
+
+SON
+Babylon js ne prend pas en charge les fichiers midi.
+Il faudra exporter les pistes individuellement en .wav par exemple
+Dans la doc : Playing several sounds simultaneously and synchronized
+On démarre tous les sons en même temps, mais on met le volume sonore à 0 pour les pistes qu'on n'utilise pas encore.
+
+
+
+
+
+
+INUTILE
+[] Faire un mini déplacement vers le haut quand on commence l'hovering
+    Bof en fait ?
+
+====================================================================
+====================================================================
+ON OUBLIE
+[] Utiliser un character controller au lieu de le coder soi-même ?
+    Mais en fait, il faut utiliser un moteur physique pour pouvoir faire ça.
+    Du coup on oublie
+
+[] Reprogrammer la détection du sol/pentes comme Griffpatch car là on passe parfois au travers
+    En fait, bof. Mieux vaut éviter les boucles infinies
+
+#hammerjs
+
+En vrai, est-ce que y a vraiment besoin de faire ça MAINTENANT ?
+Oui, parce que sinon, ça va devenir horrible avec l'enum
+[] Faire un changement entre deux scènes
+    Par exemple entre la ville et le monde du tuto
+    Pour ça il faudra d'abord restructurer le code. Il ne faut pas utiliser une enum car c'est pas terrible.
+    Il va falloir faire des classes d'état.
+    [] GameState (classe mère)
+        [] GameplayState
+            Prend en paramètre une ressource graphique
+        [] MenuState
+            Il faut définir les menus dans le corps de la classe (et si on utilisait des classes anonymes ?
+                                                                  ça permettrait d'écrire tous les états dans un seul fichier)
+
+       QUESTION : Est-ce qu'il faut faire une structure qui permet de savoir quels sont les états voisins.
+                    Afin de les charger à l'avance ? On peut faire par exemple un graphe ou un arbre.
+                    ça a l'air intéressant, mais on verra ça plus tard...
+
+    Sinon on peut juste faire une classe SceneManager.
+    Il aurait une scene active. Et pourrait charger les autres scènes. En fait ça revient au même.
+    En fait on a besoin des deux. on pourrait plutôt l'appeler GameStateManager.
+    Et voilà.
+
+    De quoi a besoin une scène ?
+    1. d'être initialisée => Charger ressource graphique, et faire spawn des mobs par exemple
+    2. d'être update => boucle de jeu
+
+    On peut peut-être dissocier le chargement des ressources avec un RessourceManager ?
+
+
+RECAP
+    En fait une scene a besoin de :
+        - start : actions exécutées quand on démarre la scène
+        - update : la boucle de jeu de la scene
