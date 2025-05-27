@@ -39,7 +39,7 @@ export class Monolog {
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("Monolog");
         this.textBlock = new TextBlock();
         this.textBlock.color = "#FDF1bf";
-        this.textBlock.fontSize = 34;
+        this.textBlock.fontSize = "4%";
         this.textBlock.fontFamily = "Trebuchet MS";
         this.textBlock.shadowOffsetX = 1;
         this.textBlock.shadowBlur = 15;
