@@ -43,7 +43,7 @@ export class SugarlessBakery extends AbstractLevel {
         super(game, id);
         this._isNightmareLevel = true;
         this._name = "sugarless_bakery";
-        this._ressourceName = "https://dl.dropbox.com/scl/fi/5ix5uduz3npupr4wkvxh7/bakery_level_14.glb?rlkey=yb119txemkw7enl9xe7llovf0&st=pgrgd8ef&dl=0";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/pi41u2d059uklokttg4tn/bakery_level_15.glb?rlkey=kh09x2afbbt30qdtnhh4w8h3e&st=2kjwjhut&dl=0";
 
         this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
                                                 [   ["piano1",  "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],
@@ -138,18 +138,6 @@ export class SugarlessBakery extends AbstractLevel {
         this._cakes.find(node => node.name === "element_nightmare3")
             .rotation = new Vector3(Tools.ToRadians(90), 0, 0);
          */
-    }
-
-    private _updateCakes() {
-        // TODO : update la rotation des gâteaux
-
-        const playerPos = this._game.getPlayerPosition();
-
-        for (const cake of this._cakes) {
-            cake.lookAt(playerPos);
-
-        }
-
     }
 
     private _initSmallBakery(): void {
