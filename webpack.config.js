@@ -32,10 +32,11 @@ module.exports = {
         ],
     },
     plugins: [
+        /*
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
-        }),
+        }),*/
         new CopyWebpackPlugin({
             patterns: [
                 { from: 'public', to: 'public' }, // copie le dossier assets vers dist/assets
