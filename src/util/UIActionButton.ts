@@ -25,7 +25,7 @@ export class UIActionButton {
         text.text = actionText;
         text.fontStyle ="bold";
         text.color = "white";
-        text.fontSize = "30px";
+        text.fontSize = "35%";
         text.shadowOffsetX = 3;
         text.shadowColor= "black";
         text.paddingLeft = "15px";

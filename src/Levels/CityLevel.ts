@@ -27,7 +27,7 @@ export class CityLevel extends AbstractLevel{
                                                                   new Vector3(0, 0, 0),
                                                                   -1.557);
 
-    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 60, -30.75),
+    public static BAKERY_EXIT_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-56, 61.17, -30.75),
                                                                     new Vector3(0, Tools.ToRadians(270), 0),
                                                                     -2.102);
 
@@ -51,7 +51,7 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "https://dl.dropbox.com/scl/fi/ys6eh55kopu7bt0hgq03i/city-v26.glb?rlkey=8l6nl1pshdmhmkuw6v585ftal&st=wm0t4x8k&dl=0";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/05pd7y7dkcewk3aff1v1o/city_v27.glb?rlkey=28q0e3sifduwhlhc4xgh8ieat&st=dgjl0cl1&dl=0";
 
         this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', './musics/city/city_intro.ogg'],
                                                                   ['loop', './musics/city/city_loop.ogg'  ] ]);
@@ -69,12 +69,19 @@ export class CityLevel extends AbstractLevel{
         console.log("after adding triggers");
         this.cinematicScene = new CinematicScene(this._game.getGameScene(), AllCinematicData.getData(2), new Vector3(0, 10, 1), false);
         this.cinematicScene.stop();
-        AllMonolog.play(0);
+
+        if (this._playWelcomeMonolog) {
+            AllMonolog.play(0, this._game);
+            this._playWelcomeMonolog = false;
+        }
+
 
         this._finishedLoading();
     }
 
     initialize(): void {
+        this._game.getGameScene().getMeshByName(" pont collider stairs").name = "pont collider";
+
         this._skateparkExitTriggerActive = true;
 
         if (this._playTutorial) {
@@ -102,6 +109,8 @@ export class CityLevel extends AbstractLevel{
             this._music.play();
         }
 
+        this._initBaker();
+
 
     }
 
@@ -118,7 +127,7 @@ export class CityLevel extends AbstractLevel{
                 mesh.actionManager = new ActionManager(this._game.getScene());
 
                 const sfxAction6 = async () => {
-                    this._game.getPlayer().setIsActive(false);
+                    this._game.getPlayer().addMovementBlock();
                     this._sounds["on_the_right_track_6"].play();
                     this._game.getPlayer().disableCamera();
 
@@ -183,6 +192,7 @@ export class CityLevel extends AbstractLevel{
             }
 
             if (mesh.name.includes("entrance_skatepark")) {
+                mesh.isPickable = false;
                 mesh.actionManager = new ActionManager(this._game.getScene());
                 const entranceAction = () => {
                     if (! this._skateparkEntranceTriggerActive) return;
@@ -201,6 +211,7 @@ export class CityLevel extends AbstractLevel{
             }
 
             if (mesh.name.includes("exit_skatepark")) {
+                mesh.isPickable = false;
                 mesh.actionManager = new ActionManager(this._game.getScene());
                 const exitAction = async () => {
                     if (!this._skateparkExitTriggerActive) return;
@@ -282,7 +293,7 @@ export class CityLevel extends AbstractLevel{
         let cinematic  = AllCinematicData.getData(2);
         this.cinematicScene.play();
         //this._game.setGamestate(GameState.DO_NOTHING); // TODO : stopper le joueur proprement ?
-        this._game.getPlayer().setIsActive(false);
+        this._game.getPlayer().addMovementBlock();
         this._game.getScene().activeCamera = new FreeCamera("cinematic camera",new Vector3(0,10,-12));
         this._game.getPlayer().disableCamera();
         this._game.switchPlayerLight(0);
@@ -293,9 +304,27 @@ export class CityLevel extends AbstractLevel{
     }
 
     doAfterCinematic(): void {
-        this._game.getPlayer().setIsActive(true);
+        this._game.getPlayer().removeMovementBlock();
         this._firstCityEntrance();
         this.cinematicScene.stop();
+    }
+
+    private async _initBaker() {
+        const baker = await this._game.spriteLoader.loadSprite("BOULANGERE.glb");
+
+        //const bakerRoot = this._game.getGameScene().getTransformNodeByName("Armature");
+        const bakerRoot = baker.mesh;
+
+        const armature = bakerRoot.getChildTransformNodes()[0];
+
+        bakerRoot.rotationQuaternion = null;
+        armature.rotationQuaternion = null;
+
+        armature.position = new Vector3(-42, 63.6, 34.5);
+        armature.rotation.y = Tools.ToRadians(90);
+        armature.rotation.x = Tools.ToRadians(90);
+
+        baker.animationGroups[0].play(true);
     }
 
     private _initSounds() {

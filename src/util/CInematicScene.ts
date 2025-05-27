@@ -16,6 +16,7 @@ export class CinematicScene {
         let camera = new ArcRotateCamera("cinematic camera", -Math.PI/2, Math.PI/2, 15,  Vector3.Zero(), scene); // TODO camera doit dépendre de position ?
         let path_video = cinematicData.getPath();
         this.videoTexture =  new VideoTexture("truc_mushe", path_video, scene);
+        this.videoTexture.video.loop = false;
         //camera.setTarget(new Vector3(0, 0, 0.2));
 
         let planeOpts = {

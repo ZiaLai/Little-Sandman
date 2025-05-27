@@ -1,4 +1,4 @@
-import {AbstractMesh, Nullable, PickWithRay, Ray, RayHelper, Scene, Vector3} from "@babylonjs/core";
+import {Ray, Scene, Vector3} from "@babylonjs/core";
 
 export class ShootingSystem {
     private _isShooting: boolean;
@@ -31,10 +31,10 @@ export class ShootingSystem {
         }
     }
 
-    public getRayFromShooting(scene: Scene, position: Vector3, direction: Vector3): void {
+    public getRayFromShooting(scene: Scene, position: Vector3, direction: Vector3, playerShootingAnimationPlaying: boolean): void {
         const rayPosition = new Vector3(position.x, position.y + 1.2, position.z);
 
-        if (this._isShooting) {
+        if (this._isShooting && playerShootingAnimationPlaying) {
             this._shootingRay = new Ray(rayPosition, direction, 3);
             // const rayHelper = new RayHelper(this._shootingRay);
             // rayHelper.show(scene);

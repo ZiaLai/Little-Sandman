@@ -18,7 +18,7 @@ import {AllMonolog} from "../data/AllMonolog";
 
 
 export class SugarlessBakery extends AbstractLevel {
-    private _nbNightmareFound: number = 0;
+    private _nbNightmareFound: number;
 
     // todo : décomenter
     public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
@@ -59,6 +59,7 @@ export class SugarlessBakery extends AbstractLevel {
         await super.load();
         this._addTriggers();
         //this._finishedLoading();
+        this._nbNightmareFound = 0;
         this.setUpGui();
         this._music.play();
         this.setClearNightmareParticles();
@@ -80,6 +81,8 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     public initialize() {
+
+
         const breadSlice: TransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         breadSlice.getChildMeshes().forEach(mesh => {
             mesh.isVisible = false;
@@ -96,7 +99,7 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._initSmallBakery();
 
-        AllMonolog.play(2);
+        AllMonolog.play(2, this._game);
 
         //this._objects["bread_slice"] = [];
     }
@@ -141,10 +144,10 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     private _initSmallBakery(): void {
-        // TODO : ajouter un sol pickable, et décomenter
-        // this._game.getGameScene().getTransformNodeByName("mur_plafond_regularSolid").getChildMeshes().forEach(mesh => {
-        //     mesh.isPickable = false;
-        // });
+        this._game.getGameScene().getTransformNodeByName("murs_plafond_regularSolid").getChildMeshes().forEach(mesh => {
+            if (mesh.name === "murs_plafond_regularSolid_primitive3") return;
+            mesh.isPickable = false;
+        });
     }
 
     private _initBars(): void {
@@ -182,7 +185,6 @@ export class SugarlessBakery extends AbstractLevel {
                 this._knifeTimer += this._game.getDeltaTime();
                 if (this._knifeTimer >= 1 && this._knifeCanCreateBreadSlicePlatform) {
                     this._knifeCanCreateBreadSlicePlatform = false;
-
 
                     this._objects.push(new BreadSlicePlatform(this._game, this._breadSlicePlatformTransformNode, new Vector3(21.2, 21.65, 26.81)))
                 }

@@ -23,6 +23,8 @@ export abstract class AbstractLevel {
     protected _lastSpawnData: SpawnData;
     protected clearNigthmareParticleEmmitter:ClearNightmareParticles[] = [];
 
+    protected _playWelcomeMonolog: boolean = true;
+
 
     protected constructor(game: Game, id: number) {
         this._game = game;

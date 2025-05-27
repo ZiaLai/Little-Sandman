@@ -59,14 +59,13 @@ export class Game {
     }
 
     public update(): void {
-        console.log("LOCK POINTER:", this.getPlayer().getInput().getLockPointer());
         switch (this._state){
             case GameState.PLAYING:
                 this.getPlayer().getInput().setLockPointer(true);
                 this._levels[this._currentLevel].update();
                 if (this.getPlayer().getInput().pauseKeyDown){
                     this._state = GameState.ENTERING_PAUSE;
-                    this.getPlayer().setIsActive(false);
+                    this.getPlayer().addMovementBlock();
                     //this.getPlayer().disableCamera();
                 }
                 break;
@@ -94,7 +93,7 @@ export class Game {
                     this._pauseMenu.hide();
 
                     this.getPlayer().getInput().requestPointerLock();
-                    this.getPlayer().setIsActive(true);
+                    this.getPlayer().removeMovementBlock();
                     //this.getPlayer().camera.enable(this.getScene());
                 }
 

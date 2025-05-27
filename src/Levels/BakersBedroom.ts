@@ -58,7 +58,12 @@ export class BakersBedroom extends AbstractLevel {
         await super.load();
         this._addTriggers();
         //startPosition === null ? this._game.getPlayer().setPosition(this._startPosition) : this._game.getPlayer().setPosition(startPosition);
-        AllMonolog.play(1);
+
+        if (this._playWelcomeMonolog) {
+            AllMonolog.play(1, this._game);
+            this._playWelcomeMonolog = false;
+        }
+
         this._finishedLoading();
     }
 

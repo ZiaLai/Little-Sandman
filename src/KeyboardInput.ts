@@ -2,8 +2,6 @@ import {PlayerInput} from "./PlayerInput";
 import {ActionManager, ExecuteCodeAction, Scalar, Scene} from "@babylonjs/core";
 
 export class KeyboardInput extends PlayerInput {
-    private _specialKeys: string[] = ["Shift","Enter"];
-    private _pointerLocked: boolean = false;
     private _canvas: HTMLCanvasElement;
     private _lockPointer: boolean;
 
@@ -17,33 +15,19 @@ export class KeyboardInput extends PlayerInput {
 
         this.inputMap = {};
 
-        this._canvas.addEventListener("click", event => {
+        this._canvas.addEventListener("click", () => {
             if (! this._lockPointer) return;
-
-            if(this._canvas.requestPointerLock) {
-
-                this._canvas.requestPointerLock().catch(err => console.error(err));
-            }
+                this.requestPointerLock();
         }, false);
-        // scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (evt) => {
-        //     this._pointerLocked = true;
-        //
-        //
-        // }))
+
         scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
-            let key = evt.sourceEvent.key;
-            if (!(this._specialKeys.includes(key))) {
-                key = key.toLowerCase()
-            }
-            this.inputMap[key] = evt.sourceEvent.type == "keydown";
+            const code = evt.sourceEvent.code;
+            this.inputMap[code] = true;
         }));
         scene.actionManager.registerAction(new
         ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
-            let key = evt.sourceEvent.key;
-            if (!(this._specialKeys.includes(key))) {
-                key = key.toLowerCase()
-            }
-            this.inputMap[key] = evt.sourceEvent.type == "keydown";
+            const code = evt.sourceEvent.code;
+            this.inputMap[code] = false;
         }));
 
         scene.onBeforeRenderObservable.add(() => {
@@ -52,7 +36,6 @@ export class KeyboardInput extends PlayerInput {
     }
 
     private _updateFromKeyboard(): void {
-        console.log("updating input");
 
         if (this.isActive) {
             if (this.inputMap["ArrowUp"]) {
@@ -82,18 +65,14 @@ export class KeyboardInput extends PlayerInput {
             }
 
             // Jump Checks (SPACE)
-            if (this.inputMap[" "]) {
-                this.jumpKeyDown = true;
-            } else {
-                this.jumpKeyDown = false;
-            }
+            this.jumpKeyDown = !!this.inputMap["Space"];
 
 
-            if (this.inputMap["z"]) {
+            if (this.inputMap["KeyW"]) {
                 this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
                 this.verticalAxis = 1;
 
-            } else if (this.inputMap["s"]) {
+            } else if (this.inputMap["KeyS"]) {
                 this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
                 this.verticalAxis = -1;
 
@@ -102,11 +81,11 @@ export class KeyboardInput extends PlayerInput {
                 this.verticalAxis = 0;
             }
 
-            if (this.inputMap["q"]) {
+            if (this.inputMap["KeyA"]) {
                 this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
                 this.horizontalAxis = -1;
 
-            } else if (this.inputMap["d"]) {
+            } else if (this.inputMap["KeyD"]) {
                 this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
                 this.horizontalAxis = 1;
 
@@ -115,25 +94,12 @@ export class KeyboardInput extends PlayerInput {
                 this.horizontalAxis = 0;
             }
 
-            this.hoverKeyDown = !!this.inputMap["Shift"];
+            this.hoverKeyDown = !!this.inputMap["ShiftLeft"];
 
-            this.actionKeyDown = !!this.inputMap["f"];
+            this.actionKeyDown = !!this.inputMap["KeyF"];
 
             this.pauseKeyDown = !!this.inputMap["Enter"];
         }
-
-
-
-        // if (this.inputMap["a"]) {
-        //     this._pointerLocked = false;
-        // }
-        //
-        // if (!this._pointerLocked) {
-        //     if (this._canvas.requestPointerLock) {
-        //         this._canvas.requestPointerLock();
-        //     }
-        // }
-
     }
 
 
@@ -153,7 +119,17 @@ export class KeyboardInput extends PlayerInput {
     }
 
     requestPointerLock(): void {
-        this._canvas.requestPointerLock().catch(err => console.error(err));
+        if (! this._canvas) return;
+
+        const requestPointerLock = this._canvas.requestPointerLock ||
+            (this._canvas as any).mozRequestPointerLock ||
+            (this._canvas as any).webkitRequestPointerLock;
+
+        if (requestPointerLock) {
+            requestPointerLock.call(this._canvas);
+        } else {
+            console.error("requestPointerLock n'est pas pris en charge par ce navigateur.");
+        }
     }
 
     getLockPointer(): boolean {

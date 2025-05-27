@@ -27,6 +27,7 @@ import {State} from "./State";
 import {CinematicScene} from "./util/CInematicScene";
 import {AllCinematicData} from "./data/AllCInematicData";
 import {ShootingSystem} from "./ShootingSystem";
+import {CityLevel} from "./Levels/CityLevel";
 
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 
@@ -58,6 +59,7 @@ export class App {
 
     private EXECUTE_TEST = true;
     private START_LEVEL = "bakers_bedroom";
+    private START_SPAWN_DATA: SpawnData = this.START_LEVEL === "city" ? CityLevel.SKATEPARK_SPAWN_DATA : SpawnData.DEFAULT_VALUE;
 
     constructor() {
         if (this.EXECUTE_TEST) new TestRunner().main();
@@ -90,20 +92,28 @@ export class App {
         this._main();
     }
 
+    public quit(): void {
+        this._engine.stopRenderLoop();
+        this._canvas.remove();
+
+        new App();
+    }
+
+
     private _createCanvas(): HTMLCanvasElement {
 
         //Commented out for development
-        // document.documentElement.style["overflow"] = "hidden";
-        // document.documentElement.style.overflow = "hidden";
-        // document.documentElement.style.width = "100%";
-        // document.documentElement.style.height = "100%";
-        // document.documentElement.style.margin = "0";
-        // document.documentElement.style.padding = "0";
-        // document.body.style.overflow = "hidden";
-        // document.body.style.width = "100%";
-        // document.body.style.height = "100%";
-        // document.body.style.margin = "0";
-        // document.body.style.padding = "0";
+        document.documentElement.style["overflow"] = "hidden";
+        document.documentElement.style.overflow = "hidden";
+        document.documentElement.style.width = "100%";
+        document.documentElement.style.height = "100%";
+        document.documentElement.style.margin = "0";
+        document.documentElement.style.padding = "0";
+        document.body.style.overflow = "hidden";
+        document.body.style.width = "100%";
+        document.body.style.height = "100%";
+        document.body.style.margin = "0";
+        document.body.style.padding = "0";
 
         //create the canvas html element and attach it to the webpage
         this._canvas = document.createElement("canvas");
@@ -116,8 +126,8 @@ export class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
-        //await this._goToStart(); // TODO enlever quand on  aura fini dev
+        //await this._goToLesFraudes();// TODO décomenter quand on aura fini dev
+        await this._goToStart(); // TODO enlever quand on  aura fini dev
 
         // Register a render loop to repeatedly render the scene
 
@@ -397,9 +407,10 @@ export class App {
         startBtn.onPointerDownObservable.add(async() => {
             this._engine.displayLoadingUI();
             scene.detachControl(); //observables disabled
-            await this._setUpGame(this.START_LEVEL).then(res =>{
-                this._goToGame();
-            });
+            // await this._setUpGame(this.START_LEVEL).then(res =>{
+            //     this._goToGame();
+            // });
+            this.changeGameScene(this.START_LEVEL, this.START_SPAWN_DATA);
         });
 
         //--SCENE FINISHED LOADING--
@@ -530,18 +541,18 @@ export class App {
         scene.detachControl();
 
         // Bouton pour tester le changement d'environnement // TODO virrer quand on aura fini dev
-        const changeButton = Button.CreateSimpleButton("change", "CHANGE");
-        changeButton.width = 0.2
-        changeButton.height = "40px";
-        changeButton.color = "white";
-        changeButton.top = "14px";
-        changeButton.thickness = 0;
-        changeButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        playerUI.addControl(changeButton);
-
-        changeButton.onPointerDownObservable.add(() => {
-            this.changeGameScene("sugarless_bakery");
-        })
+        // const changeButton = Button.CreateSimpleButton("change", "CHANGE");
+        // changeButton.width = 0.2
+        // changeButton.height = "40px";
+        // changeButton.color = "white";
+        // changeButton.top = "14px";
+        // changeButton.thickness = 0;
+        // changeButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        // playerUI.addControl(changeButton);
+        //
+        // changeButton.onPointerDownObservable.add(() => {
+        //     this.changeGameScene("sugarless_bakery");
+        // })
 
 
         //this handles interactions with the start button attached to the scene
