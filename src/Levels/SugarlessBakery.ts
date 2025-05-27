@@ -59,6 +59,7 @@ export class SugarlessBakery extends AbstractLevel {
         await super.load();
         this._addTriggers();
         //this._finishedLoading();
+        this._nbNightmareFound = 0;
         this.setUpGui();
         this._music.play();
         this.setClearNightmareParticles();
@@ -80,7 +81,7 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     public initialize() {
-        this._nbNightmareFound = 0;
+
 
         const breadSlice: TransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         breadSlice.getChildMeshes().forEach(mesh => {
