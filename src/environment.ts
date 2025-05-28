@@ -103,7 +103,7 @@ export class Environment {
             result = await SceneLoader.ImportMeshAsync(null, "", this._currentAssetName);
         }
         else {
-            result = await SceneLoader.ImportMeshAsync(null, "models/", this._currentAssetName + ".glb",
+            result = await SceneLoader.ImportMeshAsync(null, "./models/", this._currentAssetName + ".glb",
                 this._scene);
         }
 

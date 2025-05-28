@@ -21,11 +21,9 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
-    "copy-webpack-plugin": "^13.0.0",
     "hammerjs": "^2.0.8"
   },
   "files": [
-    "./public",
-    "public"
+    "./public"
   ]
 }

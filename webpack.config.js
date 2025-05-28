@@ -1,14 +1,12 @@
 const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const appDirectory = fs.realpathSync(process.cwd());
 
 module.exports = {
     entry: path.resolve(appDirectory, "src/app.ts"), //path to the main .ts file
     output: {
         filename: "js/bundleName.js", //name for the js file that is created/compiled in memory
-        publicPath: "/Little-Sandman/",
         clean: true,
     },
     resolve: {
@@ -20,7 +18,7 @@ module.exports = {
         static: path.resolve(appDirectory, "public"), //tells webpack to serve from the public folder
         hot: true,
         devMiddleware: {
-            publicPath: "/Little-Sandman",
+            publicPath: "/",
         }
     },
     module: {
@@ -36,15 +34,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
-        }),
-        new CopyWebpackPlugin({
-            patterns: [
-                { from: path.resolve(__dirname, "public/models"), to: 'models' }, // copie le dossier assets vers dist/assets
-                { from: path.resolve(__dirname, "public/musics"), to: 'musics' },
-                { from: path.resolve(__dirname, "public/textures"), to: 'textures' },
-            ],
-        }),
+        })
     ],
     mode: "development",
-
 };
