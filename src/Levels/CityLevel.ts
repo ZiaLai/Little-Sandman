@@ -1,9 +1,14 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
 import {
-    ActionManager, ArcRotateCamera, Color3, FreeCamera,
+    ActionManager,
+    Color3,
+    FreeCamera,
     HemisphericLight,
-    Mesh, Sound,
+    Mesh, PBRMaterial,
+    Sound,
+    StandardMaterial,
+    Texture,
     Tools,
     Vector3
 } from "@babylonjs/core";
@@ -63,6 +68,28 @@ export class CityLevel extends AbstractLevel{
         await super.load();
         console.log("In city load");
         console.log(this._game.getEnvironment().getTriggers());
+
+        //Correction temporaire texture ZQSD
+        const pbr = new PBRMaterial("zqsd", this._game.getGameScene());
+
+        const texture = new Texture("/textures/zqsd_skatepark.png", this._game.getGameScene());
+        texture.hasAlpha = true;
+        texture.vScale = -1;
+
+        pbr.albedoTexture = texture;
+        pbr.albedoColor = new Color3(0.5, 0.5, 0.5);
+
+        pbr.metallic = 0;
+        pbr.roughness = 1;
+
+        const zqsd = this._game.getGameScene().getMeshByName("zqsd");
+        zqsd.material = pbr;
+
+        // Debug temporaire collider poubelle
+        const trash_collider = this._game.getGameScene().getMeshByName("g");
+        trash_collider.isVisible = false;
+        trash_collider.checkCollisions = true;
+        trash_collider.isPickable = true;
 
         this._initSounds();
         this._addTriggers();
