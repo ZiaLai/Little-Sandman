@@ -2,7 +2,7 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import {
-    Color4,
+    Color4, CreateAudioEngineAsync, CreateStreamingSoundAsync,
     Engine,
     FreeCamera,
     Matrix,
@@ -13,7 +13,7 @@ import {
     Scene,
     SceneLoader,
     SceneOptimizer,
-    ShadowGenerator, Sound,
+    ShadowGenerator, Sound, StreamingSound,
     Vector3,
 } from "@babylonjs/core";
 import {AdvancedDynamicTexture, Button, Control, Image, Rectangle, TextBlock} from "@babylonjs/gui";
@@ -28,6 +28,7 @@ import {CinematicScene} from "./util/CInematicScene";
 import {AllCinematicData} from "./data/AllCInematicData";
 import {ShootingSystem} from "./ShootingSystem";
 import {CityLevel} from "./Levels/CityLevel";
+import {PlaySound} from "./AudioControl/PlaySound";
 
 //import {CustomLoadingScreen} from "./util/CustomLoadingScreen";
 
@@ -224,21 +225,51 @@ export class App {
 
         guiMenu.addControl(imageRect);
 
-        const logo = new Image("logo", "/textures/logo_titre_blanc.png");
+        //const logo = new Image("logo", "/textures/logo_titre_blanc.png");
+        const logo = new Image("logo", "https://dl.dropbox.com/scl/fi/tgfw49awda4niy1maynpm/logo_titre_blanc.png?rlkey=huc4gwvtwlcf96qvnjw32lpx8&st=6m19o7yk&dl=0");
         logo.width = "256px";
         logo.height = "256px";
         imageRect.addControl(logo);
 
-
+/*
         // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)(op)
-        function playsound(){
+        function playSound(){
             setTimeout(() => {
+                console.log(sound);
                 sound.play();
                 }, 2000);
 
         }
+        function playSound2(){
+            console.log(sound);
+            Engine.audioEngine.useCustomUnlockedButton = true;
+            Engine.audioEngine.WarnedWebAudioUnsupported = true;
+            Engine.audioEngine.unlock();
+            console.log(sound.isPlaying);
+            sound.play();
+            console.log(sound.isPlaying);
+        }
         let sound = new Sound("les fraudes", "./musics/Les fraudes.m4a", null, playsound);
+        //let sound = new Sound("les fraudes", "https://dl.dropbox.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=es2sw5ry&dl=0", null, playSound); //, {streaming: true }
+*//*
+        async function initAudio() {
+            const audioEngine = await CreateAudioEngineAsync();
+            await audioEngine.unlockAsync();
 
+            // Audio engine is ready to play sounds ...
+
+            // Track: "No" by Soulsonic
+            // License: CC BY-ND 3.0
+
+            await CreateStreamingSoundAsync("backgroundMusic", "https://dl.dropboxusercontent.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=hecs609o&dl=0", {
+                autoplay: true,
+            }, audioEngine);
+        }
+
+        await initAudio();*/
+        PlaySound.initAudio("https://dl.dropboxusercontent.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=hecs609o&dl=0", "les fraudes").then((streamingSound: StreamingSound) => {
+            streamingSound.play();
+        })
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI();
@@ -268,7 +299,7 @@ export class App {
         imageRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
 
         guiMenu.addControl(imageRect);
-        const logo = new Image("logo", "/textures/ls_headphones.png");
+        const logo = new Image("logo", "https://dl.dropbox.com/scl/fi/hyxisssn9akxybdcie5az/ls_headphones.png?rlkey=ze5nq8q5j1h4r36hzd5mag3gy&st=252q8efg&dl=0");
         logo.width = "256px";
         logo.height = "406px";
         logo.paddingTop = 150;
@@ -382,7 +413,7 @@ export class App {
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
         // await this._setUpGame(this.START_LEVEL);
         // await this._goToGame();
-        const startbg = new Image("startbg", "models/title_screen2.jpg");
+        const startbg = new Image("startbg", "https://dl.dropbox.com/scl/fi/ipvp3c3n6vtlqc7prj0w4/title_screen2.jpg?rlkey=lq57zcnxd1inx4f8wppoixlmj&st=g8omsws8&dl=0");
         imageRect.addControl(startbg);
         //--text---
         let text = new TextBlock();
@@ -460,7 +491,7 @@ export class App {
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
 
-            return SceneLoader.ImportMeshAsync(null, "./models/", "little_sandman_23.glb", scene).then((result) => {
+            return SceneLoader.ImportMeshAsync(null, "", "https://dl.dropbox.com/scl/fi/2duys3u108dgdh0ggaim6/little_sandman_23.glb?rlkey=c5836r0a1dqi2k9wvvnlngurm&st=8p7jidu2&dl=0", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -521,6 +552,7 @@ export class App {
         this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, playerPosition);
         this._shootingSystem.registerPointerEvent(scene);
         const camera = this._player.camera.activate(this._shootingSystem);
+        console.log("after activate");
         this._game.initializeLevel();
 
     }
@@ -629,9 +661,9 @@ export class App {
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
         // await this._setUpGame(this.START_LEVEL);
         // await this._goToGame();
-        const bg = new Image("bg", "/textures/thanks_for_playing (2).png");
+        const bg = new Image("bg", "https://dl.dropbox.com/scl/fi/h71ozodm9afhtyof7gumv/thanks_for_playing-2.png?rlkey=78i7dpy5f9s32jfs3kcyoc7b3&st=9qpfk5os&dl=0");
         imageRect.addControl(bg);
-        const draw = new Image("draw", "/textures/thanks_for_playing (1).png");
+        const draw = new Image("draw", "https://dl.dropbox.com/scl/fi/tez5rs15qcq6ud5ut39ds/thanks_for_playing-1.png?rlkey=28mykmq4xhokm79ao8og1xu94&st=b31c4adi&dl=0");
         draw.height = "100%";
         draw.stretch = Image.STRETCH_UNIFORM;
         const imageLoadPromise = new Promise<void>((resolve, reject) => {

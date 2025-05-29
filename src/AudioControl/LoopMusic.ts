@@ -1,10 +1,11 @@
 import {Music} from "./Music";
-import {Scene, Sound} from "@babylonjs/core";
+import {Scene, Sound, StreamingSound} from "@babylonjs/core";
+import {PlaySound} from "./PlaySound";
 
 export class LoopMusic implements Music {
 
     private _scene: Scene;
-    private _loop: Sound;
+    private _loop: StreamingSound;
 
     private _musicData: any; // Liste [[intro_name, intro_path], [loop_name, loop_path]]
 
@@ -15,7 +16,7 @@ export class LoopMusic implements Music {
 
     }
 
-    private _initMusic() {
+    private async _initMusic() {
 
         let soundsReady = 0;
 
@@ -23,18 +24,23 @@ export class LoopMusic implements Music {
 
         function soundReady() {
             soundsReady++;
-            console.log("soundReady : " + soundsReady);
-            if (soundsReady === 1) {
-                self._loop.play();
-            }
+
         }
 
-        const loop = new Sound(this._musicData[0], this._musicData[1], this._scene, soundReady, {loop: true, spatialSound: false});
+        let loop: StreamingSound;
+
+        await PlaySound.initAudio(this._musicData[1], this._musicData[0]).then((streamingSound) => {
+            loop = streamingSound;
+            console.log("loop", loop);
+        })
         this._loop = loop;
     }
 
-    play(): void {
-        this._initMusic();
+    async play(): Promise<void> {
+        await this._initMusic().then(() => {
+            console.log("init music then");
+            this._loop.play({loop: true})
+        });
     }
 
     destroy(): void {

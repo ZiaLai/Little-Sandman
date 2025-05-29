@@ -3,7 +3,7 @@ import {Game} from "../game";
 import {
     AbstractMesh,
     AnimationGroup,
-    FreeCamera, Sound,
+    FreeCamera, Sound, StreamingSound,
     Tools,
 } from "@babylonjs/core";
 import {CityLevel} from "./CityLevel";
@@ -18,6 +18,7 @@ enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3,
 import {ActionManager, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
 import {UIActionButton} from "../util/UIActionButton";
+import {PlaySound} from "../AudioControl/PlaySound";
 
 export class BakersBedroom extends AbstractLevel {
     public static START_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(3.89, 2.45, -7.52),
@@ -44,13 +45,13 @@ export class BakersBedroom extends AbstractLevel {
     private _baker: { animationGroups: AnimationGroup[]; mesh: AbstractMesh };
     private _bakerHit: boolean;
 
-    private _goodNightSound: Sound;
+    private _goodNightSound: StreamingSound;
     private fButton : UIActionButton;
 
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "bakers_bedroom";
-        this._ressourceName = "baker_bedroom v8";
+        this._ressourceName = "https://dl.dropbox.com/scl/fi/9zz3sto67hzejkbycjppc/baker_bedroom-v8.glb?rlkey=k7p1le413fmusev03q36jwtaf&st=mncr4gqa&dl=0";
 
     }
 
@@ -67,7 +68,7 @@ export class BakersBedroom extends AbstractLevel {
         this._finishedLoading();
     }
 
-    initialize(): void {
+    async initialize(): Promise<void> {
         this._disablePlayerCamera();
 
         const camera = new FreeCamera("bakersBedroomCam", this._CAMERA_ZOOM_OUT_TARGET, this._game.getGameScene());
@@ -75,15 +76,18 @@ export class BakersBedroom extends AbstractLevel {
         this._camera = camera;
         this._game.getGameScene().activeCamera = camera;
 
-        this._goodNightSound = new Sound("good_night", "./musics/sfx/good_night.ogg", this._game.getGameScene());
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/5bc8l2a6dsh0dieysn39i/good_night.ogg?rlkey=wmbb3fq4jp5krcitap8rmolez&st=dhflfn9j&dl=0", "good_night").then((streamingSound: StreamingSound) => {
+            this._goodNightSound = streamingSound;
+            }
+        );
 
-        this.fButton = new UIActionButton("Commencer", "/textures/fButton.png");
+        this.fButton = new UIActionButton("Commencer", "https://dl.dropbox.com/scl/fi/i0n7cuy89x7q7kmx5ggul/fButton.png?rlkey=phb2a8s6s56787dxcgpwj1ua5&st=qrh9y4hx&dl=0");
         this.fButton.hide();
         this._initCloudMeshes();
 
         this._hideCloud();
 
-        this._initBaker();
+        await this._initBaker();
 
         // const bakersSkeleton = this._game.getGameScene().getSkeletonById("skeleton0");
         //
@@ -197,7 +201,7 @@ export class BakersBedroom extends AbstractLevel {
     }
 
     private async _initBaker() {
-        const baker = await this._game.spriteLoader.loadSprite("BOULANGERE.glb");
+        const baker = await this._game.spriteLoader.loadSprite("https://dl.dropbox.com/scl/fi/k61wvjtl7yi4i5p80jez7/BOULANGERE.glb?rlkey=r0zk8345ckia5bx2zl58b3979&st=dfg3xvac&dl=0");
 
         this._baker = baker;
         this._bakerHit = false;

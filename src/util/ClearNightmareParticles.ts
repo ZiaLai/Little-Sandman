@@ -9,7 +9,7 @@ export class ClearNightmareParticles {
     constructor(scene: Scene, position: Vector3, coef = 1) {
         this.particleSystem = new ParticleSystem("Clear nightmare", 2000, scene);
         this.particleSystem.emitter = position;
-        this.particleSystem.particleTexture =  new Texture("/textures/grain_sable.png", scene);
+        this.particleSystem.particleTexture =  new Texture("https://dl.dropbox.com/scl/fi/g33hxd66um5fgtjva5l0l/grain_sable.png?rlkey=k326v862pk1a3ztyto82v3lzx&st=kpli4xaq&dl=0", scene);
 
         this.particleSystem.color1 = new Color4(0.96, 1, 0.7);
         this.particleSystem.color2 = new Color4(1, 0.92, 0.2);
