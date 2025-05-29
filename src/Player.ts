@@ -7,7 +7,7 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3, Tools, Sound, StreamingSound
+    Vector3, Tools, Sound, StreamingSound, StaticSound
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -90,7 +90,7 @@ export class Player extends TransformNode {
 
     private _externalForces: Force[] = [];
 
-    private _sounds: Record<string, StreamingSound>;
+    private _sounds: Record<string, StaticSound>;
     private _soundsPlaying: Record<string, boolean>;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
@@ -146,16 +146,16 @@ export class Player extends TransformNode {
 
     private async initMusic(): Promise<void> {
         console.log("start init music player");
-        let jumpSound: StreamingSound, hoverSound: StreamingSound, sandSound: StreamingSound;
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/k7o21wwzlstg0ota6k8y1/jump.ogg?rlkey=8w81jndu6epkl5byimjj1hvng&st=q8ndmwav&dl=0", "jump").then((streamingSound: StreamingSound) => {
+        let jumpSound: StaticSound, hoverSound: StaticSound, sandSound: StaticSound;
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/k7o21wwzlstg0ota6k8y1/jump.ogg?rlkey=8w81jndu6epkl5byimjj1hvng&st=q8ndmwav&dl=0", "jump").then((streamingSound: StaticSound) => {
             jumpSound = streamingSound;
         });
 
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a68gy8oiqm1cabc3y8wqf/hover.ogg?rlkey=9dxm391zbvtngm53m415j5nxi&st=1z0jirlk&dl=0", "hover").then((streamingSound: StreamingSound) => {
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a68gy8oiqm1cabc3y8wqf/hover.ogg?rlkey=9dxm391zbvtngm53m415j5nxi&st=1z0jirlk&dl=0", "hover").then((streamingSound: StaticSound) => {
             hoverSound = streamingSound;
         });
 
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/y7inzt1cwkbuq22qonpam/throw_sand.ogg?rlkey=pcgvvuyqeprwmdmct7r10symu&st=ka5ldfa1&dl=0", "throw_sand").then((streamingSound: StreamingSound) => {
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/y7inzt1cwkbuq22qonpam/throw_sand.ogg?rlkey=pcgvvuyqeprwmdmct7r10symu&st=ka5ldfa1&dl=0", "throw_sand").then((streamingSound: StaticSound) => {
             sandSound = streamingSound;
         });
 

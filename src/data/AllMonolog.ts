@@ -34,7 +34,7 @@ export class AllMonolog {
             if (!this.getAllMonolog()[index].isPlayed()) {
                 setTimeout(() => {
                     this.getAllMonolog()[index].play();
-                }, 1000); //TODO ajuster valeur delais
+                }, 500); //TODO ajuster valeur delais
             }
             else{console.log("monolog" + index + " already played")}
         }

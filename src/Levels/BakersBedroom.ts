@@ -3,7 +3,7 @@ import {Game} from "../game";
 import {
     AbstractMesh,
     AnimationGroup,
-    FreeCamera, Sound, StreamingSound,
+    FreeCamera, Sound, StaticSound, StreamingSound,
     Tools,
 } from "@babylonjs/core";
 import {CityLevel} from "./CityLevel";
@@ -45,7 +45,7 @@ export class BakersBedroom extends AbstractLevel {
     private _baker: { animationGroups: AnimationGroup[]; mesh: AbstractMesh };
     private _bakerHit: boolean;
 
-    private _goodNightSound: StreamingSound;
+    private _goodNightSound: StaticSound;
     private fButton : UIActionButton;
 
     constructor(game: Game, id: number) {
@@ -76,8 +76,8 @@ export class BakersBedroom extends AbstractLevel {
         this._camera = camera;
         this._game.getGameScene().activeCamera = camera;
 
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/5bc8l2a6dsh0dieysn39i/good_night.ogg?rlkey=wmbb3fq4jp5krcitap8rmolez&st=dhflfn9j&dl=0", "good_night").then((streamingSound: StreamingSound) => {
-            this._goodNightSound = streamingSound;
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/5bc8l2a6dsh0dieysn39i/good_night.ogg?rlkey=wmbb3fq4jp5krcitap8rmolez&st=dhflfn9j&dl=0", "good_night").then((sound: StaticSound) => {
+            this._goodNightSound = sound;
             }
         );
 

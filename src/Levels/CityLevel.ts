@@ -11,7 +11,7 @@ import {
     Texture,
     PickWithRay, StreamingSound,
     Tools,
-    Vector3
+    Vector3, StaticSound
 } from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
 import {BakersBedroom} from "./BakersBedroom";
@@ -46,7 +46,7 @@ export class CityLevel extends AbstractLevel{
     private _skateparkExitTriggerActive: boolean;
     private _skateparkEntranceTriggerActive: boolean;
     private _playCityEntranceCinematic: boolean = true;
-    private _sounds: Record<string, StreamingSound>;
+    private _sounds: Record<string, StaticSound>;
     private _soundsPlayed: Record<string, boolean>;
 
     private _platformingTriggersActivation: boolean[];
@@ -134,7 +134,7 @@ export class CityLevel extends AbstractLevel{
 
             this._skateparkExitTriggerActive = true;
             this._skateparkEntranceTriggerActive = false;
-
+            console.log("HELLO play");
             this._music.play();
         }
 
@@ -320,6 +320,7 @@ export class CityLevel extends AbstractLevel{
 
     private async introduction(): Promise<void> {
         let cinematic  = AllCinematicData.getData(2);
+        console.log("PLAY POULET");
         this.cinematicScene.play();
         //this._game.setGamestate(GameState.DO_NOTHING); // TODO : stopper le joueur proprement ?
         this._game.getPlayer().addMovementBlock();
@@ -375,8 +376,8 @@ export class CityLevel extends AbstractLevel{
         this._sounds = {}
 
         for (let i=0; i < 6; i++) {
-            PlaySound.initAudio(soundsURL[i], soundsNames[i]).then((streamingSound: StreamingSound) => {
-                this._sounds[soundsNames[i]] = streamingSound;
+            PlaySound.initAudio(soundsURL[i], soundsNames[i]).then((sound: StaticSound) => {
+                this._sounds[soundsNames[i]] = sound;
             });
         }
 

@@ -13,7 +13,7 @@ import {
     Scene,
     SceneLoader,
     SceneOptimizer,
-    ShadowGenerator, Sound, StreamingSound,
+    ShadowGenerator, Sound, StaticSound, StreamingSound,
     Vector3,
 } from "@babylonjs/core";
 import {AdvancedDynamicTexture, Button, Control, Image, Rectangle, TextBlock} from "@babylonjs/gui";
@@ -267,8 +267,8 @@ export class App {
         }
 
         await initAudio();*/
-        PlaySound.initAudio("https://dl.dropboxusercontent.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=hecs609o&dl=0", "les fraudes").then((streamingSound: StreamingSound) => {
-            streamingSound.play();
+        await PlaySound.initAudio("https://dl.dropboxusercontent.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=hecs609o&dl=0", "les fraudes").then((sound: StaticSound) => {
+            sound.play();
         })
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();

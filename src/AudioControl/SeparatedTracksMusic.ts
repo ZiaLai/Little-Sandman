@@ -1,11 +1,11 @@
 import {Music} from "./Music";
-import {Scene, Sound, StreamingSound} from "@babylonjs/core";
+import {Scene, Sound, StaticSound, StreamingSound} from "@babylonjs/core";
 import {PlaySound} from "./PlaySound";
 
 export class SeparatedTracksMusic implements Music {
 
     private _scene: Scene;
-    private _tracks: StreamingSound[];
+    private _tracks: StaticSound[];
     private _trackData: any  // Liste de [nom, path] des instruments
     private _nbOfTracks: number;
 
@@ -14,7 +14,7 @@ export class SeparatedTracksMusic implements Music {
     private _nbOfTracksPlaying: number;
     private _nbOfTracksPlayingAtStart: number;
 
-    constructor (scene, nbOfTracksPlayingAtStart: number, trackData: any) {
+    constructor(scene, nbOfTracksPlayingAtStart: number, trackData: any) {
         this._scene = scene;
         this._tracks = [];
         this._trackData = trackData;
@@ -52,8 +52,8 @@ export class SeparatedTracksMusic implements Music {
             this._tracks[i].volume = 0;
 
         }
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a2gw9pz6jelwyf36pyr2d/upgrade.ogg?rlkey=adqo59ajv2e1fz7w265ct7xx6&st=2s2vsx3s&dl=0", 'upgrade').then((streamingSound: StreamingSound) => {
-            this._upgradeSound = streamingSound;
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a2gw9pz6jelwyf36pyr2d/upgrade.ogg?rlkey=adqo59ajv2e1fz7w265ct7xx6&st=2s2vsx3s&dl=0", 'upgrade').then((sound: StaticSound) => {
+            this._upgradeSound = sound;
         })
     }
 
