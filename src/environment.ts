@@ -41,7 +41,7 @@ export class Environment {
         this._assets.allMeshes.forEach((mesh: Mesh) => {
             mesh.receiveShadows = true;
             mesh.checkCollisions = true;
-            console.log("name ", mesh.name);
+            /* console.log("name ", mesh.name); */
 
             if (mesh.name.includes("collider") && mesh.name.includes("trigger")) {
                 mesh.isVisible = true;
