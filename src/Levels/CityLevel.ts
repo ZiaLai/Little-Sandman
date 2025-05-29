@@ -339,7 +339,7 @@ export class CityLevel extends AbstractLevel{
     }
 
     private async _initBaker() {
-        const baker = await this._game.spriteLoader.loadSprite("BOULANGERE.glb");
+        const baker = await this._game.spriteLoader.loadSprite("https://dl.dropbox.com/scl/fi/k61wvjtl7yi4i5p80jez7/BOULANGERE.glb?rlkey=r0zk8345ckia5bx2zl58b3979&st=0d6dp1s4&dl=0");
 
         //const bakerRoot = this._game.getGameScene().getTransformNodeByName("Armature");
         const bakerRoot = baker.mesh;
