@@ -9,7 +9,7 @@ export class SpriteLoader {
     }
 
     public async loadSprite(fileName: string) {
-        return SceneLoader.ImportMeshAsync("", "./models/", fileName, this._game.getGameScene()).then((result) => {
+        return SceneLoader.ImportMeshAsync("", "", fileName, this._game.getGameScene()).then((result) => {
 
             const mesh = result.meshes[0];
             mesh.rotationQuaternion = null;

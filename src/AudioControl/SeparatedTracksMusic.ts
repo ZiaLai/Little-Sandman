@@ -1,10 +1,11 @@
 import {Music} from "./Music";
-import {Scene, Sound} from "@babylonjs/core";
+import {Scene, Sound, StreamingSound} from "@babylonjs/core";
+import {PlaySound} from "./PlaySound";
 
 export class SeparatedTracksMusic implements Music {
 
     private _scene: Scene;
-    private _tracks: Sound[];
+    private _tracks: StreamingSound[];
     private _trackData: any  // Liste de [nom, path] des instruments
     private _nbOfTracks: number;
 
@@ -23,7 +24,7 @@ export class SeparatedTracksMusic implements Music {
         this._nbOfTracksPlayingAtStart = nbOfTracksPlayingAtStart;
     }
 
-    private _initTracks(trackData: []) {
+    private async _initTracks() {
         this._nbOfTracksPlaying = this._nbOfTracksPlayingAtStart;
 
         let soundsReady = 0;
@@ -33,28 +34,37 @@ export class SeparatedTracksMusic implements Music {
             soundsReady++;
             console.log("soundReady : " + soundsReady);
             if (soundsReady === self._nbOfTracks) {
-                for (let music of self._tracks) {
-                    music.play();
-                }
+
             }
         }
 
         this._tracks = [];
-        for (const elt of trackData) {
-            const sound: Sound = new Sound(elt[0], elt[1], this._scene, soundReady, {loop: true, spatialSound: false});
-            this._tracks.push(sound);
+        for (const elt of this._trackData) {
+            await PlaySound.initAudio(elt[1], elt[0]).then(streamingSound => {
+                this._tracks.push(streamingSound);
+            });
+            //const sound: Sound = new Sound(elt[0], elt[1], this._scene, soundReady, {loop: true, spatialSound: false});
+
         }
 
         // Désactiver toutes les pistes à part les deux premières
         for (let i = this._nbOfTracksPlayingAtStart; i < this._nbOfTracks; i++) {
-            this._tracks[i].setVolume(0);
-        }
+            this._tracks[i].volume = 0;
 
-        this._upgradeSound = new Sound('upgrade', './musics/sfx/upgrade.ogg', this._scene);
+        }
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a2gw9pz6jelwyf36pyr2d/upgrade.ogg?rlkey=adqo59ajv2e1fz7w265ct7xx6&st=2s2vsx3s&dl=0", 'upgrade').then((streamingSound: StreamingSound) => {
+            this._upgradeSound = streamingSound;
+        })
     }
 
     play(): void {
-        this._initTracks(this._trackData);
+        this._initTracks().then(() => {
+            for (let music of this._tracks) {
+                console.log("play music no:" + music.name);
+                music.play({loop: true});
+            }
+        });
+
     }
 
     upgrade(): void {
@@ -63,7 +73,7 @@ export class SeparatedTracksMusic implements Music {
         if (this._nbOfTracksPlaying >= this._nbOfTracks) return;
 
 
-        this._tracks[this._nbOfTracksPlaying].setVolume(1);
+        this._tracks[this._nbOfTracksPlaying].volume = 1;
         this._nbOfTracksPlaying++;
     }
 

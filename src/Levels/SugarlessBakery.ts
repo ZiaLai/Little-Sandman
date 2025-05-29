@@ -46,13 +46,13 @@ export class SugarlessBakery extends AbstractLevel {
         this._ressourceName = "https://dl.dropbox.com/scl/fi/pi41u2d059uklokttg4tn/bakery_level_15.glb?rlkey=kh09x2afbbt30qdtnhh4w8h3e&st=2kjwjhut&dl=0";
 
         this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
-                                                [   ["piano1",  "./musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],
-                                                    ["piano2",  "./musics/sugarlessBakery/sugarless_bakery-Piano_2.ogg"           ],
-                                                    ["flute",   "./musics/sugarlessBakery/sugarless_bakery-Flûte.ogg"             ],
-                                                    ["bass",    "./musics/sugarlessBakery/sugarless_bakery-Basse.ogg"             ],
-                                                    ["battery", "./musics/sugarlessBakery/sugarless_bakery-Set_de_batterie.ogg"   ],
-                                                    ["guitar",  "./musics/sugarlessBakery/sugarless_bakery-Guitare_électrique.ogg"],
-                                                    ["violins", "./musics/sugarlessBakery/sugarless_bakery-Violons.ogg"           ]]);
+                                                [   ["piano1",  "https://dl.dropbox.com/scl/fi/7mk0182nd5hmcmb2uu5l6/sugarless_bakery-Piano_1.ogg?rlkey=mpg4up6npiskqoxsym8et3e8a&st=42ueinsb&dl=0"           ],
+                                                    ["piano2",  "https://dl.dropbox.com/scl/fi/ygy7ncfeqiexfdl29hqqz/sugarless_bakery-Piano_2.ogg?rlkey=sdtsfuxua2q8983b80qskkqvm&st=p3s6515q&dl=0"           ],
+                                                    ["flute",   "https://dl.dropbox.com/scl/fi/5asej6j2shvbvsqv64kr1/sugarless_bakery-Fl-te.ogg?rlkey=4ikqfrhvgpuatoqvatrcx1bql&st=mud9sfwq&dl=0"             ],
+                                                    ["bass",    "https://dl.dropbox.com/scl/fi/nzzshpsu8ac1hkqtad3em/sugarless_bakery-Basse.ogg?rlkey=p1paoh1sy9jfsj668z25f89bi&st=k4p8up3f&dl=0"             ],
+                                                    ["battery", "https://dl.dropbox.com/scl/fi/3cw63qitm0mgpccw3108o/sugarless_bakery-Set_de_batterie.ogg?rlkey=j2lldy0vekzvr3ujipyfhopqp&st=p6v6yhsx&dl=0"   ],
+                                                    ["guitar",  "https://dl.dropbox.com/scl/fi/7gjy2gmey2wq61poj8pjq/sugarless_bakery-Guitare_-lectrique.ogg?rlkey=9bhpnfhjsjnnon2wm5quihctu&st=h830ey8v&dl=0"],
+                                                    ["violons", "https://dl.dropbox.com/scl/fi/g8lve455f65wxtcsspx9o/sugarless_bakery-Violons.ogg?rlkey=csctpa3x59rlo5skksm7gv4zz&st=2olhuaw6&dl=0"           ]]);
     }
 
     protected async load() {
@@ -61,7 +61,9 @@ export class SugarlessBakery extends AbstractLevel {
         //this._finishedLoading();
         this._nbNightmareFound = 0;
         this.setUpGui();
+        console.log("BEFORE PLAY");
         this._music.play();
+        console.log("AFTER PLAY");
         this.setClearNightmareParticles();
 
         // this._upgradeMusic();
@@ -112,10 +114,8 @@ export class SugarlessBakery extends AbstractLevel {
                 let origin = nightmareElement.getAbsolutePosition();
                 let playerPosition = this._game.getPlayer().mesh.getAbsolutePosition();
                 let direction = playerPosition.subtract(origin);
-                console.log(direction.x, direction.z);
                 direction.x = -direction.x;
                 //direction.z = -direction.z; //Laisser même si commentée car je suis bête
-                console.log(direction.x, direction.z);
                 nightmareElement.setDirection(direction);
             })
         }
@@ -271,8 +271,10 @@ export class SugarlessBakery extends AbstractLevel {
                         }
 
                         await sleep(3000);
-                        await this._game.getApp().goToSomething(State.CINEMATIC, 1);
-                        this.destroy();
+                        await this._game.getApp().goToSomething(State.CINEMATIC, 1).then(() => {
+                            this.destroy();
+                        });
+                        //this.destroy
                     }
                 }
                 //console.log("swap done", this._nbNightmareFound);
@@ -311,8 +313,16 @@ export class SugarlessBakery extends AbstractLevel {
 
     private setUpGui(): void {
         const ui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
-        const compteur = new Image("compteur", "/textures/compteur-"+this._nbNightmareFound+".png");
+        const compteursURL = [
+            "https://dl.dropbox.com/scl/fi/o8ycxitblnrxm4fjjwhtx/compteur-0.png?rlkey=gd8p09s8iqgoyzrkba6zv6fxd&st=q9sng5l5&dl=0",
+            "https://dl.dropbox.com/scl/fi/6t6tevhihu7051hmvknn9/compteur-1.png?rlkey=rzczn4m93tgfb39n8pl0fx02b&st=j1f1nwtw&dl=0",
+            "https://dl.dropbox.com/scl/fi/bwokt8uip8ki9bcng4hot/compteur-2.png?rlkey=5yx7ekyiz39oulrgfv7bytgnc&st=6qseymq7&dl=0",
+            "https://dl.dropbox.com/scl/fi/fs7sxus91ncphslptrte5/compteur-3.PNG?rlkey=6yuuwgwktpazou29cvo1ixz9q&st=9w662t99&dl=0",
+            "https://dl.dropbox.com/scl/fi/1c0c4893bczhflen220ps/compteur-4.png?rlkey=l4gebmr5k6ajctdeq8yqbvne7&st=srpwgbz6&dl=0",
+            "https://dl.dropbox.com/scl/fi/bhe09mfjw3v69uf5b8t23/compteur-5.png?rlkey=ptnf5vu73q2ortpeb1yvxnd4y&st=tah3zkie&dl=0",
+            "https://dl.dropbox.com/scl/fi/a20bne8em2241lf4sy2u2/compteur-6.PNG?rlkey=x53p4ovgxziazkvii1r0x8dzg&st=i6qwkxz7&dl=0"
+        ];
+        const compteur = new Image("compteur", compteursURL[this._nbNightmareFound]);
         compteur.width = "25%";
         compteur.height = "25%";
         compteur.stretch = Image.STRETCH_UNIFORM;
