@@ -7,7 +7,7 @@ import {
     Mesh,
     ShadowGenerator,
     TransformNode,
-    Vector3, Tools, Sound
+    Vector3, Tools, Sound, StreamingSound
 } from "@babylonjs/core";
 import {PlayerInput} from "./PlayerInput";
 import {KeyboardInput} from "./KeyboardInput";
@@ -17,6 +17,7 @@ import {Sand} from "./util/Sand";
 import {ShootingSystem} from "./ShootingSystem";
 import {StaminaBar} from "./util/StaminaBar";
 import {Force} from "./Force";
+import {PlaySound} from "./AudioControl/PlaySound";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -89,7 +90,7 @@ export class Player extends TransformNode {
 
     private _externalForces: Force[] = [];
 
-    private _sounds: Record<string, Sound>;
+    private _sounds: Record<string, StreamingSound>;
     private _soundsPlaying: Record<string, boolean>;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
@@ -138,22 +139,41 @@ export class Player extends TransformNode {
         this.hoveringSandEmetter.createPointEmitter(new Vector3(-0.2,-1,0.2), new Vector3(0.2,-1,-0.2));
         // -- STAMINA BAR
         this._staminaBar = new StaminaBar(this.mesh, this.scene);
+        console.log("before init music player");
 
+        this.initMusic()
+    }
 
-        this._sounds = {"jump" :  new Sound("jump", "./musics/sfx/jump.ogg"),
-                         "hover" : new Sound("hover", "./musics/sfx/hover.ogg"),
-                         "throw_sand" : new Sound("throw_sand", "./musics/sfx/throw_sand.ogg") };
+    private async initMusic(): Promise<void> {
+        console.log("start init music player");
+        let jumpSound: StreamingSound, hoverSound: StreamingSound, sandSound: StreamingSound;
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/k7o21wwzlstg0ota6k8y1/jump.ogg?rlkey=8w81jndu6epkl5byimjj1hvng&st=q8ndmwav&dl=0", "jump").then((streamingSound: StreamingSound) => {
+            jumpSound = streamingSound;
+        });
+
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a68gy8oiqm1cabc3y8wqf/hover.ogg?rlkey=9dxm391zbvtngm53m415j5nxi&st=1z0jirlk&dl=0", "hover").then((streamingSound: StreamingSound) => {
+            hoverSound = streamingSound;
+        });
+
+        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/y7inzt1cwkbuq22qonpam/throw_sand.ogg?rlkey=pcgvvuyqeprwmdmct7r10symu&st=ka5ldfa1&dl=0", "throw_sand").then((streamingSound: StreamingSound) => {
+            sandSound = streamingSound;
+        });
+
+        this._sounds = {"jump" :  jumpSound,
+            "hover" : hoverSound,
+            "throw_sand" : sandSound};
 
         this._soundsPlaying = {}
         for (const key of Object.keys(this._sounds)) {
             this._soundsPlaying[key] = false;
         }
 
-        this._sounds["jump"].setVolume(0.5);
-        this._sounds["hover"].setVolume(0.5);
-        this._sounds["throw_sand"].setVolume(0.8);
-
+        this._sounds["jump"].volume = 0.5;
+        this._sounds["hover"].volume = 0.5;
+        this._sounds["throw_sand"].volume = 0.5;
+        console.log("end init music player");
     }
+
     private _setUpAnimations(){
         this.scene.stopAllAnimations();
         // indique quelles anim bouclent // utile dans anim player
@@ -260,8 +280,10 @@ export class Player extends TransformNode {
             }
         }
         else {
-            this._sounds["hover"].stop(0.02);
-            this._soundsPlaying["hover"] = false;
+            if (this._sounds) {
+                this._sounds["hover"].stop();
+                this._soundsPlaying["hover"] = false;
+            }
         }
 
         if (this._isShooting) {
@@ -272,8 +294,10 @@ export class Player extends TransformNode {
 
         }
         else {
-            this._sounds["throw_sand"].stop(0.025);
-            this._soundsPlaying["throw_sand"] = false;
+            if (this._sounds) {
+                this._sounds["throw_sand"].stop();
+                this._soundsPlaying["throw_sand"] = false;
+            }
         }
     }
 
