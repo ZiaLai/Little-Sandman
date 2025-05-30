@@ -37,6 +37,7 @@ export class SugarlessBakery extends AbstractLevel {
     private _breadSlicePlatformTransformNode: TransformNode;
     private _barsMesh: AbstractMesh;
     private _barsState: BarsState;
+    private _uiCounter: AdvancedDynamicTexture;
 
 
     constructor(game: Game, id: number) {
@@ -80,6 +81,8 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     public initialize() {
+        this._nbNightmareFound = 0;
+
         const breadSlice: TransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         breadSlice.getChildMeshes().forEach(mesh => {
             mesh.isVisible = false;
@@ -93,6 +96,8 @@ export class SugarlessBakery extends AbstractLevel {
         this._initBars();
 
         this._initSmallBakery();
+        this._uiCounter = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
 
         AllMonolog.play(2);
 
@@ -269,7 +274,6 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     private setUpGui(): void {
-        const ui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
         const compteur = new Image("compteur", "/textures/compteur-"+this._nbNightmareFound+".png");
         compteur.width = "25%";
@@ -279,7 +283,7 @@ export class SugarlessBakery extends AbstractLevel {
 
         compteur.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         compteur.paddingLeft = 40;
-        ui.addControl(compteur);
+        this._uiCounter.addControl(compteur);
 
     }
 
