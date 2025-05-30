@@ -75,12 +75,10 @@ export class IntroLoopMusic implements Music {
     destroy(): void {
         if (this._intro) {
             this._intro.stop();
-            this._intro.dispose();
         }
 
         if (this._loop) {
             this._loop.stop();
-            this._loop.dispose();
         }
     }
 }

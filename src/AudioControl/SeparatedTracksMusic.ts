@@ -1,86 +1,96 @@
-import {Music} from "./Music";
-import {Scene, Sound, StaticSound, StreamingSound} from "@babylonjs/core";
-import {PlaySound} from "./PlaySound";
+import { Music } from "./Music";
+import { Scene } from "@babylonjs/core";
 
 export class SeparatedTracksMusic implements Music {
-
     private _scene: Scene;
-    private _tracks: StaticSound[];
-    private _trackData: any  // Liste de [nom, path] des instruments
+    private _trackData: [string, string][];
+    private _audioContext: AudioContext;
+    private _buffers: AudioBuffer[] = [];
+    private _sources: AudioBufferSourceNode[] = [];
+    private _gains: GainNode[] = [];
+
     private _nbOfTracks: number;
-
-    private _upgradeSound;
-
     private _nbOfTracksPlaying: number;
     private _nbOfTracksPlayingAtStart: number;
 
-    constructor(scene, nbOfTracksPlayingAtStart: number, trackData: any) {
+    private _upgradeBuffer: AudioBuffer | null = null;
+
+    constructor(scene: Scene, nbOfTracksPlayingAtStart: number, trackData: [string, string][]) {
         this._scene = scene;
-        this._tracks = [];
         this._trackData = trackData;
         this._nbOfTracks = trackData.length;
-
-        this._nbOfTracksPlaying = nbOfTracksPlayingAtStart;
         this._nbOfTracksPlayingAtStart = nbOfTracksPlayingAtStart;
+        this._nbOfTracksPlaying = nbOfTracksPlayingAtStart;
+
+        this._audioContext = new AudioContext();
+    }
+
+    private async _loadBuffer(url: string): Promise<AudioBuffer> {
+        const res = await fetch(url);
+        const arr = await res.arrayBuffer();
+        return await this._audioContext.decodeAudioData(arr);
     }
 
     private async _initTracks() {
-        this._nbOfTracksPlaying = this._nbOfTracksPlayingAtStart;
+        this._buffers = await Promise.all(this._trackData.map(track => this._loadBuffer(track[1])));
 
-        let soundsReady = 0;
-        const self = this;
+        this._sources = [];
+        this._gains = [];
 
-        function soundReady() {
-            soundsReady++;
-            console.log("soundReady : " + soundsReady);
-            if (soundsReady === self._nbOfTracks) {
+        const now = this._audioContext.currentTime;
 
-            }
+        for (let i = 0; i < this._buffers.length; i++) {
+            const source = this._audioContext.createBufferSource();
+            source.buffer = this._buffers[i];
+            source.loop = true;
+
+            const gain = this._audioContext.createGain();
+            gain.gain.value = i < this._nbOfTracksPlayingAtStart ? 1 : 0;
+
+            source.connect(gain);
+            gain.connect(this._audioContext.destination);
+
+            this._sources.push(source);
+            this._gains.push(gain);
         }
 
-        this._tracks = [];
-        for (const elt of this._trackData) {
-            await PlaySound.initAudio(elt[1], elt[0]).then(streamingSound => {
-                this._tracks.push(streamingSound);
-            });
-            //const sound: Sound = new Sound(elt[0], elt[1], this._scene, soundReady, {loop: true, spatialSound: false});
-
-        }
-
-        // Désactiver toutes les pistes à part les deux premières
-        for (let i = this._nbOfTracksPlayingAtStart; i < this._nbOfTracks; i++) {
-            this._tracks[i].volume = 0;
-
-        }
-        await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/upgrade.ogg", 'upgrade').then((sound: StaticSound) => {
-            this._upgradeSound = sound;
-        })
+        // Charger le son d'upgrade
+        this._upgradeBuffer = await this._loadBuffer("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/upgrade.ogg");
     }
 
-    play(): void {
-        this._initTracks().then(() => {
-            for (let music of this._tracks) {
-                console.log("play music no:" + music.name);
-                music.play({loop: true});
-            }
-        });
+    async play(): Promise<void> {
+        await this._initTracks();
 
+        const startTime = this._audioContext.currentTime + 0.1; // Légère marge pour planifier
+
+        for (let source of this._sources) {
+            source.start(startTime);
+        }
     }
 
     upgrade(): void {
-        this._upgradeSound.play();
+        if (this._upgradeBuffer) {
+            const source = this._audioContext.createBufferSource();
+            source.buffer = this._upgradeBuffer;
+            source.connect(this._audioContext.destination);
+            source.start();
+        }
 
-        if (this._nbOfTracksPlaying >= this._nbOfTracks) return;
-
-
-        this._tracks[this._nbOfTracksPlaying].volume = 1;
-        this._nbOfTracksPlaying++;
+        if (this._nbOfTracksPlaying < this._nbOfTracks) {
+            this._gains[this._nbOfTracksPlaying].gain.setValueAtTime(1, this._audioContext.currentTime);
+            this._nbOfTracksPlaying++;
+        }
     }
 
     destroy(): void {
-        for (const track of this._tracks) {
-            track.stop();
-            track.dispose()
+        for (const source of this._sources) {
+            try {
+                source.stop();
+            } catch (e) {
+                // ignore
+            }
         }
+        this._sources = [];
+        this._gains = [];
     }
 }

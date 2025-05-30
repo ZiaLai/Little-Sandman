@@ -46,7 +46,6 @@ export class LoopMusic implements Music {
     destroy(): void {
         if (this._loop) {
             this._loop.stop();
-            this._loop.dispose();
         }
     }
 }
