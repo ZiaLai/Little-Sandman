@@ -127,7 +127,7 @@ export class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToLesFraudes();
+        await this._goToActivateSound();
         //await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
@@ -162,7 +162,7 @@ export class App {
                         this.fraudeTimer += this._scene.deltaTime/1000;
                     }
                     else {
-                        await this._goToActivateSound();
+                        await this._goToCinematic(0);
                     }
                     break;
                 case State.ACTIVEZ_SON:
@@ -335,7 +335,7 @@ export class App {
         imageRect.addControl(ok);
 
         ok.onPointerDownObservable.add(async() => {
-            await this._goToCinematic(0);
+            await this._goToLesFraudes();
             scene.detachControl(); //observables disabled
         });
 
