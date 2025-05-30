@@ -51,7 +51,7 @@ export class BakersBedroom extends AbstractLevel {
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "bakers_bedroom";
-        this._ressourceName = "https://dl.dropbox.com/scl/fi/9zz3sto67hzejkbycjppc/baker_bedroom-v8.glb?rlkey=k7p1le413fmusev03q36jwtaf&st=mncr4gqa&dl=0";
+        this._ressourceName = "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/baker_bedroom_v8.glb";
 
     }
 
@@ -76,12 +76,12 @@ export class BakersBedroom extends AbstractLevel {
         this._camera = camera;
         this._game.getGameScene().activeCamera = camera;
 
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/5bc8l2a6dsh0dieysn39i/good_night.ogg?rlkey=wmbb3fq4jp5krcitap8rmolez&st=dhflfn9j&dl=0", "good_night").then((sound: StaticSound) => {
+        await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/good_night.ogg", "good_night").then((sound: StaticSound) => {
             this._goodNightSound = sound;
             }
         );
 
-        this.fButton = new UIActionButton("Commencer", "https://dl.dropbox.com/scl/fi/i0n7cuy89x7q7kmx5ggul/fButton.png?rlkey=phb2a8s6s56787dxcgpwj1ua5&st=qrh9y4hx&dl=0");
+        this.fButton = new UIActionButton("Commencer", "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/fButton.png");
         this.fButton.hide();
         this._initCloudMeshes();
 
@@ -201,7 +201,7 @@ export class BakersBedroom extends AbstractLevel {
     }
 
     private async _initBaker() {
-        const baker = await this._game.spriteLoader.loadSprite("https://dl.dropbox.com/scl/fi/k61wvjtl7yi4i5p80jez7/BOULANGERE.glb?rlkey=r0zk8345ckia5bx2zl58b3979&st=dfg3xvac&dl=0");
+        const baker = await this._game.spriteLoader.loadSprite("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/BOULANGERE.glb");
 
         this._baker = baker;
         this._bakerHit = false;

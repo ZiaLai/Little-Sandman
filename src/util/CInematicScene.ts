@@ -39,7 +39,7 @@ export class CinematicScene {
         if (isBackgroundActive){
             let background = MeshBuilder.CreatePlane("plane", backgroudopt, scene);
             let mat= new StandardMaterial("mat", scene);
-            mat.diffuseTexture = new Texture("https://dl.dropbox.com/scl/fi/xks3956v41md7khfu69wm/etoiles.png?rlkey=546hvia23n1mbjl8u1ge5kmp2&st=ijtvzih7&dl=0", scene);
+            mat.diffuseTexture = new Texture("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/etoiles.png", scene);
             mat.emissiveColor = Color3.White();
             background.material = mat;
             background.position = new Vector3(0, 0, 0.2);

@@ -52,7 +52,7 @@ export class SeparatedTracksMusic implements Music {
             this._tracks[i].volume = 0;
 
         }
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a2gw9pz6jelwyf36pyr2d/upgrade.ogg?rlkey=adqo59ajv2e1fz7w265ct7xx6&st=2s2vsx3s&dl=0", 'upgrade').then((sound: StaticSound) => {
+        await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/upgrade.ogg", 'upgrade').then((sound: StaticSound) => {
             this._upgradeSound = sound;
         })
     }

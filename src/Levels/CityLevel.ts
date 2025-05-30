@@ -58,12 +58,12 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "https://dl.dropbox.com/scl/fi/05pd7y7dkcewk3aff1v1o/city_v27.glb?rlkey=28q0e3sifduwhlhc4xgh8ieat&st=dgjl0cl1&dl=0";
+        this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v27.glb";
 
-        this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', 'https://dl.dropbox.com/scl/fi/g3mfcm57nnrxsp2jk4upb/city_intro.ogg?rlkey=ivzjwukic5wtj88jkdau90cpr&st=d57rnltt&dl=0'],
-                                                                  ['loop', 'https://dl.dropbox.com/scl/fi/lv1xoh4dxuxyz433s9l9j/city_loop.ogg?rlkey=dhbea7y6n7mrok5veomz3i8no&st=gzfovfrv&dl=0'  ] ]);
+        this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', 'https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/city/city_intro.ogg'],
+                                                                  ['loop', 'https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/city/city_loop.ogg'  ] ]);
 
-        this._skateparkMusic = new LoopMusic(this._game.getScene(), ["skatepark", "https://dl.dropbox.com/scl/fi/bk3vub8xw7zgd8f5eu4ra/skatepark_v2.ogg?rlkey=hmgxjmi6d933hmhwiuwcdube7&st=kowsqps7&dl=0" ]);
+        this._skateparkMusic = new LoopMusic(this._game.getScene(), ["skatepark", "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/skatepark/skatepark_v2.ogg" ]);
     }
 
     protected async load() {
@@ -74,7 +74,7 @@ export class CityLevel extends AbstractLevel{
         //Correction temporaire texture ZQSD
         const pbr = new PBRMaterial("zqsd", this._game.getGameScene());
 
-        const texture = new Texture("https://dl.dropbox.com/scl/fi/kq4fho7r8idzepsv68ckv/zqsd_skatepark.png?rlkey=lq0anbvhs9rr570xmgclgcpx4&st=kdikgwky&dl=0", this._game.getGameScene());
+        const texture = new Texture("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/zqsd_skatepark.png", this._game.getGameScene());
         texture.hasAlpha = true;
         texture.vScale = -1;
 
@@ -340,7 +340,7 @@ export class CityLevel extends AbstractLevel{
     }
 
     private async _initBaker() {
-        const baker = await this._game.spriteLoader.loadSprite("https://dl.dropbox.com/scl/fi/k61wvjtl7yi4i5p80jez7/BOULANGERE.glb?rlkey=r0zk8345ckia5bx2zl58b3979&st=0d6dp1s4&dl=0");
+        const baker = await this._game.spriteLoader.loadSprite("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/BOULANGERE.glb");
 
         //const bakerRoot = this._game.getGameScene().getTransformNodeByName("Armature");
         const bakerRoot = baker.mesh;
@@ -364,12 +364,12 @@ export class CityLevel extends AbstractLevel{
             soundsNames.push("on_the_right_track_" + i);
         }
         const soundsURL = [
-            "https://dl.dropbox.com/scl/fi/husg8n2fnhdi6034cmz1o/on_the_right_track_1.ogg?rlkey=fxdrmq4zqtk67fg846swsm777&st=n8iiwidy&dl=0",
-            "https://dl.dropbox.com/scl/fi/3n7a6g60dhoeoalenhgqx/on_the_right_track_2.ogg?rlkey=04c7g3antodinatfhrt0jizc1&st=1ottw7g7&dl=0",
-            "https://dl.dropbox.com/scl/fi/iau3q93to5v1ruft00j53/on_the_right_track_3.ogg?rlkey=zxy23fy9fdj3ml19hy1tqbilp&st=oq3b7kkj&dl=0",
-            "https://dl.dropbox.com/scl/fi/xcr37gkbpw66q6v8tjd8q/on_the_right_track_4.ogg?rlkey=1flr3jbyzbxekjo4yl4kwh47z&st=s5p2t9lk&dl=0",
-            "https://dl.dropbox.com/scl/fi/0hf2vt4n4ywi9navurivf/on_the_right_track_5.ogg?rlkey=ns3hhs1rn9an9eiwsg5sb1q7j&st=owosvr1k&dl=0",
-            "https://dl.dropbox.com/scl/fi/lx04xqamppup75rb4q2r9/on_the_right_track_6.ogg?rlkey=iogfoozdqhxcdwc1n0x38od4j&st=9w77wldm&dl=0"
+            "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/OnTheRightTrack/on_the_right_track_1.ogg",
+            "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/OnTheRightTrack/on_the_right_track_2.ogg",
+            "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/OnTheRightTrack/on_the_right_track_3.ogg",
+            "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/OnTheRightTrack/on_the_right_track_4.ogg",
+            "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/OnTheRightTrack/on_the_right_track_5.ogg",
+            "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/OnTheRightTrack/on_the_right_track_6.ogg"
         ];
 
 

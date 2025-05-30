@@ -32,7 +32,7 @@ export class CustomLoadingScreen implements ILoadingScreen {
         #spriteLoader {
             width: 100vw;
             height: 100vh;
-            background-image: url("https://dl.dropbox.com/scl/fi/ymg8r2t4iklm66x10lsco/loading_screen_sprite_sheet.png?rlkey=9o6pkjobi3mvv5jgdei6uy3qo&st=wusmnx2q&dl=0");
+            background-image: url("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/loading_screen_sprite_sheet.png");
             background-repeat: no-repeat;
             background-size: 700vw 100vh;
             animation: spritePlay 1s steps(7) infinite;  

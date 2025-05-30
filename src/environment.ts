@@ -99,7 +99,7 @@ export class Environment {
     public async _loadAsset() {
 
         let result;
-        if (this._currentAssetName.includes("dropbox")) { // Import de la ville sur dropbox car fichier lourd
+        if (this._currentAssetName.includes("jsdelivr") || this._currentAssetName.includes("githubusercontent")) { // Import de la ville sur dropbox car fichier lourd
             result = await SceneLoader.ImportMeshAsync(null, "", this._currentAssetName);
         }
         else {

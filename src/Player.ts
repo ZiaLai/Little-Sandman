@@ -147,15 +147,15 @@ export class Player extends TransformNode {
     private async initMusic(): Promise<void> {
         console.log("start init music player");
         let jumpSound: StaticSound, hoverSound: StaticSound, sandSound: StaticSound;
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/k7o21wwzlstg0ota6k8y1/jump.ogg?rlkey=8w81jndu6epkl5byimjj1hvng&st=q8ndmwav&dl=0", "jump").then((streamingSound: StaticSound) => {
+        await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/jump.ogg", "jump").then((streamingSound: StaticSound) => {
             jumpSound = streamingSound;
         });
 
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/a68gy8oiqm1cabc3y8wqf/hover.ogg?rlkey=9dxm391zbvtngm53m415j5nxi&st=1z0jirlk&dl=0", "hover").then((streamingSound: StaticSound) => {
+        await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/hover.ogg", "hover").then((streamingSound: StaticSound) => {
             hoverSound = streamingSound;
         });
 
-        await PlaySound.initAudio("https://dl.dropbox.com/scl/fi/y7inzt1cwkbuq22qonpam/throw_sand.ogg?rlkey=pcgvvuyqeprwmdmct7r10symu&st=ka5ldfa1&dl=0", "throw_sand").then((streamingSound: StaticSound) => {
+        await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sfx/throw_sand.ogg", "throw_sand").then((streamingSound: StaticSound) => {
             sandSound = streamingSound;
         });
 

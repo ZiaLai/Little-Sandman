@@ -20,7 +20,7 @@ export class Sand {
         let particleSystem = new ParticleSystem("particles", 2000, scene);
 
         //Texture of each particle
-        particleSystem.particleTexture = new Texture("https://dl.dropbox.com/scl/fi/g33hxd66um5fgtjva5l0l/grain_sable.png?rlkey=k326v862pk1a3ztyto82v3lzx&st=kpli4xaq&dl=0", scene);
+        particleSystem.particleTexture = new Texture("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/grain_sable.png", scene);
         //particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
 
         // Where the particles come from

@@ -19,7 +19,7 @@ export class PauseMenu {
         //this.pauseMenu.background = "#062E5b";
         this.pauseMenu.isVisible = false;
         this.pauseMenu.verticalAlignement = Control.VERTICAL_ALIGNMENT_CENTER;
-        const bgImage = new Image("bg","https://dl.dropbox.com/scl/fi/xks3956v41md7khfu69wm/etoiles.png?rlkey=546hvia23n1mbjl8u1ge5kmp2&st=ijtvzih7&dl=0");
+        const bgImage = new Image("bg","https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/etoiles.png");
         bgImage.alpha = 1;
         this.pauseMenu.addControl(bgImage);
         this.advancedTexture.addControl(this.pauseMenu);
