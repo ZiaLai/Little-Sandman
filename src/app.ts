@@ -320,7 +320,7 @@ export class App {
         this._scene.detachControl();
         this.currentCinematic = AllCinematicData.getData(indexCinematic);
         let scene = new Scene(this._engine);
-        new CinematicScene(scene, this.currentCinematic);
+        new CinematicScene(scene, this.currentCinematic).play(true);
         if (this.currentCinematic.isSkippable()) {
             // -- GUI button skip
             const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -351,6 +351,7 @@ export class App {
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI();
+        this.currentCinematic; //TODO à corriger
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
@@ -518,7 +519,6 @@ export class App {
         this._player = new Player(this.assets, scene, this._canvas,  shadowGenerator, playerPosition);
         this._shootingSystem.registerPointerEvent(scene);
         const camera = this._player.camera.activate(this._shootingSystem);
-        console.log("after activate");
         this._game.initializeLevel();
 
     }

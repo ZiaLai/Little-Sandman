@@ -18,7 +18,7 @@ import {AllMonolog} from "../data/AllMonolog";
 
 
 export class SugarlessBakery extends AbstractLevel {
-    private _nbNightmareFound: number;
+    private _nbNightmareFound: number = 0;
 
     // todo : décomenter
     public static ENTRANCE_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(-14.75, 1, 81.14),
@@ -37,6 +37,7 @@ export class SugarlessBakery extends AbstractLevel {
     private _breadSlicePlatformTransformNode: TransformNode;
     private _barsMesh: AbstractMesh;
     private _barsState: BarsState;
+    private _uiCounter: AdvancedDynamicTexture;
 
 
     constructor(game: Game, id: number) {
@@ -61,9 +62,7 @@ export class SugarlessBakery extends AbstractLevel {
         //this._finishedLoading();
         this._nbNightmareFound = 0;
         this.setUpGui();
-        console.log("BEFORE PLAY");
         this._music.play();
-        console.log("AFTER PLAY");
         this.setClearNightmareParticles();
 
         // this._upgradeMusic();
@@ -83,7 +82,7 @@ export class SugarlessBakery extends AbstractLevel {
     }
 
     public initialize() {
-
+        this._nbNightmareFound = 0;
 
         const breadSlice: TransformNode = this._game.getGameScene().getTransformNodeByName("bread_slice");
         breadSlice.getChildMeshes().forEach(mesh => {
@@ -100,6 +99,8 @@ export class SugarlessBakery extends AbstractLevel {
         this._initBars();
 
         this._initSmallBakery();
+        this._uiCounter = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
 
         AllMonolog.play(2, this._game);
 
@@ -307,7 +308,7 @@ export class SugarlessBakery extends AbstractLevel {
         light.intensity = 2000;
         // const cake1 = new PointLight("cake 1", new Vector3(4, 2.8, 1), this._game.getGameScene());
         // cake1.diffuse = new Color3(0.585, 1, 0.573);
-        // cake1.intensity = 10;
+        // cake1.intensity =10 ;
 
     }
 
@@ -330,7 +331,7 @@ export class SugarlessBakery extends AbstractLevel {
 
         compteur.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         compteur.paddingLeft = 40;
-        ui.addControl(compteur);
+        this._uiCounter.addControl(compteur);
 
     }
 
