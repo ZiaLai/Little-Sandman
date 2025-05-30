@@ -268,6 +268,7 @@ export class App {
 
         await initAudio();*/
         await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/Les_fraudes.m4a", "les fraudes").then((sound: StaticSound) => {
+            sound.volume = 0.3;
             sound.play();
         })
         //--SCENE FINISHED LOADING--
