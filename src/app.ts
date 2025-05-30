@@ -57,7 +57,7 @@ export class App {
     private cinematicTimer = 0;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "bakers_bedroom";
+    private START_LEVEL = "city";
 
     constructor() {
         if (this.EXECUTE_TEST) new TestRunner().main();
@@ -313,7 +313,7 @@ export class App {
         this._scene.detachControl();
         this.currentCinematic = AllCinematicData.getData(indexCinematic);
         let scene = new Scene(this._engine);
-        new CinematicScene(scene, this.currentCinematic);
+        new CinematicScene(scene, this.currentCinematic).play(true);
         if (this.currentCinematic.isSkippable()) {
             // -- GUI button skip
             const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -344,6 +344,7 @@ export class App {
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI();
+        this.currentCinematic
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
