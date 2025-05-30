@@ -162,6 +162,7 @@ export class App {
                         this.fraudeTimer += this._scene.deltaTime/1000;
                     }
                     else {
+                        this._state = State.CINEMATIC;
                         await this._goToCinematic(0);
                     }
                     break;
@@ -231,42 +232,6 @@ export class App {
         logo.height = "256px";
         imageRect.addControl(logo);
 
-/*
-        // TODO : afficher et désafficher progressivement (et add une petite musique frauduleuse)(op)
-        function playSound(){
-            setTimeout(() => {
-                console.log(sound);
-                sound.play();
-                }, 2000);
-
-        }
-        function playSound2(){
-            console.log(sound);
-            Engine.audioEngine.useCustomUnlockedButton = true;
-            Engine.audioEngine.WarnedWebAudioUnsupported = true;
-            Engine.audioEngine.unlock();
-            console.log(sound.isPlaying);
-            sound.play();
-            console.log(sound.isPlaying);
-        }
-        let sound = new Sound("les fraudes", "./musics/Les_fraudes.m4a", null, playsound);
-        //let sound = new Sound("les fraudes", "https://dl.dropbox.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=es2sw5ry&dl=0", null, playSound); //, {streaming: true }
-*//*
-        async function initAudio() {
-            const audioEngine = await CreateAudioEngineAsync();
-            await audioEngine.unlockAsync();
-
-            // Audio engine is ready to play sounds ...
-
-            // Track: "No" by Soulsonic
-            // License: CC BY-ND 3.0
-
-            await CreateStreamingSoundAsync("backgroundMusic", "https://dl.dropboxusercontent.com/scl/fi/i06hdf7js5rsa1oowj1ia/Les-fraudes.m4a?rlkey=we36r8k2e01wpmyif7s8qfz32&st=hecs609o&dl=0", {
-                autoplay: true,
-            }, audioEngine);
-        }
-
-        await initAudio();*/
         await PlaySound.initAudio("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/Les_fraudes.m4a", "les fraudes").then((sound: StaticSound) => {
             sound.volume = 0.3;
             sound.play();
