@@ -164,8 +164,10 @@ export class CityLevel extends AbstractLevel{
                         return new Promise(resolve => setTimeout(resolve, ms));
                     }
 
-                    await sleep(2000);
-                    this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
+                    setTimeout(() => {
+                        this._game.getApp().changeGameScene("bakers_bedroom", BakersBedroom.START_SPAWN_DATA)
+                    }, 1000);
+
                 }
 
                 // const observer = this._sounds["on_the_right_track_6"].onEndedObservable.add(() => {
