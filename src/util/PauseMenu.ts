@@ -8,7 +8,7 @@ import {CityLevel} from "../Levels/CityLevel";
 
 export class PauseMenu {
     private advancedTexture: AdvancedDynamicTexture;
-    private pauseMenu;
+    private pauseMenu: Rectangle;
     constructor(game :Game) {
         this.advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("PAUSE UI");
         this.pauseMenu = new Rectangle();
@@ -18,7 +18,7 @@ export class PauseMenu {
         this.pauseMenu.thickness = 0;
         //this.pauseMenu.background = "#062E5b";
         this.pauseMenu.isVisible = false;
-        this.pauseMenu.verticalAlignement = Control.VERTICAL_ALIGNMENT_CENTER;
+        this.pauseMenu.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         const bgImage = new Image("bg","https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/etoiles.png");
         bgImage.alpha = 1;
         this.pauseMenu.addControl(bgImage);

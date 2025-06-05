@@ -61,7 +61,6 @@ export class SugarlessBakery extends AbstractLevel {
         this._addTriggers();
         //this._finishedLoading();
         this._nbNightmareFound = 0;
-        this.setUpGui();
         this._music.play();
         this.setClearNightmareParticles();
 
@@ -100,7 +99,7 @@ export class SugarlessBakery extends AbstractLevel {
 
         this._initSmallBakery();
         this._uiCounter = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
+        this.setUpGui();
 
         AllMonolog.play(2, this._game);
 
