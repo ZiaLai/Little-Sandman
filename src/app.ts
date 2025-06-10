@@ -59,7 +59,7 @@ export class App {
     private cinematicTimer = 0;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "city";
+    private START_LEVEL = "bakers_bedroom";
     private START_SPAWN_DATA: SpawnData = this.START_LEVEL === "city" ? CityLevel.SKATEPARK_SPAWN_DATA : SpawnData.DEFAULT_VALUE;
 
     constructor() {
@@ -127,8 +127,8 @@ export class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToActivateSound();
-        //await this._goToStart();
+        //await this._goToActivateSound();
+        await this._goToStart(); // TODO commenter
 
         // Register a render loop to repeatedly render the scene
 
@@ -491,8 +491,8 @@ export class App {
 
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
-
-            return SceneLoader.ImportMeshAsync(null, "", "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/little_sandman_23.glb", scene).then((result) => {
+// TODO changer lien du little sandman
+            return SceneLoader.ImportMeshAsync(null, "", "/models/little_sandman_24.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 // body is our actual player mesh
                 const body = root;
@@ -506,10 +506,10 @@ export class App {
                 console.log(bone.name)
                 // The player has 2 scarfs
                 // The name of the first scarf is "Plane.001"
-                const scarf1 = body.getChildMeshes().find(m => m.name.includes("Plane.001")) as Mesh;
+                const scarf1 = body.getChildMeshes().find(m => m.name.includes("scarf")) as Mesh;
 
                 // The name of the second scarf is "Plane.003"
-                const scarf2 = body.getChildMeshes().find(m => m.name.includes("Plane.003")) as Mesh;
+                const scarf2 = body.getChildMeshes().find(m => m.name.includes("scarf.001")) as Mesh;
 
                 const tshirt = scene.getMeshByName("t shirt sans simul.001");
 
@@ -521,11 +521,13 @@ export class App {
                     scarf2.position.z = 8;
                     scarf1.attachToBone(bone, tshirt);
                     scarf2.attachToBone(bone, tshirt);
+
                 }
 
                 return {
                     mesh: outer as Mesh,
-                    animationGroups : result.animationGroups
+                    animationGroups : result.animationGroups,
+                    skeleton : skeleton
                 }
             })
 

@@ -18,6 +18,8 @@ import {ShootingSystem} from "./ShootingSystem";
 import {StaminaBar} from "./util/StaminaBar";
 import {Force} from "./Force";
 import {PlaySound} from "./AudioControl/PlaySound";
+import {ScarfAnimation} from "./util/ScarfAnimation";
+import {ScarffAnimation} from "./util/ScarffAnimation";
 
 export class Player extends TransformNode {
     public camera: PlayerCamera;
@@ -77,6 +79,8 @@ export class Player extends TransformNode {
     private _wasShootingLastFrame: boolean = false;
     private _shootAnimationTimer: number;
 
+    private isMoving: boolean = false;
+
     private _animations: {};
     private _currentAnim;
     private _prevAnim;
@@ -92,6 +96,9 @@ export class Player extends TransformNode {
 
     private _sounds: Record<string, StaticSound>;
     private _soundsPlaying: Record<string, boolean>;
+    private scarf:ScarffAnimation;
+    //private _scarf_v2 : ScarfAnimation;
+    private _neck;
 
     constructor(assets, scene: Scene, canvas: HTMLCanvasElement, shadowGenerator: ShadowGenerator, playerPosition: Vector3) {
         super("player", scene);
@@ -141,7 +148,13 @@ export class Player extends TransformNode {
         this._staminaBar = new StaminaBar(this.mesh, this.scene);
         console.log("before init music player");
 
-        this.initMusic()
+        this.initMusic();
+        const skeleton = assets.skeleton;
+        this._neck = this.scene.getMeshByName("scarf.001");//skeleton.bones[4];new TransformNode("neckLocator", this._scene);
+        //this._neck.attachToBone(skeleton.bones[4]);//
+        this.scarf = new ScarffAnimation(this.scene);
+        //this._scarf_v2 = new ScarfAnimation(this.scene, scarfMesh1);
+        //this._scarf_v2.initializePhysics();
     }
 
     private async initMusic(): Promise<void> {
@@ -187,8 +200,8 @@ export class Player extends TransformNode {
         //init anim
         this._currentAnim = this._animations["idle"];
         this._prevAnim = this._animations["walk"];
-        this._animations["scarf_right"].play(true);
-        this._animations["scarf_left"].play(true);
+        //this._animations["scarf_right"].play(true); // TODO uncomment pour avoir l'anim statique
+        //this._animations["scarf_left"].play(true);
         this._animations["idle"].play(true);
 }
     private _animatePlayer(){
@@ -262,6 +275,7 @@ export class Player extends TransformNode {
             this._currentAnim.play(this._currentAnim.loopAnimation);
             this._prevAnim = this._currentAnim
         }
+        this.isMoving = this._isWalking || this._isJumping || this._isFalling;
 
 
 }
@@ -396,9 +410,13 @@ export class Player extends TransformNode {
         this.updateStaminaBar();
 
         this._updateSounds();
+        this.scarf.update(this._neck, this.isMoving, this);
+        //this._scarf_v2.applyClothPhysics();
     }
 
-
+    public getPosition() {
+        return new Vector3().copyFrom(this.mesh.position);
+    }
 
     private updateStates(shootingSystem: ShootingSystem) {
         if (this._gravity.y <= 0) {
@@ -680,40 +698,39 @@ export class Player extends TransformNode {
         return this._deltaTime;
     }
 
+    public getRotateAroundPlayer(hauteur: number, angle:number, center : Vector3, offset :number  = 1) {
+        let center_copy = new Vector3().copyFrom(center);
+        let x = this.getMeshDirection()._x * offset;
+        let z = this.getMeshDirection()._z * offset;
+        let position = new Vector3().copyFrom(center_copy).addInPlace(new Vector3(x,hauteur,z));
+
+        angle = Tools.ToRadians(angle);
+        const translated = position.subtract(center);
+
+        // Rotation autour de l'axe Y (plan XZ)
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+
+        const rotatedX = translated.x * cos - translated.z * sin;
+        const rotatedZ = translated.x * sin + translated.z * cos;
+
+        const rotated = new Vector3(rotatedX, translated.y, rotatedZ);
+
+        // Retour à la position d'origine
+        return rotated.add(center);
+    }
     private updateSandEmetter(){
         this.hoveringSandEmetter.emitter = new Vector3(0,1.23,0).addInPlace(new Vector3().copyFrom(this.mesh.position));
+
+        this.sandEmetter.emitter = this.getRotateAroundPlayer(1.23, -7, this.getPosition());
+
+        //-- ANGLE d'émission
         let x = this.getMeshDirection()._x;
         let z = this.getMeshDirection()._z;
-        // -- POSITION
-        let center = new Vector3().copyFrom(this.mesh.position);
-
-        let position = center.addInPlace(new Vector3(x,1.23,z));
-
-        function rotateAroundY(vector, center, angle) {
-            // Translation vers l'origine
-            angle = Tools.ToRadians(angle);
-            const translated = vector.subtract(center);
-
-            // Rotation autour de l'axe Y (plan XZ)
-            const cos = Math.cos(angle);
-            const sin = Math.sin(angle);
-
-            const rotatedX = translated.x * cos - translated.z * sin;
-            const rotatedZ = translated.x * sin + translated.z * cos;
-
-            const rotated = new Vector3(rotatedX, translated.y, rotatedZ);
-
-            // Retour à la position d'origine
-            return rotated.add(center);
-        }
-
-        this.sandEmetter.emitter = rotateAroundY(position,new Vector3().copyFrom(this.mesh.position), -7);
-        //-- ANGLE
-
         let orthogonal = new Vector3(-z,0.1,x).scale(1/3);
         let copyDirection = new Vector3().copyFrom(this.getMeshDirection());
         let copyDirection2 = new Vector3().copyFrom(this.getMeshDirection());
-        let min  = copyDirection.subtract(orthogonal);
+        let min = copyDirection.subtract(orthogonal);
         let max = copyDirection2.addInPlace(orthogonal);
         this.sandEmetter.createPointEmitter(min,max);
         //console.log ("direction :", this._direction, " direction sable :",min, ", ", max , " position sable : ", position);

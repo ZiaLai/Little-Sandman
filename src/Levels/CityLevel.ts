@@ -100,7 +100,7 @@ export class CityLevel extends AbstractLevel{
         this.cinematicScene.stop();
 
         if (this._playWelcomeMonolog) {
-            AllMonolog.play(0, this._game);
+            //AllMonolog.play(0, this._game); // TODO uncommment
             this._playWelcomeMonolog = false;
         }
 
