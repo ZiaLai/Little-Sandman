@@ -51,7 +51,7 @@ export class Monolog {
         this.textBlock.text = this.sentences[0];
 
         advancedTexture.addControl(this.textBlock);
-        await FadeText.fadeIn(this.textBlock);
+        await FadeText.fadeIn(this.textBlock, 500);
         const next = Button.CreateSimpleButton("next", "");
         next.width = 100;
         next.height = 100;
@@ -61,7 +61,7 @@ export class Monolog {
             if (canClick){
                 canClick = false;
                 this.current_sentence++;
-                await FadeText.fadeOut(this.textBlock);
+                await FadeText.fadeOut(this.textBlock, 500);
                 if (this.current_sentence > this.sentences.length - 1) {
                     this.isFinished = true;
                     this.textBlock.text = "";
@@ -76,7 +76,7 @@ export class Monolog {
                 else {
                     this.textBlock.text = this.sentences[this.current_sentence];
                     advancedTexture.addControl(this.textBlock);
-                    await FadeText.fadeIn(this.textBlock);
+                    await FadeText.fadeIn(this.textBlock, 500);
                     canClick = true;
                 }
             }
