@@ -58,7 +58,8 @@ export class CityLevel extends AbstractLevel{
     constructor(game: Game, id: number) {
         super(game, id);
         this._name = "city";
-        this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v27.glb";
+        //this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v27.glb";
+        this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v30.glb";
 
         this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', 'https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/city/city_intro.ogg'],
                                                                   ['loop', 'https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/city/city_loop.ogg'  ] ]);
@@ -88,10 +89,6 @@ export class CityLevel extends AbstractLevel{
         zqsd.material = pbr;
 
         // Debug temporaire collider poubelle
-        const trash_collider = this._game.getGameScene().getMeshByName("g");
-        trash_collider.isVisible = false;
-        trash_collider.checkCollisions = true;
-        trash_collider.isPickable = true;
 
         this._initSounds();
         this._addTriggers();
