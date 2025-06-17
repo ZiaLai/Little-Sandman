@@ -41,10 +41,10 @@ export class SugarlessBakery extends AbstractLevel {
 
 
     constructor(game: Game, id: number) {
-        super(game, id);
+        let levelResourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/bakery_level_15.glb";
+        super(game, id, levelResourceName);
         this._isNightmareLevel = true;
         this._name = "sugarless_bakery";
-        this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/bakery_level_15.glb";
 
         this._music = new SeparatedTracksMusic(this._game.getScene(), 2,
                                                 [   ["piano1",  "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/sugarlessBakery/sugarless_bakery-Piano_1.ogg"           ],

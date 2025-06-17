@@ -9,7 +9,7 @@ import {ClearNightmareParticles} from "../util/ClearNightmareParticles";
 
 export abstract class AbstractLevel {
     protected _name: string;
-    protected _ressourceName: string;
+    protected _levelResourceName: string;
     protected _game: Game;
 
     protected _music: Music;
@@ -26,14 +26,15 @@ export abstract class AbstractLevel {
     protected _playWelcomeMonolog: boolean = true;
 
 
-    protected constructor(game: Game, id: number) {
+    protected constructor(game: Game, id: number, levelResourceName: string) {
         this._game = game;
         this._id = id;
         this._isNightmareLevel = false;
+        this._levelResourceName = levelResourceName;
     }
 
     public getRessourceName(): string {
-        return this._ressourceName;
+        return this._levelResourceName;
     }
 
     // Charge la ressource graphique du niveau

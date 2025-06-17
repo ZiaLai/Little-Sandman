@@ -56,10 +56,10 @@ export class CityLevel extends AbstractLevel{
 
 
     constructor(game: Game, id: number) {
-        super(game, id);
+        let levelResourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v30.glb";
+        super(game, id, levelResourceName);
         this._name = "city";
-        //this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v27.glb";
-        this._ressourceName = "https://raw.githubusercontent.com/ZiaLai/Little-Sandman/main/public/models/city_v30.glb";
+
 
         this._music = new IntroLoopMusic(this._game.getScene(), [ ['intro', 'https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/city/city_intro.ogg'],
                                                                   ['loop', 'https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/musics/city/city_loop.ogg'  ] ]);

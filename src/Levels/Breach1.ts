@@ -17,9 +17,9 @@ export class Breach1 extends AbstractLevel {
 
 
     constructor(game: Game, id: number) {
-        super(game, id);
+        super(game, id, "");
         this._name = "breach_1";
-        this._ressourceName = "BRECHE1";
+        this._levelResourceName = "BRECHE1";
 
 
         //this._startPosition = new Vector3(3.74, 0.91, -3.28);
