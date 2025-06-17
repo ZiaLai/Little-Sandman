@@ -1,30 +1,20 @@
 import {AbstractLevel} from "./AbstractLevel";
 import {Game} from "../game";
-import {
-    AbstractMesh,
-    AnimationGroup,
-    FreeCamera, Sound, StaticSound, StreamingSound,
-    Tools,
-} from "@babylonjs/core";
+import {AbstractMesh, AnimationGroup, FreeCamera, StaticSound, Tools, ActionManager, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {CityLevel} from "./CityLevel";
 import {SpawnData} from "../SpawnData";
 import {SugarlessBakery} from "./SugarlessBakery";
-
-enum CameraState {ZOOMING_IN, ZOOMING_OUT, ZOOMED_IN, ZOOMED_OUT }
-
-enum CloudState {HIDDEN, START_APPEARING, APPEARING_1, APPEARING_2, APPEARING_3, APPEARING_4, SHOWN}
-
-
-import {ActionManager, Color3, HemisphericLight, PointLight, Vector3} from "@babylonjs/core";
 import {AllMonolog} from "../data/AllMonolog";
 import {UIActionButton} from "../util/UIActionButton";
 import {PlaySound} from "../AudioControl/PlaySound";
+import {AbstractBedroom} from "./AbstractBedroom";
+import {CloudState} from "../util/CloudState";
 
-export class BakersBedroom extends AbstractLevel {
+export class BakersBedroom extends AbstractBedroom {
     public static START_SPAWN_DATA: SpawnData = new SpawnData(new Vector3(3.89, 2.45, -7.52),
                                                               new Vector3(0, 0, 0),
                                                               null);
-
+/*
     private _CAMERA_ZOOM_IN_TARGET: Vector3 = new Vector3(7.2, 4.3, 4);
     private _CAMERA_ZOOM_OUT_TARGET: Vector3 = new Vector3(4, 3.8, 8);
 
@@ -33,25 +23,27 @@ export class BakersBedroom extends AbstractLevel {
     private _CAMERA_TRIGGER_DISTANCE: number = 6;
 
     private _CLOUD_ANIMATION_DELAY: number = 0.4;
+*/
+    //private _cameraState: CameraState = CameraState.ZOOMING_IN;
+    //private _cloudState: CloudState = CloudState.HIDDEN;
+    //private _cloudTimer: number = 0;
 
-    private _cameraState: CameraState = CameraState.ZOOMING_IN;
-    private _cloudState: CloudState = CloudState.HIDDEN;
-    private _cloudTimer: number = 0;
-
-    private _camera: FreeCamera;
+    //private _camera: FreeCamera;
 
 
-    private _cloudMeshes: AbstractMesh[];
+    //private _cloudMeshes: AbstractMesh[];
     private _baker: { animationGroups: AnimationGroup[]; mesh: AbstractMesh };
     private _bakerHit: boolean;
 
-    private _goodNightSound: StaticSound;
-    private fButton : UIActionButton;
+    //private _goodNightSound: StaticSound;
+    //private fButton : UIActionButton;
 
     constructor(game: Game, id: number) {
-        super(game, id);
+        let levelResourceName = "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/baker_bedroom_v8.glb";
+        let sleeperResourceName = "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/BOULANGERE.glb";
+        super(game, id, levelResourceName, sleeperResourceName);
         this._name = "bakers_bedroom";
-        this._ressourceName = "https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/baker_bedroom_v8.glb";
+
 
     }
 
@@ -67,7 +59,7 @@ export class BakersBedroom extends AbstractLevel {
 
         this._finishedLoading();
     }
-
+    /*
     async initialize(): Promise<void> {
         this._disablePlayerCamera();
 
@@ -95,7 +87,7 @@ export class BakersBedroom extends AbstractLevel {
         //
         // this._game.getScene().beginAnimation(bakersSkeleton, 0, 60, true);
     }
-
+    /*
     private _initCloudMeshes(): void {
         const cloudSphere1 = this._game.getGameScene().getTransformNodeByName("Sphere").getChildMeshes();
         const cloudSphere2 = this._game.getGameScene().getTransformNodeByName("Sphere.001").getChildMeshes();
@@ -158,7 +150,7 @@ export class BakersBedroom extends AbstractLevel {
                 break;
         }
     }
-
+    */
     protected _addTriggers() {
         this._game.getEnvironment().getTriggers().forEach(m => {
             if (m.name.includes("exit")) {
@@ -199,7 +191,7 @@ export class BakersBedroom extends AbstractLevel {
     protected setUpSkydome(): void {
 
     }
-
+    /*
     private async _initBaker() {
         const baker = await this._game.spriteLoader.loadSprite("https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/models/BOULANGERE.glb");
 
@@ -219,7 +211,7 @@ export class BakersBedroom extends AbstractLevel {
 
         baker.animationGroups[0].play(true);
     }
-
+    /*
     private _hideCloud() {
         console.log("in hide cloud, cloudMeshes: ", this._cloudMeshes );
         for (const mesh of this._cloudMeshes) {
@@ -297,7 +289,7 @@ export class BakersBedroom extends AbstractLevel {
                 break;
         }
     }
-
+*/
     doAfterCinematic(): void {
     }
 }
