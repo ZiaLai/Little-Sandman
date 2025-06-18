@@ -1,6 +1,6 @@
 import {AbstractMesh, ActionManager, ExecuteCodeAction, Mesh} from "@babylonjs/core";
 import {Game} from "../game";
-import {GameObject} from "../GameObjects/GameObject";
+import {TransformNodeGameObject} from "../GameObjects/TransformNodeGameObject";
 import {Music} from "../AudioControl/Music";
 import {SeparatedTracksMusic} from "../AudioControl/SeparatedTracksMusic";
 import {SpawnData} from "../SpawnData";
@@ -16,7 +16,7 @@ export abstract class AbstractLevel {
 
     protected _objectsMeshes: {};
     //protected _objects: {} = {}; // Dictionnaire de string name vers une liste de GameObjects
-    protected _objects: GameObject[] = [];
+    protected _objects: TransformNodeGameObject[] = [];
     private _id: number;
     private _loading: boolean;
     protected _isNightmareLevel: boolean;

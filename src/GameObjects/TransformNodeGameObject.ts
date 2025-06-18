@@ -5,7 +5,7 @@ import {
 } from "@babylonjs/core";
 import {Game} from "../game";
 
-export abstract class GameObject {
+export abstract class TransformNodeGameObject {
     protected _meshes: Mesh[];
     protected _game: Game;
     protected _blenderId: string;

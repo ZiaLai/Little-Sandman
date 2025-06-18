@@ -1,8 +1,8 @@
-import {GameObject} from "./GameObject";
+import {TransformNodeGameObject} from "./TransformNodeGameObject";
 
-export class Knife extends GameObject {
+export class Knife extends TransformNodeGameObject {
 
-    constructor(...args: ConstructorParameters<typeof GameObject>) {
+    constructor(...args: ConstructorParameters<typeof TransformNodeGameObject>) {
         super(...args);
 
     }
