@@ -51,7 +51,7 @@ export class Environment {
             }
 
             else if (mesh.name.includes("debug")) {
-                const activateDebug = false;
+                const activateDebug = true;
 
                 mesh.isVisible = activateDebug;
                 mesh.isPickable = activateDebug;
@@ -59,7 +59,7 @@ export class Environment {
             }
             else if (mesh.name.includes("collider")) {
                 // Les colliders sont invisibles et matériels
-                mesh.isVisible = false;
+                // mesh.isVisible = false;
                 mesh.isPickable = true;
             }
 

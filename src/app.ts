@@ -59,7 +59,7 @@ export class App {
     private cinematicTimer = 0;
 
     private EXECUTE_TEST = true;
-    private START_LEVEL = "city";
+    private START_LEVEL = "fatal_error";
     private START_SPAWN_DATA: SpawnData = this.START_LEVEL === "city" ? CityLevel.SKATEPARK_SPAWN_DATA : SpawnData.DEFAULT_VALUE;
 
     constructor() {
@@ -127,8 +127,8 @@ export class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToActivateSound();
-        //await this._goToStart();
+        //await this._goToActivateSound();
+        await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
 

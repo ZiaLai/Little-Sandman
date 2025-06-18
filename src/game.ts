@@ -9,10 +9,11 @@ import {SpriteLoader} from "./SpriteLoader";
 import {App} from "./app";
 import {GameState} from "./GameState";
 import {AdvancedDynamicTexture, Button, Rectangle, StackPanel} from "@babylonjs/gui";
-import {GameObject} from "./GameObjects/GameObject";
+import {TransformNodeGameObject} from "./GameObjects/TransformNodeGameObject";
 import {CinematicData} from "./data/CinematicData";
 import {PauseMenu} from "./util/PauseMenu";
 import {SpawnData} from "./SpawnData";
+import {FatalError} from "./Levels/FatalError";
 
 export class Game {
 
@@ -39,7 +40,7 @@ export class Game {
             new CityLevel(this, 0),
             new BakersBedroom(this, 1),
             new SugarlessBakery(this, 2),
-            new Breach1(this, 3)
+            new FatalError(this, 3)
 
         ];
 
@@ -239,7 +240,7 @@ export class Game {
         return this.getPlayer().getDeltaTime();
     }
 
-    public destroyGameObject(gameObject: GameObject) {
+    public destroyGameObject(gameObject: TransformNodeGameObject) {
         const index: number = this._levels[this._currentLevel].getObjects().indexOf(gameObject);
         if (index !== -1) {
             this._levels[this._currentLevel].getObjects().splice(index, 1);
