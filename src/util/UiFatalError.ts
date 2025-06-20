@@ -20,25 +20,39 @@ export class UiFatalError {
         this.window.height = "100%";
         this.window.alpha = 0.9;
         this.window.thickness = 0;
-        this.window.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        const bgImage = new Image("bg","https://cdn.jsdelivr.net/gh/ZiaLai/Little-Sandman@main/public/textures/etoiles.png");// TODO mettre le fond
+        this.window.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        const bgImage = new Image("bg","/textures/fatal_error-bg.png");// TODO mettre le fond
         this.window.addControl(bgImage);
+        document.fonts.load("32px 'FatalError'").then(() => {
 
-        this.titleblock = new TextBlock();
-        this.titleblock.text = errorTitle;
-        // TODO mettre la police spleciale
-        this.window.addControl(this.titleblock);
+            this.titleblock = new TextBlock();
+            this.titleblock.text = errorTitle;
+            this.titleblock.color = "red";
+            this.titleblock.fontFamily = "FatalError";
+            this.titleblock.fontSize = 90;
+            this.titleblock.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            this.titleblock.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            this.titleblock.resizeToFit = true;
 
-        this.contentBlock = new TextBlock();
-        this.contentBlock.fontFamily = "FatalError-Regular"
-        this.window.addControl(this.contentBlock);
 
-        this.advancedTexture.addControl(this.window);
+            // TODO mettre la police spleciale
+            this.window.addControl(this.titleblock);
+
+            this.contentBlock = new TextBlock();
+            this.contentBlock.color = "red";
+            this.contentBlock.fontFamily = "FatalError";
+            this.contentBlock.fontSize = 50;
+            this.contentBlock.text = errorMessages[0];
+            this.window.addControl(this.contentBlock);
+
+            this.advancedTexture.addControl(this.window);
+        });
     }
 
     public play():void {
         // bloquer joueur
         this._game.getPlayer().addMovementBlock();
+
         const next = Button.CreateSimpleButton("next", "");
         next.width = 100;
         next.height = 100;

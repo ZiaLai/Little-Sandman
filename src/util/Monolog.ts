@@ -15,20 +15,7 @@ export class Monolog {
         this.sentences = sentences;
 
     }
-    private init_textBlock() {
-         this.textBlock = new TextBlock();
-         this.textBlock.color = "#FDF1bf";
-         this.textBlock.fontSize = 34;
-         this.textBlock.fontFamily = "Trebuchet MS";
-         this.textBlock.shadowOffsetX = 1;
-         this.textBlock.shadowBlur = 15;
-         this.textBlock.shadowColor = "#594000FF";
-         this.textBlock.fontWeight = "bold";
-         this.textBlock.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_BOTTOM;
-         this.textBlock.paddingBottom = 100;
-         this.textBlock.alpha = 0;
 
-    }
     public isPlayed(): boolean {
         return this.isFinished;
     }
@@ -70,8 +57,6 @@ export class Monolog {
                     advancedTexture.addControl(next);
                     // debloquer joueur
                     this._game.getPlayer().removeMovementBlock();
-
-                    //TODO détruire ce gui ? (cest la fin de la fonction)
                 }
                 else {
                     this.textBlock.text = this.sentences[this.current_sentence];
